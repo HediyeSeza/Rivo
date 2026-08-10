@@ -1,0 +1,167 @@
+/* ========================================
+   Rivo - Button
+   ======================================== */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-regular);
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    background-color 150ms ease,
+    color 150ms ease,
+    border-color 150ms ease,
+    opacity 150ms ease;
+}
+
+
+/* ========================================
+   Size
+   ======================================== */
+
+.button--large {
+  min-height: 36px;
+  padding: 0 16px;
+
+  font-size: var(--font-size-md);
+}
+
+.button--small {
+  min-height: 32px;
+  padding: 0 14px;
+
+  font-size: var(--font-size-sm);
+}
+
+
+/* ========================================
+   Icon
+   ======================================== */
+
+.button__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+}
+
+.button__content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.button__icon + .button__content {
+  margin-inline-start: 8px;
+}
+
+
+/* ========================================
+   Primary
+   ======================================== */
+
+.button--primary {
+  background-color: var(--button-primary-bg);
+  color: var(--button-primary-text);
+}
+
+.button--primary:hover:not(:disabled) {
+  background-color: var(--button-primary-hover-bg);
+  color: var(--button-primary-hover-text);
+}
+
+.button--primary:disabled {
+  background-color: var(--button-primary-disabled-bg);
+  color: var(--button-primary-disabled-text);
+
+  cursor: not-allowed;
+}
+
+
+/* ========================================
+   Secondary
+   ======================================== */
+
+.button--secondary {
+  background-color: var(--button-secondary-bg);
+  color: var(--button-secondary-text);
+}
+
+.button--secondary:hover:not(:disabled) {
+  background-color: var(--button-secondary-hover-bg);
+  color: var(--button-secondary-hover-text);
+}
+
+.button--secondary:disabled {
+  background-color: var(--button-secondary-disabled-bg);
+  color: var(--button-secondary-disabled-text);
+
+  cursor: not-allowed;
+}
+
+
+/* ========================================
+   Tertiary
+   ======================================== */
+
+.button--tertiary {
+  background-color: var(--button-tertiary-bg);
+  color: var(--button-tertiary-text);
+}
+
+.button--tertiary:hover:not(:disabled) {
+  background-color: var(--button-tertiary-hover-bg);
+  color: var(--button-tertiary-hover-text);
+}
+
+.button--tertiary:disabled {
+  background-color: var(--button-tertiary-disabled-bg);
+  color: var(--button-tertiary-disabled-text);
+
+  cursor: not-allowed;
+}
+
+
+/* ========================================
+   Pure
+   ======================================== */
+
+.button--pure {
+  background-color: var(--button-pure-bg);
+  color: var(--button-pure-text);
+}
+
+.button--pure:hover:not(:disabled) {
+  background-color: var(--button-pure-hover-bg);
+  color: var(--button-pure-hover-text);
+}
+
+.button--pure:disabled {
+  background-color: var(--button-pure-disabled-bg);
+  color: var(--button-pure-disabled-text);
+
+  cursor: not-allowed;
+}
+
+
+/* ========================================
+   Accessibility
+   ======================================== */
+
+.button:focus-visible {
+  outline: 2px solid var(--color-content-primary);
+  outline-offset: 2px;
+}

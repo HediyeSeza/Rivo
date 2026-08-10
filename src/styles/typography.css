@@ -1,0 +1,38 @@
+/* ========================================
+   Rivo - Typography
+   ======================================== */
+
+@font-face {
+  font-family: 'Yekan Bakh';
+  src: url('../assets/fonts/YekanBakh/YekanBakh-Regular.woff2')
+    format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Yekan Bakh';
+  src: url('../assets/fonts/YekanBakh/YekanBakh-Bold.woff2')
+    format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* ---------- Font Family ---------- */
+
+  --font-family-base: 'Yekan Bakh', sans-serif;
+
+  /* ---------- Font Size ---------- */
+
+  --font-size-lg: 20px;
+  --font-size-md: 16px;
+  --font-size-sm: 14px;
+
+  /* ---------- Font Weight ---------- */
+
+  --font-weight-regular: 400;
+  --font-weight-bold: 700;
+}

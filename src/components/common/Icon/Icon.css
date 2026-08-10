@@ -1,0 +1,56 @@
+/* ========================================
+   Rivo - Icon
+   ======================================== */
+
+.icon {
+  position: relative;
+
+  display: inline-flex;
+  flex-shrink: 0;
+
+  align-items: center;
+  justify-content: center;
+}
+
+.icon img {
+  position: absolute;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+}
+
+.icon__dark {
+  display: block;
+}
+
+.icon__light {
+  display: none;
+}
+
+
+/* ========================================
+   Light Theme
+   ======================================== */
+
+:root .icon__dark {
+  display: none;
+}
+
+:root .icon__light {
+  display: block;
+}
+
+
+/* ========================================
+   Dark Theme
+   ======================================== */
+
+.dark .icon__dark {
+  display: block;
+}
+
+.dark .icon__light {
+  display: none;
+}

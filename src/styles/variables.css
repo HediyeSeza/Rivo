@@ -1,0 +1,315 @@
+/* ========================================
+   Rivo - Design Tokens
+   ======================================== */
+
+
+/* ========================================
+   Light Theme
+   ======================================== */
+
+:root {
+  /* ---------- Layout ---------- */
+
+  --color-bg: #ffffff;
+  --color-header: rgb(255 255 255 / 60%);
+  --color-card: #ffffff;
+  --color-border: #e5e5e5;
+
+
+  /* ---------- Border Radius ---------- */
+
+--radius-sm: 6px;
+--radius-md: 12px;
+
+
+  /* ---------- Content ---------- */
+
+  --color-content-primary: #171717;
+  --color-content-secondary: #737373;
+  --color-content-tertiary: #a6a6a6;
+  --color-content-opposite: #fafafa;
+
+
+  /* ---------- Status ---------- */
+
+  --color-red: #ef4444;
+
+
+  /* ---------- Brand ---------- */
+
+  --color-brand-main: #3b82f6;
+  --color-brand-secondary: #7e97c0;
+  --color-brand-tertiary: #8d9cb5;
+
+
+  /* ========================================
+     Button / Primary
+     ======================================== */
+
+  --button-primary-bg: #0a0a0a;
+  --button-primary-text: #fafafa;
+
+  --button-primary-hover-bg: #171717;
+  --button-primary-hover-text: #fafafa;
+
+  --button-primary-disabled-bg: rgb(23 23 23 / 50%);
+  --button-primary-disabled-text: rgb(250 250 250 / 50%);
+
+
+  /* ========================================
+     Button / Secondary
+     ======================================== */
+
+  --button-secondary-bg: #ffffff;
+  --button-secondary-text: #0a0a0a;
+
+  --button-secondary-hover-bg: #fafafa;
+  --button-secondary-hover-text: #171717;
+
+  --button-secondary-disabled-bg: rgb(136 136 136 / 50%);
+  --button-secondary-disabled-text: rgb(23 23 23 / 50%);
+
+
+  /* ========================================
+     Button / Tertiary
+     ======================================== */
+
+  --button-tertiary-bg: #e5e5e5;
+  --button-tertiary-text: #171717;
+
+  --button-tertiary-hover-bg: rgb(229 229 229 / 80%);
+  --button-tertiary-hover-text: #171717;
+
+  --button-tertiary-disabled-bg: rgb(229 229 229 / 25%);
+  --button-tertiary-disabled-text: rgb(38 38 38 / 25%);
+
+
+  /* ========================================
+     Button / Pure
+     ======================================== */
+
+  --button-pure-bg: transparent;
+  --button-pure-text: #171717;
+
+  --button-pure-hover-bg: transparent;
+  --button-pure-hover-text: #171717;
+
+  --button-pure-disabled-bg: transparent;
+  --button-pure-disabled-text: rgb(23 23 23 / 25%);
+
+
+  /* ========================================
+     Input / Text Field
+     ======================================== */
+
+  --input-bg: #ffffff;
+  --input-text: #171717;
+  --input-placeholder: #a6a6a6;
+  --input-border: #e5e5e5;
+
+  /* ---------- Focus ---------- */
+
+  --input-focus-border: #171717;
+
+  /* ---------- Disabled ---------- */
+
+  --input-disabled-bg: #fafafa;
+  --input-disabled-text: #a6a6a6;
+  --input-disabled-placeholder: #a6a6a6;
+  --input-disabled-border: #e5e5e5;
+
+
+  /* ========================================
+     Selection / Like Button
+     ======================================== */
+
+  --like-button-bg: transparent;
+  --like-button-text: #171717;
+  --like-button-icon: #171717;
+
+  /* ---------- Hover ---------- */
+
+  --like-button-hover-bg: #262626;
+  --like-button-hover-text: #ef4444;
+  --like-button-hover-icon: #ef4444;
+
+  /* ---------- Active ---------- */
+
+  --like-button-active-bg: #262626;
+  --like-button-active-text: #ef4444;
+  --like-button-active-icon: #ef4444;
+
+
+  /* ========================================
+     Selection / Chat Button
+     ======================================== */
+
+  --chat-button-bg: transparent;
+  --chat-button-text: #171717;
+  --chat-button-icon: #171717;
+
+  /* ---------- Hover ---------- */
+
+  --chat-button-hover-bg: #262626;
+  --chat-button-hover-text: #3b82f6;
+  --chat-button-hover-icon: #3b82f6;
+
+  /* ---------- Active ---------- */
+
+  --chat-button-active-bg: #262626;
+  --chat-button-active-text: #3b82f6;
+  --chat-button-active-icon: #3b82f6;
+}
+
+
+/* ========================================
+   Dark Theme
+   ======================================== */
+
+.dark {
+  /* ---------- Layout ---------- */
+
+  --color-bg: #0a0a0a;
+  --color-header: rgb(10 10 10 / 60%);
+  --color-card: #0a0a0a;
+  --color-border: #262626;
+
+
+  /* ---------- Content ---------- */
+
+  --color-content-primary: #fafafa;
+  --color-content-secondary: #a3a3a3;
+  --color-content-tertiary: #575757;
+  --color-content-opposite: #171717;
+
+
+  /* ---------- Status ---------- */
+
+  --color-red: #ef4444;
+
+
+  /* ---------- Brand ---------- */
+
+  --color-brand-main: #3b82f6;
+  --color-brand-secondary: #7e97c0;
+  --color-brand-tertiary: #8d9cb5;
+
+
+  /* ========================================
+     Button / Primary
+     ======================================== */
+
+  --button-primary-bg: #fafafa;
+  --button-primary-text: #0a0a0a;
+
+  --button-primary-hover-bg: rgb(250 250 250 / 90%);
+  --button-primary-hover-text: #0a0a0a;
+
+  --button-primary-disabled-bg: rgb(250 250 250 / 50%);
+  --button-primary-disabled-text: rgb(23 23 23 / 50%);
+
+
+  /* ========================================
+     Button / Secondary
+     ======================================== */
+
+  --button-secondary-bg: #0a0a0a;
+  --button-secondary-text: #ffffff;
+
+  --button-secondary-hover-bg: #171717;
+  --button-secondary-hover-text: #fafafa;
+
+  --button-secondary-disabled-bg: rgb(23 23 23 / 50%);
+  --button-secondary-disabled-text: rgb(250 250 250 / 50%);
+
+
+  /* ========================================
+     Button / Tertiary
+     ======================================== */
+
+  --button-tertiary-bg: #262626;
+  --button-tertiary-text: #fafafa;
+
+  --button-tertiary-hover-bg: rgb(38 38 38 / 80%);
+  --button-tertiary-hover-text: #fafafa;
+
+  --button-tertiary-disabled-bg: rgb(38 38 38 / 25%);
+  --button-tertiary-disabled-text: rgb(229 229 229 / 25%);
+
+
+  /* ========================================
+     Button / Pure
+     ======================================== */
+
+  --button-pure-bg: transparent;
+  --button-pure-text: #fafafa;
+
+  --button-pure-hover-bg: transparent;
+  --button-pure-hover-text: #fafafa;
+
+  --button-pure-disabled-bg: transparent;
+  --button-pure-disabled-text: rgb(250 250 250 / 25%);
+
+
+  /* ========================================
+     Input / Text Field
+     ======================================== */
+
+  --input-bg: #0a0a0a;
+  --input-text: #fafafa;
+  --input-placeholder: #575757;
+  --input-border: #262626;
+
+  /* ---------- Focus ---------- */
+
+  --input-focus-border: #fafafa;
+
+  /* ---------- Disabled ---------- */
+
+  --input-disabled-bg: #171717;
+  --input-disabled-text: #575757;
+  --input-disabled-placeholder: #575757;
+  --input-disabled-border: #262626;
+
+
+  /* ========================================
+     Selection / Like Button
+     ======================================== */
+
+  --like-button-bg: transparent;
+  --like-button-text: #fafafa;
+  --like-button-icon: #fafafa;
+
+  /* ---------- Hover ---------- */
+
+  --like-button-hover-bg: #262626;
+  --like-button-hover-text: #ef4444;
+  --like-button-hover-icon: #ef4444;
+
+  /* ---------- Active ---------- */
+
+  --like-button-active-bg: #262626;
+  --like-button-active-text: #ef4444;
+  --like-button-active-icon: #ef4444;
+
+
+  /* ========================================
+     Selection / Chat Button
+     ======================================== */
+
+  --chat-button-bg: transparent;
+  --chat-button-text: #fafafa;
+  --chat-button-icon: #fafafa;
+
+  /* ---------- Hover ---------- */
+
+  --chat-button-hover-bg: #262626;
+  --chat-button-hover-text: #3b82f6;
+  --chat-button-hover-icon: #3b82f6;
+
+  /* ---------- Active ---------- */
+
+  --chat-button-active-bg: #262626;
+  --chat-button-active-text: #3b82f6;
+  --chat-button-active-icon: #3b82f6;
+}

@@ -1,0 +1,166 @@
+/* ========================================
+   Rivo - Input
+   ======================================== */
+
+
+/* ========================================
+   Wrapper
+   ======================================== */
+
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  width: 100%;
+}
+
+
+/* ========================================
+   Label
+   ======================================== */
+
+.input-label {
+  color: var(--color-content-primary);
+
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+
+  cursor: text;
+}
+
+
+/* ========================================
+   Input Base
+   ======================================== */
+
+.input {
+  width: 100%;
+  min-height: 60px;
+
+  padding: 0 18px;
+
+  background-color: var(--input-bg);
+  color: var(--input-text);
+
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+
+  outline: none;
+
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    color 150ms ease;
+
+  box-sizing: border-box;
+}
+
+
+/* ========================================
+   Placeholder
+   ======================================== */
+
+.input::placeholder {
+  color: var(--input-placeholder);
+  opacity: 1;
+}
+
+
+/* ========================================
+   Hover
+   ======================================== */
+
+.input:hover:not(:disabled) {
+  border-color: var(--input-focus-border);
+}
+
+
+/* ========================================
+   Focus
+   ======================================== */
+
+.input:focus {
+  border-color: var(--input-focus-border);
+}
+
+
+/* ========================================
+   Disabled
+   ======================================== */
+
+.input:disabled {
+  background-color: var(--input-disabled-bg);
+  color: var(--input-disabled-text);
+
+  border-color: var(--input-disabled-border);
+
+  cursor: not-allowed;
+}
+
+.input:disabled::placeholder {
+  color: var(--input-disabled-placeholder);
+}
+
+
+/* ========================================
+   Textarea
+   ======================================== */
+
+.input--textarea {
+  min-height: 120px;
+
+  padding: 16px 18px;
+
+  resize: vertical;
+
+  line-height: 24px;
+}
+
+
+/* ========================================
+   Error
+   ======================================== */
+
+.input-wrapper--error .input {
+  border-color: var(--color-red);
+}
+
+.input-wrapper--error .input:focus {
+  border-color: var(--color-red);
+}
+
+
+/* ========================================
+   Error Message
+   ======================================== */
+
+.input-error {
+  color: var(--color-red);
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+}
+
+
+/* ========================================
+   Helper Text
+   ======================================== */
+
+.input-helper {
+  color: var(--color-content-secondary);
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+}
