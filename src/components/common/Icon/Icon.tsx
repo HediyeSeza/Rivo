@@ -1,5 +1,17 @@
 import './Icon.css';
 
+import menuDark from '../../../assets/icons/Dark/Menu.svg';
+import menuLight from '../../../assets/icons/Light/Menu.svg';
+
+import logoutDark from '../../../assets/icons/Dark/logout.svg';
+import logoutLight from '../../../assets/icons/Light/logout.svg';
+
+import calendarDark from '../../../assets/icons/Dark/Calendar.svg';
+import calendarLight from '../../../assets/icons/Light/Calendar.svg';
+
+import postDark from '../../../assets/icons/Dark/Post.svg';
+import postLight from '../../../assets/icons/Light/Post.svg';
+
 import chatDark from '../../../assets/icons/Dark/Chat.svg';
 import chatLight from '../../../assets/icons/Light/Chat.svg';
 
@@ -103,6 +115,26 @@ const icons = {
   Tash: {
     dark: tashDark,
     light: tashLight,
+  },
+
+  Menu: {
+    dark: menuDark,
+    light: menuLight,
+  },
+
+  Logout: {
+    dark: logoutDark,
+    light: logoutLight,
+  },
+
+  Calendar: {
+    dark: calendarDark,
+    light: calendarLight,
+  },
+
+  Post: {
+    dark: postDark,
+    light: postLight,
   },
 } as const;
 
