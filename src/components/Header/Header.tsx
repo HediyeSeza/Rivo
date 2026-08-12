@@ -1,61 +1,121 @@
+import { useState } from "react";
+
 import Logo from "../common/Logo/Logo";
 import Icon from "../common/Icon/Icon";
 import Button from "../common/Button/Button";
-import { useState } from "react";
 import MobileMenu from "./MobileMenu/MobileMenu";
+
+import { useTheme } from "../../context/ThemeContext";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const { theme, toggleTheme } = useTheme();
+
   return (
-    <header className="flex w-full h-16 items-center justify-between border border-[#E5E5E5] fixed left-0 right-0 top-0 z-40 bg-white/30 backdrop-blur-xl dark:bg-[#0A0A0A99]">
+    <header
+      className="
+        fixed left-0 right-0 top-0 z-40
+        flex h-16 w-full items-center justify-between
+        border-b border-black/10
+        bg-white/30
+        backdrop-blur-xl
+        dark:border-white/10
+        dark:bg-black/30
+      "
+    >
+      {/* Logo */}
       <div className="flex items-center pl-2">
         <Logo />
-        <h1 className="font-bold text-xl text-[]">ivo</h1>
+
+        <h1 className="text-xl font-bold text-black dark:text-white">
+          ivo
+        </h1>
       </div>
 
-      <nav className="flex items-center gap-4 mr-2 relative">
-        <button>
-          <div className="flex border border-[#E5E5E5] bg-white hover:bg-gray-100 rounded-md items-center justify-center p-2 drop-shadow-2xl">
-            <Icon name="Light" size={16} />
-          </div>
-        </button>
+      <nav className="relative mr-2 flex items-center gap-4">
+
+        {/* Theme Toggle */}
+       <button
+  type="button"
+  onClick={toggleTheme}
+  className="
+    flex h-10 w-10 items-center justify-center
+    rounded-xl
+    !border
+  !border-gray-300
+  !bg-transparent
+    border border-black/10
+    bg-transparent
+    transition-all duration-200
+    hover:bg-black/5
+    dark:border-white/10
+    dark:hover:bg-white/5
+  "
+>
+  <Icon
+    name={theme === "dark" ? "Moon" : "Light"}
+    size={18}
+  />
+</button>
+
+        {/* Mobile Menu */}
         <Button
           className="md:!hidden"
           variant="primary"
           icon={<Icon name="Person" size={18} />}
           onClick={() => setIsMenuOpen(true)}
         >
-          <span></span>
+          <span />
         </Button>
-        <MobileMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+
+        <MobileMenu
+          isOpen={isMenuOpen}
+          onClose={() => setIsMenuOpen(false)}
+        />
+
+        {/* Home */}
         <Button
           className="!hidden md:!flex"
           variant="secondary"
           icon={<Icon name="Home" size={18} />}
         >
-          <span className="font-normal text-[14px]">Home</span>
+          <span className="text-[14px] font-normal">
+            Home
+          </span>
         </Button>
+
+        {/* Notification */}
         <Button
           className="!hidden md:!flex"
           variant="secondary"
           icon={<Icon name="notif" size={18} />}
         >
-          <span className="font-normal text-[14px]">Notification</span>
+          <span className="text-[14px] font-normal">
+            Notification
+          </span>
         </Button>
+
+        {/* Profile */}
         <Button
           className="!hidden md:!flex"
           variant="secondary"
           icon={<Icon name="Person" size={18} />}
         >
-          <span className="font-normal text-[14px]">Profile</span>
+          <span className="text-[14px] font-normal">
+            Profile
+          </span>
         </Button>
+
+        {/* Logout */}
         <Button
-          className="!hidden md:!flex w-2 "
+          className="!hidden md:!flex"
           variant="secondary"
-          icon={<Icon name="Tash" size={18} />}
+          icon={<Icon name="Logout" size={18} />}
         >
-          <span></span>
+          <span />
         </Button>
+
       </nav>
     </header>
   );
