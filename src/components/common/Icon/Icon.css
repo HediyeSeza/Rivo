@@ -21,27 +21,17 @@
   object-fit: contain;
 }
 
-.icon__dark {
-  display: block;
-}
-
-.icon__light {
-  display: none;
-}
-
-
 /* ========================================
    Light Theme
    ======================================== */
 
-:root .icon__dark {
+.icon__dark {
   display: none;
 }
 
-:root .icon__light {
+.icon__light {
   display: block;
 }
-
 
 /* ========================================
    Dark Theme
