@@ -1,16 +1,13 @@
-import './Logo.css';
+import "./Logo.css";
 
-import logo from '../../../assets/logo/Rivo.svg';
+import logo from "../../../assets/logo/Rivo.png";
 
 interface LogoProps {
   size?: number;
   className?: string;
 }
 
-const Logo = ({
-  size = 32,
-  className = '',
-}: LogoProps) => {
+const Logo = ({ size = 32, className = "" }: LogoProps) => {
   return (
     <img
       className={`logo ${className}`}
