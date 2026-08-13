@@ -1,12 +1,14 @@
 import Button from "./components/common/Button/Button";
 import Icon from "./components/common/Icon/Icon";
 import Header from "./components/Header/Header";
+import Home from "./pages/Home/Home";
 
 function App() {
   return (
     <>
       <Header />
-      <div
+      <Home />
+      {/* <div
         style={{
           display: "flex",
           flexDirection: "column",
@@ -103,7 +105,7 @@ function App() {
         >
           Sign Up
         </Button>
-      </div>
+      </div> */}
     </>
   );
 }
