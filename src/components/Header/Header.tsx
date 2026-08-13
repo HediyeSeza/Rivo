@@ -28,18 +28,15 @@ function Header() {
       <div className="flex items-center pl-2">
         <Logo />
 
-        <h1 className="text-xl font-bold text-black dark:text-white">
-          ivo
-        </h1>
+        <h1 className="text-xl font-bold text-black dark:text-white">ivo</h1>
       </div>
 
       <nav className="relative mr-2 flex items-center gap-4">
-
         {/* Theme Toggle */}
-       <button
-  type="button"
-  onClick={toggleTheme}
-  className="
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="
     flex h-10 w-10 items-center justify-center
     rounded-xl
     !border
@@ -52,27 +49,21 @@ function Header() {
     dark:border-white/10
     dark:hover:bg-white/5
   "
->
-  <Icon
-    name={theme === "dark" ? "Moon" : "Light"}
-    size={18}
-  />
-</button>
+        >
+          <Icon name={theme === "dark" ? "Moon" : "Light"} size={18} />
+        </button>
 
         {/* Mobile Menu */}
         <Button
-          className="md:!hidden"
+          className="md:!hidden w-0"
           variant="primary"
-          icon={<Icon name="Person" size={18} />}
+          icon={<Icon name="Menu" size={18} />}
           onClick={() => setIsMenuOpen(true)}
         >
           <span />
         </Button>
 
-        <MobileMenu
-          isOpen={isMenuOpen}
-          onClose={() => setIsMenuOpen(false)}
-        />
+        <MobileMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
 
         {/* Home */}
         <Button
@@ -80,9 +71,7 @@ function Header() {
           variant="secondary"
           icon={<Icon name="Home" size={18} />}
         >
-          <span className="text-[14px] font-normal">
-            Home
-          </span>
+          <span className="text-[14px] font-normal">Home</span>
         </Button>
 
         {/* Notification */}
@@ -91,9 +80,7 @@ function Header() {
           variant="secondary"
           icon={<Icon name="notif" size={18} />}
         >
-          <span className="text-[14px] font-normal">
-            Notification
-          </span>
+          <span className="text-[14px] font-normal">Notification</span>
         </Button>
 
         {/* Profile */}
@@ -102,9 +89,7 @@ function Header() {
           variant="secondary"
           icon={<Icon name="Person" size={18} />}
         >
-          <span className="text-[14px] font-normal">
-            Profile
-          </span>
+          <span className="text-[14px] font-normal">Profile</span>
         </Button>
 
         {/* Logout */}
@@ -115,7 +100,6 @@ function Header() {
         >
           <span />
         </Button>
-
       </nav>
     </header>
   );
