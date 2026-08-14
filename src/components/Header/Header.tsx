@@ -15,14 +15,16 @@ function Header() {
   return (
     <header
       className="
-        fixed left-0 right-0 top-0 z-40
-        flex h-16 w-full items-center justify-between
-        border-b border-black/10
-        bg-white/30
-        backdrop-blur-xl
-        dark:border-white/10
-        dark:bg-black/30
-      "
+    fixed left-0 right-0 top-0 z-40
+    flex h-16 w-full items-center justify-between
+    border-b
+    border-black/10
+    bg-white/80
+    backdrop-blur-xl
+    transition-colors duration-300
+    dark:border-white/10
+    dark:bg-[#0A0A0A99]
+  "
     >
       {/* Logo */}
       <div className="flex items-center pl-2">
@@ -39,9 +41,6 @@ function Header() {
           className="
     flex h-10 w-10 items-center justify-center
     rounded-xl
-    !border
-  !border-gray-300
-  !bg-transparent
     border border-black/10
     bg-transparent
     transition-all duration-200
