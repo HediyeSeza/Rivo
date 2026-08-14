@@ -1,8 +1,14 @@
 import Icon from "../common/Icon/Icon";
+import { useTheme } from "../../context/ThemeContext";
 
 const ProfileSidebar = () => {
+  const { theme } = useTheme();
+
+  console.log("Sidebar theme:", theme);
+
+  console.log("Sidebar theme:", theme);
   return (
-    <aside className="fixed w-[294px] rounded-2xl border border-[#E5E5E5] bg-white p-5 shadow-sm">
+    <aside className="fixed w-[294px] rounded-2xl border border-[#E5E5E5] bg-white p-5 shadow-sm dark:bg-[#0A0A0A] dark:border-[#262626]">
       <div className="flex justify-center items-center w-[246px]">
         <div className="w-full">
           {/* Profile */}
