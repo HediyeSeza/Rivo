@@ -1,0 +1,228 @@
+/* ========================================
+   RegisterForm Styles
+   ======================================== */
+
+.register-form-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 100vh;
+  width: 100%;
+
+  background-color: var(--color-bg);
+  padding: 20px;
+  gap: 16px;
+}
+
+.register-form-container {
+  width: 100%;
+  max-width: 900px;
+}
+
+.register-form-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.register-form-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  padding: 40px 32px;
+}
+
+.register-form-image-placeholder {
+  background-color: var(--color-bg);
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.register-form-image {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  max-height: 100%;
+}
+
+/* ========================================
+   Back Button
+   ======================================== */
+
+.register-form-back-button {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: var(--color-brand-main);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  padding: 0;
+  margin-bottom: 12px;
+
+  transition: color 150ms ease;
+}
+
+.register-form-back-button:hover {
+  color: var(--color-brand-secondary);
+  text-decoration: underline;
+}
+
+/* ========================================
+   Title & Subtitle
+   ======================================== */
+
+.register-form-title {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 2px;
+  padding-top: 20px;
+
+  color: var(--color-content-primary);
+  margin: 0;
+  text-align: center;
+}
+
+.register-form-subtitle {
+  font-size: 14px;
+  line-height: 20px;
+
+  color: var(--color-content-secondary);
+  margin: 0;
+  text-align: center;
+}
+
+/* ========================================
+   Form
+   ======================================== */
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.register-form-submit {
+  width: 100% !important;
+  min-height: 36px;
+  font-size: 14px !important;
+}
+
+/* ========================================
+   Footer
+   ======================================== */
+
+.register-form-footer {
+  text-align: center;
+}
+
+.register-form-footer-text {
+  font-size: 14px;
+  line-height: 20px;
+
+  color: var(--color-content-secondary);
+}
+
+.register-form-link {
+  background: none;
+  border: none;
+  color: var(--color-brand-main);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  padding: 0;
+
+  transition: color 150ms ease;
+}
+
+.register-form-link:hover {
+  color: var(--color-brand-secondary);
+  text-decoration: underline;
+}
+
+/* ========================================
+   Policy
+   ======================================== */
+
+.register-form-policy {
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+
+  color: var(--color-content-tertiary);
+  width: 100%;
+  max-width: 1200px;
+}
+
+.register-form-policy p {
+  margin: 0;
+}
+
+.register-form-policy-link {
+  color: var(--color-brand-main);
+  text-decoration: none;
+
+  transition: color 150ms ease;
+}
+
+.register-form-policy-link:hover {
+  color: var(--color-brand-secondary);
+  text-decoration: underline;
+}
+
+/* ========================================
+   Responsive
+   ======================================== */
+
+@media (max-width: 768px) {
+  .register-form-wrapper {
+    grid-template-columns: 1fr;
+  }
+
+  .register-form-image-placeholder {
+    display: none;
+  }
+}
+
+/* ========================================
+   Dark Mode
+   ======================================== */
+
+.dark .register-form-main {
+  background-color: var(--color-content-opposite);
+}
+
+.dark .register-form-wrapper {
+  background-color: var(--button-secondary-hover-bg);
+  border-color: var(--button-tertiary-bg);
+}
+
+.dark .register-form-image-placeholder {
+  background-color: var(--color-content-opposite);
+}
+
+@media (max-width: 640px) {
+  .register-form-content {
+    padding: 32px 20px;
+    gap: 20px;
+  }
+
+  .register-form-title {
+    font-size: 20px;
+  }
+}
