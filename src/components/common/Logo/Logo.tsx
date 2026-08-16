@@ -1,8 +1,8 @@
 import "./Logo.css";
 
+import { useTheme } from "../../../context/ThemeContext";
 import lightLogo from "../../../assets/icons/Light/Rivo.png";
 import darkLogo from "../../../assets/icons/Dark/Rivo.png";
-import { useTheme } from "../../../context/ThemeContext";
 
 interface LogoProps {
   size?: number;
@@ -12,13 +12,10 @@ interface LogoProps {
 const Logo = ({ size = 32, className = "" }: LogoProps) => {
   const { theme } = useTheme();
 
-  const isDark = theme === "dark";
-  const logoSrc = isDark ? darkLogo : lightLogo;
-
   return (
     <img
       className={`logo ${className}`}
-      src={logoSrc}
+      src={theme === "dark" ? darkLogo : lightLogo}
       alt="Rivo"
       style={{
         width: size,
@@ -29,3 +26,5 @@ const Logo = ({ size = 32, className = "" }: LogoProps) => {
 };
 
 export default Logo;
+
+
