@@ -6,9 +6,9 @@ const Home = () => {
   const isAuthenticated = false;
 
   return (
-    <main className="mx-auto grid w-full grid-cols-1 gap-7 px-4 pt-24 md:grid-cols-[280px_minmax(0,1fr)] lg:grid-cols-[280px_minmax(0,1fr)_380px]">
+    <main className="mx-auto grid w-full grid-cols-1 gap-7 px-3 pt-24 md:grid-cols-[280px_minmax(0,1fr)] lg:grid-cols-[280px_minmax(0,1fr)_380px]">
       {/* Left Sidebar */}
-      <aside className="hidden md:block">
+      <aside className="hidden lg:block">
         {!isAuthenticated && <WelcomeSection />}
       </aside>
 

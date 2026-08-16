@@ -15,8 +15,8 @@ const ProfileCard = () => {
         bg-white
         p-5
         shadow-sm
-        dark:border-[#262626]
-        dark:bg-[#0A0A0A]
+        dark:border-[#313131]
+        dark:bg-[#191919]
       "
     >
       <div className="w-full">
