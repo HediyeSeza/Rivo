@@ -22,6 +22,7 @@ const RecommendedUsers = () => {
   return (
     <aside
       className="
+      h-[280px]
     w-full rounded-2xl
     border border-[#E5E5E5]
     bg-white
