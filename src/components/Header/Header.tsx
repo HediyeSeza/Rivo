@@ -37,7 +37,7 @@ function Header() {
       >
         <Logo />
 
-        <h1 className="text-xl font-bold text-black dark:text-white">
+        <h1 className="text-xl font-bold mt-1 text-black dark:text-white">
           ivo
         </h1>
       </button>
