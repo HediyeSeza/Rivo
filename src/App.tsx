@@ -5,6 +5,7 @@ import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import Home from "./pages/Home/Home";
 import Notifications from "./pages/Notifications/Notifications";
+import NotFound from "./pages/NotFound/NotFound";
 
 function AppContent() {
   const location = useLocation();
@@ -20,6 +21,7 @@ function AppContent() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/notifications" element={<Notifications />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );
