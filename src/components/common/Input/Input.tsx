@@ -1,49 +1,36 @@
-import './Input.css';
+import type { InputHTMLAttributes } from "react";
+import "./Input.css";
 
-interface InputProps {
+interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
-  placeholder?: string;
-  value?: string;
-  disabled?: boolean;
   error?: string;
   helperText?: string;
 }
 
 const Input = ({
   label,
-  placeholder,
-  value,
-  disabled = false,
   error,
   helperText,
+  className = "",
+  type = "text",
+  disabled = false,
+  ...props
 }: InputProps) => {
   return (
-    <div className={`input-wrapper ${error ? 'input-wrapper--error' : ''}`}>
-      {label && (
-        <label className="input-label">
-          {label}
-        </label>
-      )}
+    <div className={`input-wrapper ${error ? "input-wrapper--error" : ""}`}>
+      {label && <label className="input-label">{label}</label>}
 
       <input
-        className="input"
-        type="text"
-        placeholder={placeholder}
-        value={value}
+        className={`input ${className}`}
+        type={type}
         disabled={disabled}
-        readOnly={value !== undefined}
+        {...props}
       />
 
-      {error && (
-        <span className="input-error">
-          {error}
-        </span>
-      )}
+      {error && <span className="input-error">{error}</span>}
 
       {!error && helperText && (
-        <span className="input-helper">
-          {helperText}
-        </span>
+        <span className="input-helper">{helperText}</span>
       )}
     </div>
   );
