@@ -44,3 +44,19 @@
 .dark .icon__light {
   display: none;
 }
+
+.icon--reverse-theme .icon__dark {
+  display: block;
+}
+
+.icon--reverse-theme .icon__light {
+  display: none;
+}
+
+.dark .icon--reverse-theme .icon__dark {
+  display: none;
+}
+
+.dark .icon--reverse-theme .icon__light {
+  display: block;
+}
