@@ -8,13 +8,30 @@ const ProfileSidebar = () => {
 
   console.log("Sidebar theme:", theme);
   return (
-    <aside className="fixed w-[294px] rounded-2xl border border-[#E5E5E5] bg-white p-5 shadow-sm dark:bg-[#0A0A0A] dark:border-[#262626]">
-      <div className="flex justify-center items-center w-[246px]">
+    <aside
+      className="
+        fixed
+        left-6
+        top-24
+        w-[230px]
+        xl:w-[294px]
+        2xl:w-[358px]
+        rounded-2xl
+        border border-[#E5E5E5]
+        bg-white
+        p-5
+        shadow-sm
+        transition-colors duration-300
+        dark:border-[#262626]
+        dark:bg-[#191919]
+      "
+    >
+      <div className="flex justify-center items-center">
         <div className="w-full">
           {/* Profile */}
           <div className="flex flex-col items-center">
             <img
-              src="/profile.png"
+              src="src\assets\Avatar\a.png"
               alt="Profile"
               className="h-20 w-20 rounded-full object-cover"
             />
