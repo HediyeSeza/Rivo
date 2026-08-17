@@ -8,15 +8,16 @@ const Notifications = () => {
         mx-auto
         grid
         w-full
+        max-w-[1450px]
         grid-cols-1
-        gap-7
+        gap-6
         px-4
         pt-24
-        md:grid-cols-[280px_minmax(0,1fr)]
+        md:grid-cols-[350px_minmax(0,1fr)]
       "
     >
       {/* Left Sidebar */}
-      <aside className="hidden md:block">
+      <aside className="hidden min-w-0 md:block">
         <ProfileSidebar />
       </aside>
 
@@ -24,11 +25,12 @@ const Notifications = () => {
       <section
         className="
           min-w-0
+          w-full
           rounded-xl
           border
           border-[var(--color-border)]
           bg-[var(--color-card)]
-          p-6
+          p-7
           text-[var(--color-content-primary)]
           shadow-[0_2px_8px_rgba(0,0,0,0.08)]
           transition-colors
@@ -70,7 +72,7 @@ const Notifications = () => {
         </div>
 
         {/* Notifications List */}
-        <div className="mt-6">
+        <div className="mt-7">
           <NotificationsList />
         </div>
       </section>

@@ -11,8 +11,6 @@ const EditProfileModal = ({ isOpen, onClose }: EditProfileModalProps) => {
   const [location, setLocation] = useState("");
   const [website, setWebsite] = useState("");
 
-  if (!isOpen) return null;
-
   const handleSave = () => {
     // فعلاً فقط برای تست
     console.log({
@@ -26,22 +24,44 @@ const EditProfileModal = ({ isOpen, onClose }: EditProfileModalProps) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+    <div
+      className={`
+        fixed inset-0 z-50
+        flex items-center justify-center
+        bg-black/50 px-4
+
+        transition-opacity duration-300 ease-in-out
+
+        ${
+          isOpen
+            ? "pointer-events-auto opacity-100"
+            : "pointer-events-none opacity-0"
+        }
+      `}
+    >
       <div
-        className="
-          w-full max-w-[500px]
-          h-full max-h-[570px]
+        className={`
+          w-full max-w-[575px]
           rounded-lg
           border border-[#E5E5E5]
           bg-white
-          p-5
+          p-7
           shadow-xl
+
+          transition-all duration-300 ease-in-out
+
+          ${
+            isOpen
+              ? "translate-y-0 scale-100 opacity-100"
+              : "translate-y-2 scale-95 opacity-0"
+          }
+
           dark:border-[#262626]
           dark:bg-[#0A0A0A]
-        "
+        `}
       >
         {/* Header */}
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-8 flex items-center justify-between">
           <h2 className="text-[21px] font-semibold">Edit Profile</h2>
 
           <button
@@ -56,7 +76,7 @@ const EditProfileModal = ({ isOpen, onClose }: EditProfileModalProps) => {
               dark:hover:text-white
             "
           >
-            ×
+            X
           </button>
         </div>
 
@@ -79,7 +99,7 @@ const EditProfileModal = ({ isOpen, onClose }: EditProfileModalProps) => {
               transition
               focus:border-black
               dark:border-[#262626]
-              dark:bg-[#0A0A0A]
+              dark:bg-[#191919]
               dark:focus:border-white
             "
           />
@@ -94,7 +114,7 @@ const EditProfileModal = ({ isOpen, onClose }: EditProfileModalProps) => {
             onChange={(e) => setBio(e.target.value)}
             placeholder="Enter your Bio"
             className="
-              h-36
+              h-26
               w-full
               resize-none
               rounded-lg
@@ -105,7 +125,7 @@ const EditProfileModal = ({ isOpen, onClose }: EditProfileModalProps) => {
               transition
               focus:border-black
               dark:border-[#262626]
-              dark:bg-[#0A0A0A]
+              dark:bg-[#191919]
               dark:focus:border-white
             "
           />
@@ -131,7 +151,7 @@ const EditProfileModal = ({ isOpen, onClose }: EditProfileModalProps) => {
               transition
               focus:border-black
               dark:border-[#262626]
-              dark:bg-[#0A0A0A]
+              dark:bg-[#191919]
               dark:focus:border-white
             "
           />
@@ -157,7 +177,7 @@ const EditProfileModal = ({ isOpen, onClose }: EditProfileModalProps) => {
               transition
               focus:border-black
               dark:border-[#262626]
-              dark:bg-[#0A0A0A]
+              dark:bg-[#191919]
               dark:focus:border-white
             "
           />
