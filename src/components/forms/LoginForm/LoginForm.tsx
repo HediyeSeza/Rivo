@@ -3,11 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { useTheme } from "../../../context/ThemeContext";
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
+import backIcon from "../../../assets/icons/Light/back.svg";
+import eyeIcon from "../../../assets/icons/Light/eye.svg";
+import closeEyeIcon from "../../../assets/icons/Light/close-eye.svg";
 import "./LoginForm.css";
 
 const LoginForm = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -73,15 +77,17 @@ const LoginForm = () => {
       <div className="login-form-container">
         <div className="login-form-wrapper">
           <div className="login-form-content">
-            <button
-              type="button"
-              className="login-form-back-button"
-              onClick={handleBackHome}
-              aria-label="Back to home"
-            >
-              ← Home
-            </button>
-            <h1 className="login-form-title">Welcome back</h1>
+            <div className="login-form-header">
+              <button
+                type="button"
+                className="login-form-back-button"
+                onClick={handleBackHome}
+                aria-label="Back to home"
+              >
+                <img src={backIcon} alt="Back" />
+              </button>
+              <h1 className="login-form-title">Welcome back</h1>
+            </div>
             <p className="login-form-subtitle">
               Login to your Socially account
             </p>
@@ -99,12 +105,19 @@ const LoginForm = () => {
 
               <Input
                 label="Password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder="Enter your password"
                 value={formData.password}
                 onChange={handleChange}
                 error={errors.password}
+                rightIcon={
+                  <img
+                    src={showPassword ? closeEyeIcon : eyeIcon}
+                    alt={showPassword ? "Hide password" : "Show password"}
+                  />
+                }
+                onRightIconClick={() => setShowPassword(!showPassword)}
               />
 
               <Button

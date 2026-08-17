@@ -3,11 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { useTheme } from "../../../context/ThemeContext";
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
+import backIcon from "../../../assets/icons/Light/back.svg";
+import eyeIcon from "../../../assets/icons/Light/eye.svg";
+import closeEyeIcon from "../../../assets/icons/Light/close-eye.svg";
 import "./RegisterForm.css";
 
 const RegisterForm = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -81,17 +85,19 @@ const RegisterForm = () => {
       <div className="register-form-container">
         <div className="register-form-wrapper">
           <div className="register-form-content">
-            <button
-              type="button"
-              className="register-form-back-button"
-              onClick={handleBackHome}
-              aria-label="Back to home"
-            >
-              ← Home
-            </button>
-            <h1 className="register-form-title">Create your account</h1>
+            <div className="register-form-header">
+              <button
+                type="button"
+                className="register-form-back-button"
+                onClick={handleBackHome}
+                aria-label="Back to home"
+              >
+                <img src={backIcon} alt="Back" />
+              </button>
+              <h1 className="register-form-title">Create your account</h1>
+            </div>
             <p className="register-form-subtitle">
-              Enter your email below to create your account
+              Enter your details below to create your account
             </p>
 
             <form className="register-form" onSubmit={handleSubmit}>
@@ -117,12 +123,19 @@ const RegisterForm = () => {
 
               <Input
                 label="Password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder="Enter your password"
                 value={formData.password}
                 onChange={handleChange}
                 error={errors.password}
+                rightIcon={
+                  <img
+                    src={showPassword ? closeEyeIcon : eyeIcon}
+                    alt={showPassword ? "Hide password" : "Show password"}
+                  />
+                }
+                onRightIconClick={() => setShowPassword(!showPassword)}
               />
 
               <Button
@@ -150,9 +163,9 @@ const RegisterForm = () => {
           </div>
 
           <div className="register-form-image-placeholder">
-            <img 
-              src={theme === "dark" ? "/Rivo-dark.png" : "/Rivo.png"} 
-              alt="Rivo Logo" 
+            <img
+              src={theme === "dark" ? "/Rivo-dark.png" : "/Rivo.png"}
+              alt="Rivo Logo"
               className="register-form-image"
             />
           </div>
