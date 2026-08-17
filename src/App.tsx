@@ -17,19 +17,19 @@ function AppContent() {
     <>
       {!isAuthPage && <Header />}
 
+      {/* <Routes> */}
+      {/* <Route path="/" element={<Home />} /> */}
       <Routes>
         <Route path="/" element={<Home />} />
-<Routes>
-  <Route path="/" element={<Home />} />
 
-  <Route path="/login" element={<Login />} />
-  <Route path="/register" element={<Register />} />
-  <Route path="/notifications" element={<Notifications />} />
-  <Route path="/profile" element={<Profile />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/notifications" element={<Notifications />} />
+        <Route path="/profile" element={<Profile />} />
 
-  <Route path="*" element={<NotFound />} />
-</Routes>
+        <Route path="*" element={<NotFound />} />
       </Routes>
+      {/* </Routes> */}
     </>
   );
 }
@@ -38,5 +38,4 @@ function App() {
   return <AppContent />;
 }
 
-export default App;
 export default App;
