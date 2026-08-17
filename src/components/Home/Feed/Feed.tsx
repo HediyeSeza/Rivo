@@ -32,7 +32,7 @@ const posts = [
     comments: 8,
   },
   {
-    id: 1,
+    id: 4,
     name: "Amin",
     username: "amin",
     createdAt: "2025-08-15T10:00:00Z",
@@ -42,7 +42,7 @@ const posts = [
     comments: 5,
   },
   {
-    id: 2,
+    id: 5,
     name: "Sara",
     username: "sara",
     createdAt: "2025-08-15T08:00:00Z",
@@ -52,7 +52,7 @@ const posts = [
     comments: 3,
   },
   {
-    id: 3,
+    id: 6,
     name: "Matin",
     username: "matin",
     createdAt: "2025-08-14T12:00:00Z",
@@ -65,25 +65,22 @@ const posts = [
 
 const Feed = () => {
   return (
-    <section
-      className="
-        flex
-        w-full
-        flex-col
-        gap-4
-      "
-    >
-      {posts.map((post) => (
-        <PostCard
-          key={post.id}
-          name={post.name}
-          username={post.username}
-          createdAt={post.createdAt}
-          content={post.content}
-          likes={post.likes}
-          comments={post.comments}
-        />
-      ))}
+    <section className="w-full px-3">
+  <div className="w-full">
+        <div className="flex flex-col gap-4">
+          {posts.map((post) => (
+            <PostCard
+              key={post.id}
+              name={post.name}
+              username={post.username}
+              createdAt={post.createdAt}
+              content={post.content}
+              likes={post.likes}
+              comments={post.comments}
+            />
+          ))}
+        </div>
+      </div>
     </section>
   );
 };

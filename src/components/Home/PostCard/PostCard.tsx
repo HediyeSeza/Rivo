@@ -69,7 +69,8 @@ const PostCard = ({
         border
         border-[var(--color-border)]
         bg-[var(--color-card)]
-        p-6
+        px-5
+        py-4
         text-[var(--color-content-primary)]
         shadow-[0_2px_10px_rgba(0,0,0,0.08)]
         transition-colors
@@ -78,7 +79,7 @@ const PostCard = ({
       "
     >
       {/* Post Header */}
-      <div className="flex cursor-pointer items-center gap-3">
+      <div className="flex items-center gap-3">
         <Avatar
           src={avatar || avatarImage}
           alt={`${name} avatar`}
@@ -86,16 +87,16 @@ const PostCard = ({
         />
 
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-[16px] font-bold text-[var(--color-content-primary)]">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+            <h3 className="text-[16px] font-bold leading-5 text-[var(--color-content-primary)]">
               {name}
             </h3>
 
-            <span className="text-[14px] text-[var(--color-content-secondary)]">
+            <span className="text-[14px] leading-5 text-[var(--color-content-secondary)]">
               @{username}
             </span>
 
-            <span className="text-[14px] text-[var(--color-content-secondary)]">
+            <span className="text-[14px] leading-5 text-[var(--color-content-secondary)]">
               {formatPostTime(createdAt)}
             </span>
           </div>
@@ -103,13 +104,13 @@ const PostCard = ({
       </div>
 
       {/* Post Content */}
-      <div className="mt-2">
+      <div className="mt-3">
         <p
           className="
             whitespace-pre-wrap
             break-words
             text-[14px]
-            leading-6
+            leading-5
             text-[var(--color-content-primary)]
           "
         >
@@ -118,7 +119,7 @@ const PostCard = ({
       </div>
 
       {/* Actions */}
-      <div className="mt-6 flex items-center gap-5">
+      <div className="mt-3 flex items-center gap-2">
         {/* Like */}
         <button
           type="button"
@@ -129,8 +130,8 @@ const PostCard = ({
             items-center
             gap-2
             rounded-lg
-            px-3
-            py-2
+            px-2
+            py-1
             text-[var(--color-content-secondary)]
             transition-colors
             duration-200
@@ -152,8 +153,8 @@ const PostCard = ({
             items-center
             gap-2
             rounded-lg
-            px-3
-            py-2
+            px-2
+            py-1
             text-[var(--color-content-secondary)]
             transition-colors
             duration-200
