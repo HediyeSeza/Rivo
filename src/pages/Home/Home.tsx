@@ -12,11 +12,11 @@ const Home = () => {
         grid
         w-full
         grid-cols-1
-        gap-7
+        gap-0
         px-4
         pt-24
         md:px-5
-        lg:grid-cols-[280px_minmax(0,1fr)_335px]
+        lg:grid-cols-[360px_minmax(0,1fr)_360px]
       "
     >
       {/* Left Sidebar */}
