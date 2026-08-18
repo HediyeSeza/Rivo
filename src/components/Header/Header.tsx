@@ -17,19 +17,16 @@ function Header() {
   return (
     <header
       className="
-    fixed left-0 right-0 top-0 z-40
-    flex h-16 w-full items-center justify-between
-
-    border-b border-white/30
-    bg-white/20
-    backdrop-blur-lg
-    shadow-sm
-
-    transition-colors duration-300
-
-    dark:border-white/10
-    dark:bg-[#0A0A0A99]
-  "
+        fixed left-0 right-0 top-0 z-40
+        flex h-16 w-full items-center justify-between
+        border-b border-white/30
+        bg-white/20
+        backdrop-blur-lg
+        shadow-sm
+        transition-colors duration-300
+        dark:border-white/10
+        dark:bg-[#0A0A0A99]
+      "
     >
       {/* Logo */}
       <button
@@ -40,24 +37,26 @@ function Header() {
       >
         <Logo />
 
-        <h1 className="text-xl font-bold text-black dark:text-white">Rivo</h1>
+        <h1 className="text-xl font-bold text-black dark:text-white">
+          Rivo
+        </h1>
       </button>
 
       <nav className="relative mr-2 flex items-center gap-4">
         {/* Theme Toggle */}
-        <div className="border-2 border-[#E5E5E5] rounded-xl dark:border-[#333333]">
+        <div className="rounded-xl border-2 border-[#E5E5E5] dark:border-[#333333]">
           <button
             type="button"
             onClick={toggleTheme}
             className="
-            flex h-10 w-10 cursor-pointer items-center justify-center
-            rounded-xl
-            bg-[#fefefe]
-            transition-all duration-200
-            hover:bg-black/5
-            dark:bg-[#212121]
-            dark:hover:bg-white/5
-          "
+              flex h-10 w-10 cursor-pointer items-center justify-center
+              rounded-xl
+              bg-[#fefefe]
+              transition-all duration-200
+              hover:bg-black/5
+              dark:bg-[#212121]
+              dark:hover:bg-white/5
+            "
           >
             <Icon name={theme === "dark" ? "Moon" : "Light"} size={18} />
           </button>
@@ -73,7 +72,10 @@ function Header() {
           <span />
         </Button>
 
-        <MobileMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+        <MobileMenu
+          isOpen={isMenuOpen}
+          onClose={() => setIsMenuOpen(false)}
+        />
 
         {/* Home */}
         <Button

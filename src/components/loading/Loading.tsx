@@ -2,34 +2,64 @@ import type { FC } from "react";
 
 import lightRivoLogo from "../../assets/icons/Light/Rivo.png";
 import darkRivoLogo from "../../assets/icons/Dark/Rivo.png";
+import { useTheme } from "../../context/ThemeContext";
 
 const Loading: FC = () => {
+  const { theme } = useTheme();
+
+  const isDark = theme === "dark";
+  const logo = isDark ? darkRivoLogo : lightRivoLogo;
+
   return (
     <div
       role="status"
-      aria-label="Loading"
-      className="flex min-h-full w-full items-center justify-center bg-white py-10 transition-colors duration-300 dark:bg-[#09090b]"
+      aria-label="Loading page"
+      className={`flex min-h-[calc(100dvh-64px)] w-full items-center justify-center transition-colors duration-300 ${
+        isDark ? "bg-[#09090b]" : "bg-white"
+      }`}
     >
-      <div className="relative flex h-28 w-28 items-center justify-center sm:h-32 sm:w-32">
-        <div className="absolute inset-0 animate-spin rounded-full border-4 border-b-black border-l-transparent border-r-black border-t-black dark:border-b-white dark:border-r-white dark:border-t-white" />
+      <div className="flex -translate-y-30 flex-col items-center gap-3 text-center">
+        <div className="relative flex h-11 w-11 items-center justify-center sm:h-12 sm:w-12">
+          <div
+            className={`absolute inset-0 animate-spin rounded-full border-2 border-l-transparent ${
+              isDark
+                ? "border-b-white border-r-white border-t-white"
+                : "border-b-black border-r-black border-t-black"
+            }`}
+          />
 
-        <img
-          src={lightRivoLogo}
-          alt="Rivo logo"
-          className="relative z-10 h-14 w-14 object-contain dark:hidden sm:h-16 sm:w-16"
-        />
+          <img
+            src={logo}
+            alt="Rivo logo"
+            className="relative z-10 h-4 w-5 object-contain sm:h-5 sm:w-7"
+          />
+        </div>
 
-        <img
-          src={darkRivoLogo}
-          alt="Rivo logo"
-          className="relative z-10 hidden h-14 w-14 object-contain dark:block sm:h-16 sm:w-16"
-        />
+        <div className="flex flex-col items-center">
+          <h2
+            className={`text-[14px] font-bold sm:text-base ${
+              isDark ? "text-white" : "text-black"
+            }`}
+          >
+            Loading Page
+          </h2>
+
+          <p
+            className={`mt-0.5 text-[9px] font-light sm:mt-1 sm:text-[11px] ${
+              isDark ? "text-zinc-400" : "text-zinc-500"
+            }`}
+          >
+            Please wait...
+          </p>
+        </div>
       </div>
     </div>
   );
 };
 
 export default Loading;
+
+
 
 
 
