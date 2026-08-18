@@ -37,9 +37,17 @@
 .register-form-content {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
 
   padding: 40px 32px;
+}
+
+.register-form-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
 }
 
 .register-form-image-placeholder {
@@ -63,7 +71,13 @@
    ======================================== */
 
 .register-form-back-button {
-  align-self: flex-start;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: none;
   border: none;
   color: var(--color-brand-main);
@@ -72,9 +86,14 @@
   cursor: pointer;
   text-decoration: none;
   padding: 0;
-  margin-bottom: 12px;
+  margin: 0;
+  flex-shrink: 0;
 
   transition: color 150ms ease;
+}
+
+.register-form-back-button img {
+  display: block;
 }
 
 .register-form-back-button:hover {
@@ -89,12 +108,12 @@
 .register-form-title {
   font-size: 24px;
   font-weight: 600;
-  line-height: 2px;
-  padding-top: 20px;
+  line-height: 1.3;
 
   color: var(--color-content-primary);
   margin: 0;
   text-align: center;
+  width: 100%;
 }
 
 .register-form-subtitle {
@@ -204,16 +223,16 @@
    ======================================== */
 
 .dark .register-form-main {
-  background-color: var(--color-content-opposite);
+  background-color: var(--color-bg);
 }
 
 .dark .register-form-wrapper {
-  background-color: var(--button-secondary-hover-bg);
+  background-color: var(--color-content-opposite);
   border-color: var(--button-tertiary-bg);
 }
 
 .dark .register-form-image-placeholder {
-  background-color: var(--color-content-opposite);
+  background-color: var(--color-bg);
 }
 
 @media (max-width: 640px) {

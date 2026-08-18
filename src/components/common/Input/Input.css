@@ -59,12 +59,16 @@
   box-sizing: border-box;
 }
 
+.input-container .input {
+  padding-right: 42px;
+}
+
 /* ========================================
    Placeholder
    ======================================== */
 
 .input::placeholder {
-  color: var(--input-placeholder);
+  color: var(--color-content-secondary);
   opacity: 1;
 }
 
@@ -151,6 +155,46 @@
   font-size: 12px;
   font-weight: 400;
   line-height: 18px;
+}
+
+/* ========================================
+   Input Container
+   ======================================== */
+
+.input-container {
+  position: relative;
+  width: 100%;
+}
+
+/* ========================================
+   Right Icon
+   ======================================== */
+
+.input-right-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: opacity 150ms ease;
+}
+
+.input-right-icon:hover {
+  opacity: 0.7;
+}
+
+.input-right-icon img {
+  width: 20px;
+  height: 20px;
+  display: block;
 }
 
 /* ========================================

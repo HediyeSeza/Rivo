@@ -1,10 +1,12 @@
-import type { InputHTMLAttributes } from "react";
+import type { InputHTMLAttributes, ReactNode } from "react";
 import "./Input.css";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   helperText?: string;
+  rightIcon?: ReactNode;
+  onRightIconClick?: () => void;
 }
 
 const Input = ({
@@ -14,18 +16,32 @@ const Input = ({
   className = "",
   type = "text",
   disabled = false,
+  rightIcon,
+  onRightIconClick,
   ...props
 }: InputProps) => {
   return (
     <div className={`input-wrapper ${error ? "input-wrapper--error" : ""}`}>
       {label && <label className="input-label">{label}</label>}
 
-      <input
-        className={`input ${className}`}
-        type={type}
-        disabled={disabled}
-        {...props}
-      />
+      <div className="input-container">
+        <input
+          className={`input ${className}`}
+          type={type}
+          disabled={disabled}
+          {...props}
+        />
+        {rightIcon && (
+          <button
+            type="button"
+            className="input-right-icon"
+            onClick={onRightIconClick}
+            tabIndex={-1}
+          >
+            {rightIcon}
+          </button>
+        )}
+      </div>
 
       {error && <span className="input-error">{error}</span>}
 
