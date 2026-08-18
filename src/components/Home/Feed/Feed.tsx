@@ -66,7 +66,7 @@ const posts = [
 const Feed = () => {
   return (
     <section className="w-full px-3">
-  <div className="w-full">
+      <div className="mx-auto w-full max-w-[760px]">
         <div className="flex flex-col gap-4">
           {posts.map((post) => (
             <PostCard

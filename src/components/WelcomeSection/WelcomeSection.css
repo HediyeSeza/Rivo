@@ -3,8 +3,10 @@
    ======================================== */
 
 .welcome-section {
-  position: fixed;
-  width: 300px;
+  position: sticky;
+  top: 92px;
+  width: 100%;
+  max-width: 350px;
   border-radius: 18px;
   border: 1px solid var(--color-border);
   background-color: var(--color-card);
