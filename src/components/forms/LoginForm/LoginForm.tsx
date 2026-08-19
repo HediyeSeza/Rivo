@@ -6,11 +6,15 @@ import Input from "../../common/Input/Input";
 import backIcon from "../../../assets/icons/Light/back.svg";
 import eyeIcon from "../../../assets/icons/Light/eye.svg";
 import closeEyeIcon from "../../../assets/icons/Light/close-eye.svg";
+import { login } from "../../../services/authApi";
+import { ApiError } from "../../../services/api";
+import { useAuth } from "../../../context/AuthContext";
 import "./LoginForm.css";
 
 const LoginForm = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const { signIn } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -20,6 +24,8 @@ const LoginForm = () => {
     email?: string;
     password?: string;
   }>({});
+  const [serverError, setServerError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -55,12 +61,25 @@ const LoginForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (validateForm()) {
-      // TODO: Implement login logic
-      console.log("Login:", formData);
+      setServerError("");
+      setIsSubmitting(true);
+      try {
+        const result = await login(formData);
+        signIn(result.user, result.token);
+        navigate("/");
+      } catch (error) {
+        setServerError(
+          error instanceof ApiError && [401, 404].includes(error.status)
+            ? "This account does not exist or the password is incorrect."
+            : "Unable to log in. Please try again.",
+        );
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -103,6 +122,8 @@ const LoginForm = () => {
                 error={errors.email}
               />
 
+              {serverError && <p className="input-error">{serverError}</p>}
+
               <Input
                 label="Password"
                 type={showPassword ? "text" : "password"}
@@ -125,8 +146,9 @@ const LoginForm = () => {
                 variant="primary"
                 size="large"
                 className="login-form-submit"
+                disabled={isSubmitting}
               >
-                Login
+                {isSubmitting ? "Logging in..." : "Login"}
               </Button>
             </form>
 

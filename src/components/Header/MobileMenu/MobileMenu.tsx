@@ -2,21 +2,26 @@ import { useNavigate } from "react-router-dom";
 
 import Button from "../../common/Button/Button";
 import Icon from "../../common/Icon/Icon";
+import { useAuth } from "../../../context/AuthContext";
 
 interface MobileMenuProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const MobileMenu = ({
-  isOpen,
-  onClose,
-}: MobileMenuProps) => {
+const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
   const navigate = useNavigate();
+  const { signOut } = useAuth();
 
   const handleNavigate = (path: string) => {
     navigate(path);
     onClose();
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    onClose();
+    navigate("/login");
   };
 
   return (
@@ -25,25 +30,19 @@ const MobileMenu = ({
       <div
         onClick={onClose}
         className={`absolute inset-0 bg-black/50 transition-opacity duration-300 ${
-          isOpen
-            ? "pointer-events-auto opacity-100"
-            : "opacity-0"
+          isOpen ? "pointer-events-auto opacity-100" : "opacity-0"
         }`}
       />
 
       {/* Menu */}
       <div
         className={`pointer-events-auto absolute right-0 top-0 z-10 h-[100rem] w-[75%] bg-white px-5 py-6 transition-transform duration-300 ease-in-out ${
-          isOpen
-            ? "translate-x-0"
-            : "translate-x-full"
+          isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {/* Menu Header */}
         <div className="flex items-center justify-between">
-          <h2 className="text-[20px] font-semibold">
-            Menu
-          </h2>
+          <h2 className="text-[20px] font-semibold">Menu</h2>
 
           <button
             type="button"
@@ -64,9 +63,7 @@ const MobileMenu = ({
             icon={<Icon name="Home" size={18} />}
             onClick={() => handleNavigate("/")}
           >
-            <span className="text-[16px] font-normal">
-              Home
-            </span>
+            <span className="text-[16px] font-normal">Home</span>
           </Button>
 
           {/* Notifications */}
@@ -75,13 +72,9 @@ const MobileMenu = ({
             className="w-full"
             variant="secondary"
             icon={<Icon name="notif" size={18} />}
-            onClick={() =>
-              handleNavigate("/notifications")
-            }
+            onClick={() => handleNavigate("/notifications")}
           >
-            <span className="text-[16px] font-normal">
-              Notifications
-            </span>
+            <span className="text-[16px] font-normal">Notifications</span>
           </Button>
 
           {/* Profile */}
@@ -90,13 +83,9 @@ const MobileMenu = ({
             className="w-full"
             variant="secondary"
             icon={<Icon name="Person" size={18} />}
-            onClick={() =>
-              handleNavigate("/profile")
-            }
+            onClick={() => handleNavigate("/profile")}
           >
-            <span className="text-[16px] font-normal">
-              Profile
-            </span>
+            <span className="text-[16px] font-normal">Profile</span>
           </Button>
 
           {/* Logout */}
@@ -105,6 +94,8 @@ const MobileMenu = ({
             className="w-full"
             variant="secondary"
             icon={<Icon name="Tash" size={18} />}
+            onClick={handleSignOut}
+            aria-label="Log out"
           >
             <span />
           </Button>
