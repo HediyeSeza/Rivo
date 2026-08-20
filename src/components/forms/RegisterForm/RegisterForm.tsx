@@ -6,11 +6,15 @@ import Input from "../../common/Input/Input";
 import backIcon from "../../../assets/icons/Light/back.svg";
 import eyeIcon from "../../../assets/icons/Light/eye.svg";
 import closeEyeIcon from "../../../assets/icons/Light/close-eye.svg";
+import { register } from "../../../services/authApi";
+import { ApiError } from "../../../services/api";
+import { useAuth } from "../../../context/AuthContext";
 import "./RegisterForm.css";
 
 const RegisterForm = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const { signIn } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -22,6 +26,8 @@ const RegisterForm = () => {
     email?: string;
     password?: string;
   }>({});
+  const [serverError, setServerError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -63,12 +69,29 @@ const RegisterForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (validateForm()) {
-      // TODO: Implement registration logic
-      console.log("Register:", formData);
+      setServerError("");
+      setIsSubmitting(true);
+      try {
+        const result = await register(formData);
+        signIn(result.user, result.token);
+        navigate("/");
+      } catch (error) {
+        setServerError(
+          error instanceof ApiError
+            ? error.status === 409
+              ? "An account with this email already exists."
+              : error.message
+            : error instanceof Error
+              ? error.message
+              : "Unable to create your account. Please try again.",
+        );
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -111,6 +134,8 @@ const RegisterForm = () => {
                 error={errors.name}
               />
 
+              {serverError && <p className="input-error">{serverError}</p>}
+
               <Input
                 label="Email"
                 type="email"
@@ -143,8 +168,9 @@ const RegisterForm = () => {
                 variant="primary"
                 size="large"
                 className="register-form-submit"
+                disabled={isSubmitting}
               >
-                Create Account
+                {isSubmitting ? "Creating account..." : "Create Account"}
               </Button>
             </form>
 

@@ -7,12 +7,19 @@ import Button from "../common/Button/Button";
 import MobileMenu from "./MobileMenu/MobileMenu";
 
 import { useTheme } from "../../context/ThemeContext";
+import { useAuth } from "../../context/AuthContext";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const { theme, toggleTheme } = useTheme();
+  const { signOut } = useAuth();
   const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/login");
+  };
 
   return (
     <header
@@ -37,9 +44,7 @@ function Header() {
       >
         <Logo />
 
-        <h1 className="text-xl font-bold text-black dark:text-white">
-          Rivo
-        </h1>
+        <h1 className="text-xl font-bold text-black dark:text-white">Rivo</h1>
       </button>
 
       <nav className="relative mr-2 flex items-center gap-4">
@@ -72,10 +77,7 @@ function Header() {
           <span />
         </Button>
 
-        <MobileMenu
-          isOpen={isMenuOpen}
-          onClose={() => setIsMenuOpen(false)}
-        />
+        <MobileMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
 
         {/* Home */}
         <Button
@@ -116,6 +118,8 @@ function Header() {
           className="!hidden md:!flex"
           variant="secondary"
           icon={<Icon name="Logout" size={18} />}
+          onClick={handleSignOut}
+          aria-label="Log out"
         >
           <span />
         </Button>
