@@ -13,7 +13,7 @@ import chatLight from "../../../assets/icons/Light/Name=Chat.svg";
 import avatarImage from "../../../assets/Avatar/a.png";
 
 interface NotificationCardProps {
-  type: "like" | "comment" | "follow";
+  type: "LIKE" | "COMMENT" | "FOLLOW";
   username: string;
   postContent: string;
   time: string;
@@ -29,9 +29,9 @@ const NotificationCard = ({
 }: NotificationCardProps) => {
   const { theme } = useTheme();
 
-  const isLike = type === "like";
-  const isComment = type === "comment";
-  const isFollow = type === "follow";
+  const isLike = type === "LIKE";
+  const isComment = type === "COMMENT";
+  const isFollow = type === "FOLLOW";
 
   const notificationIcon = isFollow
     ? theme === "dark"
@@ -89,7 +89,6 @@ const NotificationCard = ({
               >
                 {username}
               </span>{" "}
-
               <span className="text-[var(--color-content-secondary)]">
                 {isLike
                   ? "liked your post"
