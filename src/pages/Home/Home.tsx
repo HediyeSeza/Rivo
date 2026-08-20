@@ -1,9 +1,11 @@
 import Feed from "../../components/Home/Feed/Feed";
 import WelcomeSection from "../../components/WelcomeSection/WelcomeSection";
 import RecommendedUsers from "../../components/RecommendedUsers/RecommendedUsers";
+import ProfileSidebar from "../../components/ProfileSidebar/ProfileSidebar";
+import { useAuth } from "../../context/AuthContext";
 
 const Home = () => {
-  const isAuthenticated = false;
+  const { isAuthenticated } = useAuth();
 
   return (
     <main
@@ -21,12 +23,12 @@ const Home = () => {
     >
       {/* Left Sidebar */}
       <aside className="hidden lg:block">
-        {!isAuthenticated && <WelcomeSection />}
+        {isAuthenticated ? <ProfileSidebar /> : <WelcomeSection />}
       </aside>
 
       {/* Main Feed */}
       <section className="min-w-0 w-full">
-        {!isAuthenticated && <Feed />}
+        <Feed />
       </section>
 
       {/* Right Sidebar */}
