@@ -2,28 +2,29 @@ import Icon from "../../common/Icon/Icon";
 import Button from "../../common/Button/Button";
 import { useState } from "react";
 import EditProfileModal from "../EditProfileModal/EditProfileModal";
+import avatarImage from "../../../assets/Avatar/a.png";
 
 const ProfileCard = () => {
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   return (
     <div
-      className="
-      h-[446px]
-        w-[524px]
-        rounded-2xl
-        border border-[#E5E5E5]
-        bg-white
-        p-5
-        shadow-sm
-        dark:border-[#313131]
-        dark:bg-[#191919]
-      "
-    >
+  className="
+    min-h-[446px]
+    w-full
+    rounded-2xl
+    border border-[#E5E5E5]
+    bg-white
+    p-5
+    shadow-sm
+    dark:border-[#313131]
+    dark:bg-[#191919]
+  "
+>
       <div className="w-full">
         {/* Profile */}
         <div className="flex flex-col items-center">
           <img
-            src="src\assets\Avatar\a.png"
+            src={avatarImage}
             alt="Profile"
             className="h-20 w-20 rounded-full object-cover"
           />
