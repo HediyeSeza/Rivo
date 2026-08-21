@@ -3,67 +3,51 @@ import NotificationCard from "../NotificationCard/NotificationCard";
 import type { Notification } from "../../../types/notification";
 import { formatDate } from "../../../utils/formatDate";
 
-const notifications: Notification[] = [
-  {
-    id: "1",
-    type: "like",
-    actor: {
-      id: "1",
-      name: "Hediye Seza",
-      username: "hediyeseza",
-    },
-    post: {
-      id: "101",
-      content: "آقای کماشبان 2",
-    },
-    createdAt: new Date().toISOString(),
-    isRead: false,
-  },
-  {
-    id: "2",
-    type: "like",
-    actor: {
-      id: "2",
-      name: "Hediye Seza",
-      username: "hediyeseza",
-    },
-    post: {
-      id: "102",
-      content: "آقای کماشبان 2",
-    },
-    createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-    isRead: false,
-  },
-  {
-    id: "3",
-    type: "comment",
-    actor: {
-      id: "3",
-      name: "Hediye Seza",
-      username: "hediyeseza",
-    },
-    post: {
-      id: "103",
-      content: "dvd,dmv...",
-    },
-    createdAt: new Date(
-      Date.now() - 3 * 24 * 60 * 60 * 1000
-    ).toISOString(),
-    isRead: true,
-  },
-];
+interface NotificationsListProps {
+  notifications: Notification[];
+  loading: boolean;
+  error: string | null;
+}
 
-const NotificationsList = () => {
+const NotificationsList = ({
+  notifications,
+  loading,
+  error,
+}: NotificationsListProps) => {
+  if (loading) {
+    return (
+      <div className="py-8 text-center text-[14px] text-[var(--color-content-secondary)]">
+        Loading notifications...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="py-8 text-center text-[14px] text-red-500">{error}</div>
+    );
+  }
+
+  if (notifications.length === 0) {
+    return (
+      <div className="py-8 text-center text-[14px] text-[var(--color-content-secondary)]">
+        No notifications yet.
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-4">
       {notifications.map((notification) => (
         <NotificationCard
           key={notification.id}
           type={notification.type}
-          username={notification.actor.username}
-          postContent={notification.post.content}
+          username={notification.creator.name}
+          postContent={notification.post?.content ?? ""}
+          commentContent={notification.comment?.content ?? ""}
           time={formatDate(notification.createdAt)}
-          avatar={notification.actor.avatar}
+          avatar={notification.creator.image ?? undefined}
+          read={notification.read}
         />
       ))}
     </div>

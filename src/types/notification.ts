@@ -1,25 +1,35 @@
-export type NotificationType =
-  | "like"
-  | "comment"
-  | "follow";
+export type NotificationType = "LIKE" | "COMMENT" | "FOLLOW";
 
-export interface NotificationActor {
+export interface NotificationCreator {
   id: string;
   name: string;
-  username: string;
-  avatar?: string;
+  image: string | null;
+  email: string;
 }
 
 export interface NotificationPost {
-  id: string;
   content: string;
+}
+
+export interface NotificationComment {
+  id?: string;
+  content?: string;
 }
 
 export interface Notification {
   id: string;
+  userId: string;
+  creatorId: string;
+  postId: string | null;
+  commentId: string | null;
+
   type: NotificationType;
-  actor: NotificationActor;
-  post: NotificationPost;
+
+  read: boolean;
   createdAt: string;
-  isRead: boolean;
+
+  creator: NotificationCreator;
+
+  post: NotificationPost | null;
+  comment: NotificationComment | null;
 }
