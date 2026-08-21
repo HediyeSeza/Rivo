@@ -11,15 +11,21 @@ interface PostCardProps {
   likes?: number;
   comments?: number;
   avatar?: string;
+
+  showDelete?: boolean;
+  onDelete?: () => void;
+
+  isLiked?: boolean;
+
+  showUnlike?: boolean;
+  onUnlike?: () => void;
 }
 
 const formatPostTime = (createdAt: string) => {
   const postDate = new Date(createdAt);
   const now = new Date();
 
-  const diffInSeconds = Math.floor(
-    (now.getTime() - postDate.getTime()) / 1000
-  );
+  const diffInSeconds = Math.floor((now.getTime() - postDate.getTime()) / 1000);
 
   if (diffInSeconds < 60) {
     return "just now";
@@ -60,47 +66,75 @@ const PostCard = ({
   likes = 0,
   comments = 0,
   avatar,
+
+  showDelete = false,
+  onDelete,
+
+  isLiked = false,
+
+  showUnlike = false,
+  onUnlike,
 }: PostCardProps) => {
   return (
     <article
       className="
         w-full
         rounded-xl
-        border
-        border-[var(--color-border)]
-        bg-[var(--color-card)]
-        px-5
-        py-4
-        text-[var(--color-content-primary)]
-        shadow-[0_2px_10px_rgba(0,0,0,0.08)]
+        border border-[#E5E5E5]
+      bg-white
+        p-5
+        shadow-sm
+      dark:border-[#313131]
+      dark:bg-[#191919]
+        bg-(--color-card)]
+        text-(--color-content-primary)]
         transition-colors
         duration-200
-        dark:shadow-[0_2px_10px_rgba(0,0,0,0.25)]
+       
       "
     >
       {/* Post Header */}
       <div className="flex items-center gap-3">
-        <Avatar
-          src={avatar || avatarImage}
-          alt={`${name} avatar`}
-          size={40}
-        />
+        <Avatar src={avatar || avatarImage} alt={`${name} avatar`} size={40} />
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-            <h3 className="text-[16px] font-bold leading-5 text-[var(--color-content-primary)]">
+            <h3 className="text-[16px] font-bold leading-5 text-(--color-content-primary)]">
               {name}
             </h3>
 
-            <span className="text-[14px] leading-5 text-[var(--color-content-secondary)]">
+            <span className="text-[14px] leading-5 text-(--color-content-secondary)]">
               @{username}
             </span>
 
-            <span className="text-[14px] leading-5 text-[var(--color-content-secondary)]">
+            <span className="text-[14px] leading-5 text-(--color-content-secondary)]">
               {formatPostTime(createdAt)}
             </span>
           </div>
         </div>
+        {showDelete && (
+          <button
+            type="button"
+            onClick={onDelete}
+            aria-label="Delete post"
+            className="
+        flex
+        h-9
+        w-9
+        shrink-0
+        cursor-pointer
+        items-center
+        justify-center
+        rounded-lg
+        transition-colors
+        duration-200
+        hover:bg-black/5
+        dark:hover:bg-white/5
+      "
+          >
+            <Icon name="Tash" size={20} />
+          </button>
+        )}
       </div>
 
       {/* Post Content */}
@@ -111,7 +145,7 @@ const PostCard = ({
             break-words
             text-[14px]
             leading-5
-            text-[var(--color-content-primary)]
+            text-(--color-content-primary)]
           "
         >
           {content}
