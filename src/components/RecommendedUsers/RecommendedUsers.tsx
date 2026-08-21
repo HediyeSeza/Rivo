@@ -1,79 +1,161 @@
-import Button from "../../components/common/Button/Button";
+import { useEffect, useState } from "react";
 
-const recommendedUsers = [
-  {
-    id: 1,
-    username: "Amin",
-    followers: 0,
-  },
-  {
-    id: 2,
-    username: "salar",
-    followers: 1,
-  },
-  {
-    id: 3,
-    username: "naem-brm",
-    followers: 4,
-  },
-];
+import Button from "../common/Button/Button";
+import Icon from "../common/Icon/Icon";
+
+import type { User } from "../../types/user";
+import { getRecommendedUsers } from "../../services/userApi";
 
 const RecommendedUsers = () => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchRecommendedUsers = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const data = await getRecommendedUsers();
+
+        setUsers(data);
+      } catch (error) {
+        console.error("Failed to fetch recommended users:", error);
+        setError("Failed to load recommended users.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecommendedUsers();
+  }, []);
+
   return (
-    <aside
+    <section
       className="
-    fixed
-    right-4
-    top-24
-    w-[250px]
-    xl:w-[294px]
-    2xl:w-[358px]
-    h-[280px]
-    rounded-2xl
-    border border-[#E5E5E5]
-    bg-white
-    p-5
-    shadow-sm
-    transition-colors duration-300
-    dark:border-white/10
-    dark:bg-[#191919]
-  "
+        w-full
+        rounded-2xl
+        border border-[var(--color-border)]
+        bg-[var(--color-card)]
+        p-4
+        text-[var(--color-content-primary)]
+        transition-colors duration-200
+      "
     >
-      <h2 className="text-[20px] font-semibold">Recommended users</h2>
+      {/* Header */}
+      <div className="flex items-center gap-2">
+        <Icon name="Person" size={18} />
 
-      <div className="mt-7 flex flex-col gap-5">
-        {recommendedUsers.map((user) => (
-          <div
-            key={user.id}
-            className="flex items-center justify-between gap-3"
-          >
-            {/* User */}
-            <div className="flex min-w-0 items-center gap-3">
-              <img
-                src="/profile.png"
-                alt={user.username}
-                className="h-11 w-11 shrink-0 rounded-full object-cover"
-              />
+        <h2 className="text-[16px] font-bold">Recommended for you</h2>
+      </div>
 
-              <div className="min-w-0">
-                <p className="truncate text-[16px] font-medium">
-                  {user.username}
-                </p>
+      {/* Loading */}
+      {loading && (
+        <div
+          className="
+            mt-5
+            py-4
+            text-center
+            text-[13px]
+            text-[var(--color-content-secondary)]
+          "
+        >
+          Loading...
+        </div>
+      )}
 
-                <p className="text-[14px] text-gray-500">
-                  {user.followers} followers
+      {/* Error */}
+      {!loading && error && (
+        <div
+          className="
+            mt-5
+            py-4
+            text-center
+            text-[13px]
+            text-red-500
+          "
+        >
+          {error}
+        </div>
+      )}
+
+      {/* Empty */}
+      {!loading && !error && users.length === 0 && (
+        <div
+          className="
+            mt-5
+            py-4
+            text-center
+            text-[13px]
+            text-[var(--color-content-secondary)]
+          "
+        >
+          No recommendations available.
+        </div>
+      )}
+
+      {/* Users */}
+      {!loading && !error && users.length > 0 && (
+        <div className="mt-5 flex flex-col gap-4">
+          {users.map((user) => (
+            <div
+              key={user.id}
+              className="
+                flex
+                items-center
+                gap-3
+              "
+            >
+              {/* Avatar */}
+              <div
+                className="
+                  flex
+                  h-10
+                  w-10
+                  shrink-0
+                  items-center
+                  justify-center
+                  overflow-hidden
+                  rounded-full
+                  border border-[var(--color-border)]
+                "
+              >
+                {user.image ? (
+                  <img
+                    src={user.image}
+                    alt={user.name}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <Icon name="Person" size={18} />
+                )}
+              </div>
+
+              {/* User Info */}
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[14px] font-bold">{user.name}</p>
+
+                <p
+                  className="
+                    truncate
+                    text-[12px]
+                    text-[var(--color-content-secondary)]
+                  "
+                >
+                  {user._count?.followers ?? 0} followers
                 </p>
               </div>
-            </div>
 
-            {/* Follow */}
-            <Button variant="secondary" size="small">
-              <span className="text-[14px]">Follow</span>
-            </Button>
-          </div>
-        ))}
-      </div>
-    </aside>
+              {/* Follow */}
+              <Button variant="secondary" className="shrink-0">
+                <span className="text-[12px] font-normal">Follow</span>
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
   );
 };
 
