@@ -71,6 +71,12 @@ export const api = {
       body: body ? JSON.stringify(body) : undefined,
     }),
 
+  put: <T>(endpoint: string, body?: unknown) =>
+    request<T>(endpoint, {
+      method: "PUT",
+      body: body ? JSON.stringify(body) : undefined,
+    }),
+
   patch: <T>(endpoint: string, body?: unknown) =>
     request<T>(endpoint, {
       method: "PATCH",
@@ -82,3 +88,5 @@ export const api = {
       method: "DELETE",
     }),
 };
+
+export default api;
