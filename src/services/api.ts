@@ -6,6 +6,7 @@ export class ApiError extends Error {
 
   constructor(message: string, status: number) {
     super(message);
+
     this.name = "ApiError";
     this.status = status;
   }
@@ -22,14 +23,21 @@ const request = async <T>(
     );
   }
 
+  const token = localStorage.getItem("rivo_token");
+
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     credentials: "include",
+
     headers: {
       "Content-Type": "application/json",
-      ...(localStorage.getItem("rivo_token")
-        ? { Authorization: `Bearer ${localStorage.getItem("rivo_token")}` }
+
+      ...(token
+        ? {
+            Authorization: `Bearer ${token}`,
+          }
         : {}),
+
       ...options.headers,
     },
   });
@@ -43,8 +51,12 @@ const request = async <T>(
         error?: string;
         detail?: string;
       };
+
       message =
-        errorBody.message || errorBody.error || errorBody.detail || message;
+        errorBody.message ||
+        errorBody.error ||
+        errorBody.detail ||
+        message;
     } catch {
       // Some error responses do not contain JSON.
     }

@@ -18,7 +18,8 @@ const Home = () => {
         px-4
         pt-24
         md:px-5
-        lg:grid-cols-[360px_minmax(0,1fr)_360px]
+        lg:grid-cols-[minmax(300px,360px)_minmax(0,1fr)_minmax(300px,350px)]
+        lg:gap-6
       "
     >
       {/* Left Sidebar */}
