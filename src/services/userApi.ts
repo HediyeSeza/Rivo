@@ -14,3 +14,15 @@ export const getRecommendedUsers = async (): Promise<User[]> => {
 
   return response.data;
 };
+
+interface UserResponse {
+  message: string;
+  success: boolean;
+  data: User;
+}
+
+export const getUserById = async (id: string): Promise<User> => {
+  const response = await api.get<UserResponse>(`/api/users/${id}`);
+
+  return response.data;
+};
