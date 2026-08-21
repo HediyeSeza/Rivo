@@ -16,16 +16,20 @@ interface NotificationCardProps {
   type: "LIKE" | "COMMENT" | "FOLLOW";
   username: string;
   postContent: string;
+  commentContent: string;
   time: string;
   avatar?: string;
+  read: boolean;
 }
 
 const NotificationCard = ({
   type,
   username,
   postContent,
+  commentContent,
   time,
   avatar,
+  read,
 }: NotificationCardProps) => {
   const { theme } = useTheme();
 
@@ -47,19 +51,19 @@ const NotificationCard = ({
 
   return (
     <article
-      className="
+      className={`
         w-full
         rounded-xl
-        border
-        border-[var(--color-border)]
-        bg-[var(--color-card)]
         p-5
         text-[var(--color-content-primary)]
-        shadow-[0_2px_8px_rgba(0,0,0,0.06)]
         transition-colors
         duration-200
-        dark:shadow-[0_2px_8px_rgba(0,0,0,0.2)]
-      "
+        ${
+          read
+            ? "bg-white dark:bg-[var(--color-card)]"
+            : "bg-gray-100 dark:bg-[#2a2a2a]"
+        }
+      `}
     >
       <div className="flex items-start gap-3">
         {/* Avatar */}
@@ -104,13 +108,40 @@ const NotificationCard = ({
             <p
               className="
                 mt-3
+                p-2
+                min-w-48
+                max-w-fit
+                rounded-sm
+                bg-[#f0f0f0]
+                dark:bg-[#252525]
                 break-words
-                text-[14px]
+                text-[16px]
                 leading-6
                 text-[var(--color-content-primary)]
               "
             >
               {postContent}
+            </p>
+          )}
+
+          {/* Comment Content */}
+          {isComment && commentContent && (
+            <p
+              className="
+                mt-2
+                min-w-48
+                max-w-fit
+                p-2
+                rounded-sm
+                bg-[#f0f0f0]
+                dark:bg-[#252525]
+                break-words
+                text-[16px]
+                leading-6
+                text-[var(--color-content-primary)]
+              "
+            >
+              {commentContent}
             </p>
           )}
 
