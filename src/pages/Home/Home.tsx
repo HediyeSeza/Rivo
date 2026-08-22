@@ -11,9 +11,9 @@ const Home = () => {
     <main
       className="
         mx-auto
-        min-h-screen
+        h-screen
         w-full
-        max-w-[1400px]
+        overflow-hidden
         px-4
         pt-24
         pb-10
@@ -30,18 +30,29 @@ const Home = () => {
       "
     >
       {/* Left Sidebar */}
-      <aside className="hidden min-w-0 xl:block">
-        {isAuthenticated ? <ProfileSidebar /> : <WelcomeSection />}
+      <aside className="hidden min-h-0 lg:block">
+        <div className="sticky top-24">
+          {isAuthenticated ? <ProfileSidebar /> : <WelcomeSection />}
+        </div>
       </aside>
 
       {/* Main Feed */}
-      <section className="min-w-0 w-full">
+      <section
+        className="
+          min-w-0
+          h-full
+          overflow-y-auto
+          scrollbar-hide
+        "
+      >
         <Feed />
       </section>
 
       {/* Right Sidebar */}
-      <aside className="hidden min-w-0 xl:block">
-        <RecommendedUsers />
+      <aside className="hidden min-h-0 lg:block">
+        <div className="sticky top-24">
+          <RecommendedUsers />
+        </div>
       </aside>
     </main>
   );
