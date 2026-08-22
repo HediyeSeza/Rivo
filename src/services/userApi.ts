@@ -33,3 +33,15 @@ export const getUserById = async (id: string): Promise<User> => {
 
   return response.data;
 };
+
+export interface FollowResponse {
+  message: string;
+  success: boolean;
+  data?: unknown;
+}
+
+export const toggleFollowUser = async (userId: string) => {
+  const response = await api.patch(`/api/users/${userId}`);
+
+  return response;
+};
