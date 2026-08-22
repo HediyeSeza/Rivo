@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
-import Button from "../common/Button/Button";
 import Icon from "../common/Icon/Icon";
+import FollowButton from "../FollowButton/FollowButton";
 
 import type { User } from "../../types/user";
 import { getRecommendedUsers } from "../../services/userApi";
@@ -11,24 +11,34 @@ const RecommendedUsers = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // گرفتن کاربران پیشنهادی از بک‌اند
+  const fetchRecommendedUsers = async () => {
+    try {
+      setError(null);
+
+      const data = await getRecommendedUsers();
+
+      setUsers(data);
+    } catch (error) {
+      console.error("Failed to fetch recommended users:", error);
+
+      setError("Failed to load recommended users.");
+    }
+  };
+
+  // اولین بار که کامپوننت اجرا می‌شود
   useEffect(() => {
-    const fetchRecommendedUsers = async () => {
+    const loadUsers = async () => {
       try {
         setLoading(true);
-        setError(null);
 
-        const data = await getRecommendedUsers();
-
-        setUsers(data);
-      } catch (error) {
-        console.error("Failed to fetch recommended users:", error);
-        setError("Failed to load recommended users.");
+        await fetchRecommendedUsers();
       } finally {
         setLoading(false);
       }
     };
 
-    fetchRecommendedUsers();
+    loadUsers();
   }, []);
 
   return (
@@ -99,14 +109,7 @@ const RecommendedUsers = () => {
       {!loading && !error && users.length > 0 && (
         <div className="mt-5 flex flex-col gap-4">
           {users.map((user) => (
-            <div
-              key={user.id}
-              className="
-                flex
-                items-center
-                gap-3
-              "
-            >
+            <div key={user.id} className="flex items-center gap-3">
               {/* Avatar */}
               <div
                 className="
@@ -147,10 +150,11 @@ const RecommendedUsers = () => {
                 </p>
               </div>
 
-              {/* Follow */}
-              <Button variant="secondary" className="shrink-0">
-                <span className="text-[12px] font-normal">Follow</span>
-              </Button>
+              {/* Follow / Unfollow */}
+              <FollowButton
+                userId={user.id}
+                onFollowSuccess={fetchRecommendedUsers}
+              />
             </div>
           ))}
         </div>
