@@ -3,13 +3,16 @@ export interface User {
 
   name: string;
   email: string;
+  emailVerified: boolean;
   username?: string;
-
   avatar?: string;
+  image: string | null;
+  bio: string | null;
+  location: string | null;
+  website: string | null;
 
-  bio?: string;
-  location?: string;
-  website?: string;
+  createdAt: string;
+  updatedAt: string;
 
   postsCount?: number;
   followersCount?: number;

@@ -35,6 +35,7 @@ const ProfileSidebar = () => {
       "
     >
       <div className="flex items-center justify-center">
+
         <div className="w-full">
 
           {/* Profile */}

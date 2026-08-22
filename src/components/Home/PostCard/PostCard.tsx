@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import Icon from "../../common/Icon/Icon";
 import Avatar from "../../common/Avatar/Avatar";
 
@@ -25,7 +26,9 @@ const formatPostTime = (createdAt: string) => {
   const postDate = new Date(createdAt);
   const now = new Date();
 
-  const diffInSeconds = Math.floor((now.getTime() - postDate.getTime()) / 1000);
+  const diffInSeconds = Math.floor(
+    (now.getTime() - postDate.getTime()) / 1000,
+  );
 
   if (diffInSeconds < 60) {
     return "just now";
@@ -34,25 +37,33 @@ const formatPostTime = (createdAt: string) => {
   const diffInMinutes = Math.floor(diffInSeconds / 60);
 
   if (diffInMinutes < 60) {
-    return `${diffInMinutes}m`;
+    return `${diffInMinutes} ${
+      diffInMinutes === 1 ? "minute" : "minutes"
+    } ago`;
   }
 
   const diffInHours = Math.floor(diffInMinutes / 60);
 
   if (diffInHours < 24) {
-    return `${diffInHours}h`;
+    return `${diffInHours} ${
+      diffInHours === 1 ? "hour" : "hours"
+    } ago`;
   }
 
   const diffInDays = Math.floor(diffInHours / 24);
 
   if (diffInDays < 7) {
-    return `${diffInDays}d`;
+    return `${diffInDays} ${
+      diffInDays === 1 ? "day" : "days"
+    } ago`;
   }
 
   const diffInWeeks = Math.floor(diffInDays / 7);
 
   if (diffInWeeks < 4) {
-    return `${diffInWeeks}w`;
+    return `${diffInWeeks} ${
+      diffInWeeks === 1 ? "week" : "weeks"
+    } ago`;
   }
 
   return postDate.toLocaleDateString();
@@ -103,11 +114,22 @@ const PostCard = ({
               {name}
             </h3>
 
-            <span className="text-[14px] leading-5 text-(--color-content-secondary)]">
-              @{username}
-            </span>
+            <Link
+  to={`/profile/${username}`}
+  className="
+    cursor-pointer
+    text-[12px]
+    leading-5
+   !text-(--color-content-muted)
+    transition-colors
+    duration-200
+    hover:text-(--color-content-primary)
+  "
+>
+  @{username}
+</Link>
 
-            <span className="text-[14px] leading-5 text-(--color-content-secondary)]">
+            <span className="text-[12px] leading-5 text-(--color-content-muted)">
               {formatPostTime(createdAt)}
             </span>
           </div>

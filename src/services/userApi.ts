@@ -35,4 +35,16 @@ export const userApi = {
   ): Promise<User> => {
     return api.put<User>(`/api/users/${id}`, data);
   },
+
+
+
+// Get recommended users 
+  getRecommendedUsers: async (): Promise<User[]> => {
+    const response = await api.get<{
+      message: string;
+      success: boolean;
+      data: User[];
+    }>("/api/users/recommend");
+    return response.data;
+  },
 };
