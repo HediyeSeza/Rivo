@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 
 import PostCard from "../PostCard/PostCard";
 
 import { getPosts, type Post } from "../../../services/postApi";
+
 import { getUserById, type User } from "../../../services/userApi";
+
+import { getUsernameFromEmail } from "../../../utils/getUsernameFromEmail";
 
 type PostWithAuthor = Post & {
   author: User;
@@ -30,9 +32,6 @@ const Feed = () => {
         const users = await Promise.all(
           uniqueAuthorIds.map((id) => getUserById(id)),
         );
-
-        console.log("FIRST USER:", users[0]);
-console.log("USERNAME:", users[0]?.username);
 
         const usersMap = new Map(
           users.map((user) => [user.id, user]),
@@ -114,7 +113,7 @@ console.log("USERNAME:", users[0]?.username);
             <PostCard
               key={post.id}
               name={post.author.name}
-              username={post.author.username}
+              username={getUsernameFromEmail(post.author.email)}
               createdAt={post.createdAt}
               content={post.content}
               likes={0}

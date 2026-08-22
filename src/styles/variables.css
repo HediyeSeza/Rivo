@@ -27,6 +27,7 @@
   --color-content-primary: #171717;
   --color-content-secondary: #737373;
   --color-content-tertiary: #a6a6a6;
+  --color-content-muted: #8a8a8a;
   --color-content-opposite: #fafafa;
 
 
@@ -43,59 +44,72 @@
 
 
   /* ========================================
-     Button / Primary
-     ======================================== */
+   Button / Primary
+   ======================================== */
 
-  --button-primary-bg: #0a0a0a;
-  --button-primary-text: #fafafa;
+--button-primary-bg: transparent;
+--button-primary-text: var(--color-content-primary);
+--button-primary-border: transparent;
 
-  --button-primary-hover-bg: #171717;
-  --button-primary-hover-text: #fafafa;
+--button-primary-hover-bg: rgb(0 0 0 / 6%);
+--button-primary-hover-text: var(--color-content-primary);
+--button-primary-hover-border: transparent;
 
-  --button-primary-disabled-bg: rgb(23 23 23 / 50%);
-  --button-primary-disabled-text: rgb(250 250 250 / 50%);
-
-
-  /* ========================================
-     Button / Secondary
-     ======================================== */
-
-  --button-secondary-bg: #ffffff;
-  --button-secondary-text: #0a0a0a;
-
-  --button-secondary-hover-bg: #fafafa;
-  --button-secondary-hover-text: #171717;
-
-  --button-secondary-disabled-bg: rgb(136 136 136 / 50%);
-  --button-secondary-disabled-text: rgb(23 23 23 / 50%);
+--button-primary-disabled-bg: transparent;
+--button-primary-disabled-text: rgb(23 23 23 / 50%);
+--button-primary-disabled-border: transparent;
 
 
-  /* ========================================
-     Button / Tertiary
-     ======================================== */
+/* ========================================
+   Button / Secondary
+   ======================================== */
 
-  --button-tertiary-bg: #e5e5e5;
-  --button-tertiary-text: #171717;
+--button-secondary-bg: transparent;
+--button-secondary-text: var(--color-content-primary);
+--button-secondary-border: var(--color-border);
 
-  --button-tertiary-hover-bg: rgb(229 229 229 / 80%);
-  --button-tertiary-hover-text: #171717;
+--button-secondary-hover-bg: rgb(0 0 0 / 6%);
+--button-secondary-hover-text: var(--color-content-primary);
+--button-secondary-hover-border: var(--color-border);
 
-  --button-tertiary-disabled-bg: rgb(229 229 229 / 25%);
-  --button-tertiary-disabled-text: rgb(38 38 38 / 25%);
+--button-secondary-disabled-bg: transparent;
+--button-secondary-disabled-text: rgb(23 23 23 / 50%);
+--button-secondary-disabled-border: var(--color-border);
 
 
-  /* ========================================
-     Button / Pure
-     ======================================== */
+/* ========================================
+   Button / Tertiary
+   ======================================== */
 
-  --button-pure-bg: transparent;
-  --button-pure-text: #171717;
+--button-tertiary-bg: var(--color-border);
+--button-tertiary-text: var(--color-content-primary);
+--button-tertiary-border: transparent;
 
-  --button-pure-hover-bg: transparent;
-  --button-pure-hover-text: #171717;
+--button-tertiary-hover-bg: rgb(229 229 229 / 80%);
+--button-tertiary-hover-text: var(--color-content-primary);
+--button-tertiary-hover-border: transparent;
 
-  --button-pure-disabled-bg: transparent;
-  --button-pure-disabled-text: rgb(23 23 23 / 25%);
+--button-tertiary-disabled-bg: rgb(229 229 229 / 25%);
+--button-tertiary-disabled-text: rgb(38 38 38 / 25%);
+--button-tertiary-disabled-border: transparent;
+
+
+/* ========================================
+   Button / Pure
+   ======================================== */
+
+--button-pure-bg: transparent;
+--button-pure-text: var(--color-content-primary);
+--button-pure-border: transparent;
+
+--button-pure-hover-bg: rgb(0 0 0 / 6%);
+--button-pure-hover-text: var(--color-content-primary);
+--button-pure-hover-border: transparent;
+
+--button-pure-disabled-bg: transparent;
+--button-pure-disabled-text: rgb(23 23 23 / 25%);
+--button-pure-disabled-border: transparent;
+
 
 
   /* ========================================
@@ -175,12 +189,11 @@
   --color-border: #262626;
 
 
-  /* ---------- Content ---------- */
-
-  --color-content-primary: #fafafa;
-  --color-content-secondary: #a3a3a3;
-  --color-content-tertiary: #575757;
-  --color-content-opposite: #171717;
+/* ---------- Content ---------- */
+--color-content-primary: #fafafa;
+--color-content-secondary: #a3a3a3;
+--color-content-tertiary: #575757;
+--color-content-opposite: #171717;
 
 
   /* ---------- Status ---------- */
@@ -196,61 +209,71 @@
 
 
   /* ========================================
-     Button / Primary
-     ======================================== */
+   Button / Primary
+   ======================================== */
 
-  --button-primary-bg: #fafafa;
-  --button-primary-text: #0a0a0a;
+--button-primary-bg: transparent;
+--button-primary-text: var(--color-content-primary);
+--button-primary-border: transparent;
 
-  --button-primary-hover-bg: rgb(250 250 250 / 90%);
-  --button-primary-hover-text: #0a0a0a;
+--button-primary-hover-bg: rgb(255 255 255 / 8%);
+--button-primary-hover-text: var(--color-content-primary);
+--button-primary-hover-border: transparent;
 
-  --button-primary-disabled-bg: rgb(250 250 250 / 50%);
-  --button-primary-disabled-text: rgb(23 23 23 / 50%);
-
-
-  /* ========================================
-     Button / Secondary
-     ======================================== */
-
-  --button-secondary-bg: #0a0a0a;
-  --button-secondary-text: #ffffff;
-
-  --button-secondary-hover-bg: #171717;
-  --button-secondary-hover-text: #fafafa;
-
-  --button-secondary-disabled-bg: rgb(23 23 23 / 50%);
-  --button-secondary-disabled-text: rgb(250 250 250 / 50%);
+--button-primary-disabled-bg: transparent;
+--button-primary-disabled-text: rgb(250 250 250 / 50%);
+--button-primary-disabled-border: transparent;
 
 
-  /* ========================================
-     Button / Tertiary
-     ======================================== */
+/* ========================================
+   Button / Secondary
+   ======================================== */
 
-  --button-tertiary-bg: #262626;
-  --button-tertiary-text: #fafafa;
+--button-secondary-bg: transparent;
+--button-secondary-text: var(--color-content-primary);
+--button-secondary-border: var(--color-border);
 
-  --button-tertiary-hover-bg: rgb(38 38 38 / 80%);
-  --button-tertiary-hover-text: #fafafa;
+--button-secondary-hover-bg: rgb(255 255 255 / 8%);
+--button-secondary-hover-text: var(--color-content-primary);
+--button-secondary-hover-border: var(--color-border);
 
-  --button-tertiary-disabled-bg: rgb(38 38 38 / 25%);
-  --button-tertiary-disabled-text: rgb(229 229 229 / 25%);
-
-
-  /* ========================================
-     Button / Pure
-     ======================================== */
-
-  --button-pure-bg: transparent;
-  --button-pure-text: #fafafa;
-
-  --button-pure-hover-bg: transparent;
-  --button-pure-hover-text: #fafafa;
-
-  --button-pure-disabled-bg: transparent;
-  --button-pure-disabled-text: rgb(250 250 250 / 25%);
+--button-secondary-disabled-bg: transparent;
+--button-secondary-disabled-text: rgb(250 250 250 / 50%);
+--button-secondary-disabled-border: var(--color-border);
 
 
+/* ========================================
+   Button / Tertiary
+   ======================================== */
+
+--button-tertiary-bg: var(--color-border);
+--button-tertiary-text: var(--color-content-primary);
+--button-tertiary-border: transparent;
+
+--button-tertiary-hover-bg: rgb(38 38 38 / 80%);
+--button-tertiary-hover-text: var(--color-content-primary);
+--button-tertiary-hover-border: transparent;
+
+--button-tertiary-disabled-bg: rgb(38 38 38 / 25%);
+--button-tertiary-disabled-text: rgb(229 229 229 / 25%);
+--button-tertiary-disabled-border: transparent;
+
+
+/* ========================================
+   Button / Pure
+   ======================================== */
+
+--button-pure-bg: transparent;
+--button-pure-text: var(--color-content-primary);
+--button-pure-border: transparent;
+
+--button-pure-hover-bg: rgb(255 255 255 / 8%);
+--button-pure-hover-text: var(--color-content-primary);
+--button-pure-hover-border: transparent;
+
+--button-pure-disabled-bg: transparent;
+--button-pure-disabled-text: rgb(250 250 250 / 25%);
+--button-pure-disabled-border: transparent;
   /* ========================================
      Input / Text Field
      ======================================== */

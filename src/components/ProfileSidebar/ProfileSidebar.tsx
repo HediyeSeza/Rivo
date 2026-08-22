@@ -9,23 +9,19 @@ const ProfileSidebar = () => {
   console.log("Sidebar theme:", theme);
   return (
     <aside
-      className="
-        fixed
-        left-6
-        top-24
-        w-[230px]
-        xl:w-[294px]
-        2xl:w-[358px]
-        rounded-2xl
-        border border-[#E5E5E5]
-        bg-white
-        p-5
-        shadow-sm
-        transition-colors duration-300
-        dark:border-[#262626]
-        dark:bg-[#191919]
-      "
-    >
+  className="
+    w-full
+    rounded-2xl
+    border border-[#E5E5E5]
+    bg-white
+    p-5
+    shadow-sm
+    transition-colors
+    duration-300
+    dark:border-[#262626]
+    dark:bg-[#191919]
+  "
+>
       <div className="flex justify-center items-center">
         <div className="w-full">
           {/* Profile */}
