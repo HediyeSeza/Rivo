@@ -11,7 +11,6 @@ const RecommendedUsers = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // گرفتن کاربران پیشنهادی از بک‌اند
   const fetchRecommendedUsers = async () => {
     try {
       setError(null);
@@ -26,7 +25,6 @@ const RecommendedUsers = () => {
     }
   };
 
-  // اولین بار که کامپوننت اجرا می‌شود
   useEffect(() => {
     const loadUsers = async () => {
       try {
@@ -57,7 +55,7 @@ const RecommendedUsers = () => {
       <div className="flex items-center gap-2">
         <Icon name="Person" size={18} />
 
-        <h2 className="text-[16px] font-bold">Recommended for you</h2>
+        <h2 className="text-[16px] font-bold">Recommended users</h2>
       </div>
 
       {/* Loading */}

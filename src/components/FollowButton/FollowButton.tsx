@@ -42,7 +42,7 @@ const FollowButton = ({
       onClick={handleToggleFollow}
       disabled={loading}
     >
-      <span className="text-[12px] font-normal">
+      <span className="text-[14px] font-bold">
         {loading ? "..." : isFollowing ? "Unfollow" : "Follow"}
       </span>
     </Button>
