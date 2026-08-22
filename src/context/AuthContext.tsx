@@ -53,7 +53,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signIn = (nextUser: User, token?: string) => {
     setUser(nextUser);
     localStorage.setItem(USER_KEY, JSON.stringify(nextUser));
-    if (token) localStorage.setItem(TOKEN_KEY, token);
+    if (token) {
+      localStorage.setItem(TOKEN_KEY, token);
+    } 
   };
 
   const signOut = async () => {

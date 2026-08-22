@@ -1,88 +1,118 @@
+import { useState } from "react";
 import Icon from "../../common/Icon/Icon";
 import Button from "../../common/Button/Button";
-import { useState } from "react";
 import EditProfileModal from "../EditProfileModal/EditProfileModal";
 import avatarImage from "../../../assets/Avatar/a.png";
+import type { UpdateProfilePayload, User } from "../../../types/user";
 
-const ProfileCard = () => {
+interface ProfileCardProps {
+  user: User;
+  isOwnProfile: boolean;
+  onSaveProfile: (data: UpdateProfilePayload) => Promise<void>;
+  isSaving: boolean;
+  saveError: string | null;
+}
+
+const ProfileCard = ({
+  user,
+  isOwnProfile,
+  onSaveProfile,
+  isSaving,
+  saveError,
+}: ProfileCardProps) => {
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+
   return (
-    <div
-  className="
-    min-h-[446px]
-    w-full
-    rounded-2xl
-    border border-[#E5E5E5]
-    bg-white
-    p-5
-    shadow-sm
-    dark:border-[#313131]
-    dark:bg-[#191919]
-  "
->
+    <div className="min-h-[446px] w-full rounded-2xl border border-[#E5E5E5] bg-white p-5 shadow-sm dark:border-[#313131] dark:bg-[#191919]">
       <div className="w-full">
-        {/* Profile */}
         <div className="flex flex-col items-center">
           <img
-            src={avatarImage}
-            alt="Profile"
+            src={user.avatar || avatarImage}
+            alt={user.name}
             className="h-20 w-20 rounded-full object-cover"
           />
 
-          <h2 className="mt-3 text-[20px] font-semibold">Pedram</h2>
+          <h2 className="mt-3 text-[20px] font-semibold">{user.name}</h2>
 
-          <span className="mt-1 text-[14px] text-gray-500">iran</span>
+          {user.username ? (
+            <span className="mt-1 text-[14px] text-gray-500">
+              @{user.username}
+            </span>
+          ) : null}
+
+          {user.bio ? (
+            <p className="mt-3 text-center text-[14px] text-gray-600 dark:text-gray-300">
+              {user.bio}
+            </p>
+          ) : null}
         </div>
 
-        {/* Followers */}
-        <div className="flex items-center justify-between text-center mt-8">
+        <div className="mt-8 flex items-center justify-between text-center">
           <div>
-            <p className="text-[18px] font-medium">2</p>
+            <p className="text-[18px] font-medium">{user.followingCount ?? 0}</p>
             <span className="text-[14px] text-gray-500">Followings</span>
           </div>
-
           <div>
-            <p className="text-[18px] font-medium">2</p>
+            <p className="text-[18px] font-medium">{user.followersCount ?? 0}</p>
             <span className="text-[14px] text-gray-500">Followers</span>
           </div>
-
           <div>
-            <p className="text-[18px] font-medium">2</p>
+            <p className="text-[18px] font-medium">{user.postsCount ?? 0}</p>
             <span className="text-[14px] text-gray-500">Posts</span>
           </div>
         </div>
 
-        <div className="mt-4 h-px w-full mb-12">
-          <Button
-            type="button"
-            onClick={() => setIsEditProfileOpen(true)}
-            variant="primary"
-            className="w-full"
-          >
-            <Icon name="Edit" reverseTheme size={20} className="pr-2" />
-            <p className="w-full">Edit profile</p>
-          </Button>
-        </div>
-        <EditProfileModal
-          isOpen={isEditProfileOpen}
-          onClose={() => setIsEditProfileOpen(false)}
-        />
+        {isOwnProfile ? (
+          <div className="mb-12 mt-4 h-px w-full">
+            <Button
+              type="button"
+              onClick={() => setIsEditProfileOpen(true)}
+              variant="primary"
+              className="w-full"
+            >
+              <Icon name="Edit" reverseTheme size={20} className="pr-2" />
+              <p className="w-full">Edit profile</p>
+            </Button>
+          </div>
+        ) : (
+          <div className="mb-12 mt-4" />
+        )}
 
-        {/* Location */}
-        <div className="flex items-center gap-2 text-gray-500 pt-6">
+        {isOwnProfile ? (
+          <EditProfileModal
+            isOpen={isEditProfileOpen}
+            onClose={() => setIsEditProfileOpen(false)}
+            initialValues={{
+              name: user.name,
+              bio: user.bio ?? "",
+              location: user.location ?? "",
+              website: user.website ?? "",
+            }}
+            onSave={onSaveProfile}
+            isSaving={isSaving}
+            error={saveError}
+          />
+        ) : null}
+
+        <div className="flex items-center gap-2 pt-6 text-gray-500">
           <Icon name="Location" size={20} />
-          <span className="text-[14px]">No location</span>
+          <span className="text-[14px]">{user.location || "No location"}</span>
         </div>
 
-        {/* Website */}
         <div className="mt-3 flex items-center gap-2 text-gray-500">
           <Icon name="Link" size={20} />
-          <span className="text-[14px]">No website</span>
-        </div>
-
-        <div className="mt-3 flex items-center gap-2 text-gray-500">
-          <Icon name="Calendar" size={20} />
-          <span className="text-[14px]">6 days ago</span>
+          {user.website ? (
+            <a
+              href={user.website}
+              target="_blank"
+              rel="noreferrer"
+              className="text-[14px] underline"
+            >
+              {user.website}
+            </a>
+          ) : (
+            <span className="text-[14px]">No website</span>
+          )}
         </div>
       </div>
     </div>
