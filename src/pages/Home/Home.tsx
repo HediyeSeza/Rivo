@@ -8,53 +8,68 @@ const Home = () => {
   const { isAuthenticated } = useAuth();
 
   return (
-    <main
-      className="
-        mx-auto
-        h-screen
-        w-full
-        overflow-hidden
-        px-4
-        pt-24
-        pb-10
-
-        sm:px-6
-
-        xl:grid
-        xl:grid-cols-[250px_minmax(0,1fr)_250px]
-        xl:items-start
-        xl:gap-6
-
-        2xl:px-8
-        2xl:gap-8
-      "
-    >
-      {/* Left Sidebar */}
-      <aside className="hidden min-h-0 lg:block">
-        <div className="sticky top-24">
-          {isAuthenticated ? <ProfileSidebar /> : <WelcomeSection />}
-        </div>
-      </aside>
-
-      {/* Main Feed */}
-      <section
+    <div className="min-h-screen w-full pt-24">
+      {/* Central Layout */}
+      <div
         className="
-          min-w-0
-          h-full
-          overflow-y-auto
-          scrollbar-hide
+          relative
+          mx-auto
+          flex
+          w-full
+          items-start
+          justify-center
+          gap-6
+          px-4
+          sm:px-6
+          2xl:gap-8
         "
       >
-        <Feed />
-      </section>
+        {/* Left Sidebar */}
+        <aside
+          className="
+            sticky
+            w-[230px]
+            xl:w-[294px]
+            2xl:w-[358px]
+            top-24
+            hidden
+            shrink-0
+            lg:block
+          "
+        >
+          {isAuthenticated ? <ProfileSidebar /> : <WelcomeSection />}
+        </aside>
 
-      {/* Right Sidebar */}
-      <aside className="hidden min-h-0 lg:block">
-        <div className="sticky top-24">
+        {/* Main */}
+        <main
+          className="
+            min-w-0
+            flex-1
+            max-w-[742px]
+            overflow-y-auto
+            pb-10
+          "
+        >
+          <Feed />
+        </main>
+
+        {/* Right Sidebar */}
+        <aside
+          className="
+            sticky
+            w-[230px]
+            xl:w-[294px]
+            2xl:w-[358px]
+            top-24
+            hidden
+            shrink-0
+            lg:block
+          "
+        >
           <RecommendedUsers />
-        </div>
-      </aside>
-    </main>
+        </aside>
+      </div>
+    </div>
   );
 };
 
