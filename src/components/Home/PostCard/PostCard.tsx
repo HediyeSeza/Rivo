@@ -118,9 +118,9 @@ const PostCard = ({
   to={`/profile/${username}`}
   className="
     cursor-pointer
-    text-[14px]
+    text-[12px]
     leading-5
-    text-(--color-content-secondary)
+   !text-(--color-content-muted)
     transition-colors
     duration-200
     hover:text-(--color-content-primary)
@@ -129,7 +129,7 @@ const PostCard = ({
   @{username}
 </Link>
 
-            <span className="text-[14px] leading-5 text-(--color-content-secondary)]">
+            <span className="text-[12px] leading-5 text-(--color-content-muted)">
               {formatPostTime(createdAt)}
             </span>
           </div>

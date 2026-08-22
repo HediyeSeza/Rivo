@@ -1,5 +1,12 @@
 import { api } from "./api";
-import type { User } from "../types/user";
+
+export interface User {
+  id: string;
+  username?: string;
+  name: string;
+  email: string;
+  avatar?: string;
+}
 
 interface RecommendedUsersResponse {
   message: string;

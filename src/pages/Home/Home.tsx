@@ -11,19 +11,26 @@ const Home = () => {
     <main
       className="
         mx-auto
-        grid
+        min-h-screen
         w-full
-        grid-cols-1
-        gap-0
+        max-w-[1400px]
         px-4
         pt-24
-        md:px-5
-        lg:grid-cols-[minmax(300px,360px)_minmax(0,1fr)_minmax(300px,350px)]
-        lg:gap-6
+        pb-10
+
+        sm:px-6
+
+        xl:grid
+        xl:grid-cols-[250px_minmax(0,1fr)_250px]
+        xl:items-start
+        xl:gap-6
+
+        2xl:px-8
+        2xl:gap-8
       "
     >
       {/* Left Sidebar */}
-      <aside className="hidden lg:block">
+      <aside className="hidden min-w-0 xl:block">
         {isAuthenticated ? <ProfileSidebar /> : <WelcomeSection />}
       </aside>
 
@@ -33,7 +40,7 @@ const Home = () => {
       </section>
 
       {/* Right Sidebar */}
-      <aside className="hidden lg:block">
+      <aside className="hidden min-w-0 xl:block">
         <RecommendedUsers />
       </aside>
     </main>
