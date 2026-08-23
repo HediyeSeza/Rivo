@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import PostCard from "../../Home/PostCard/PostCard";
 
 type ProfileTab = "posts" | "likes";
@@ -65,10 +66,9 @@ const userLikedPosts: ProfilePost[] = [
 
 const ProfilePosts = ({ isOwnProfile }: ProfilePostsProps) => {
   const [activeTab, setActiveTab] = useState<ProfileTab>("posts");
-
   const [posts, setPosts] = useState<ProfilePost[]>(userPosts);
-
-  const [likedPosts, setLikedPosts] = useState<ProfilePost[]>(userLikedPosts);
+  const [likedPosts, setLikedPosts] =
+    useState<ProfilePost[]>(userLikedPosts);
 
   const displayedPosts = activeTab === "posts" ? posts : likedPosts;
 
@@ -90,94 +90,94 @@ const ProfilePosts = ({ isOwnProfile }: ProfilePostsProps) => {
 
   return (
     <section className="w-full">
+      {/* Tabs */}
       <div
-  className="
-    flex
-    w-full
-    rounded-lg
-    bg-[#efeded]
-    p-1
-    dark:bg-[#262626]
-  "
->
-  <button
-    type="button"
-    onClick={() => setActiveTab("posts")}
-    aria-pressed={activeTab === "posts"}
-    className={`
-      flex
-      min-h-[32px]
-      flex-1
-      items-center
-      justify-center
-      rounded-lg
-      px-4
-      text-[14px]
-      font-medium
-      transition-all
-      duration-200
+        className="
+          flex
+          w-full
+          items-center
+          rounded-xl
+          bg-(--color-tab-bg)
+          p-1
+        "
+      >
+        {/* Posts */}
+        <button
+          type="button"
+          onClick={() => setActiveTab("posts")}
+          aria-pressed={activeTab === "posts"}
+          className={`
+            flex
+            min-h-[36px]
+            flex-1
+            items-center
+            justify-center
+            rounded-lg
+            border
+            px-4
+            text-[16px]
+            font-medium
+            transition-all
+            duration-200
+            ${
+              activeTab === "posts"
+                ? `
+                  border-(--color-tab-active-border)
+                  bg-(--color-tab-active-bg)
+                  text-(--color-content-primary)
+                  shadow-sm
+                `
+                : `
+                  border-transparent
+                  bg-transparent
+                  text-(--color-content-secondary)
+                `
+            }
+          `}
+        >
+          Posts
+        </button>
 
-      ${
-        activeTab === "posts"
-          ? `
-            bg-white
-            text-[#171717]
-            shadow-sm
-            dark:bg-[#313131]
-            dark:text-[#171717]
-            
-          `
-          : `
-            bg-transparent
-            text-[#737373]
-            dark:text-[#A3A3A3]
-          `
-      }
-    `}
-  >
-    Posts
-  </button>
+        {/* Likes */}
+        <button
+          type="button"
+          onClick={() => setActiveTab("likes")}
+          aria-pressed={activeTab === "likes"}
+          className={`
+            flex
+            min-h-[36px]
+            flex-1
+            items-center
+            justify-center
+            rounded-lg
+            border
+            px-4
+            text-[16px]
+            font-medium
+            transition-all
+            duration-200
+            ${
+              activeTab === "likes"
+                ? `
+                  border-(--color-tab-active-border)
+                  bg-(--color-tab-active-bg)
+                  text-(--color-content-primary)
+                  shadow-sm
+                `
+                : `
+                  border-transparent
+                  bg-transparent
+                  text-(--color-content-secondary)
+                `
+            }
+          `}
+        >
+          Likes
+        </button>
+      </div>
 
-
-  <button
-    type="button"
-    onClick={() => setActiveTab("likes")}
-    aria-pressed={activeTab === "likes"}
-    className={`
-      flex
-      min-h-[32px]
-      flex-1
-      items-center
-      justify-center
-      rounded-lg
-      px-4
-      text-[14px]
-      font-medium
-      transition-all
-      duration-200
-
-      ${
-        activeTab === "likes"
-          ? `
-            bg-white
-            text-[#171717]
-            shadow-sm
-            dark:bg-[#313131]
-            dark:text-[#171717]
-          `
-          : `
-            bg-transparent
-            text-[#737373]
-            dark:text-[#A3A3A3]
-          `
-      }
-    `}
-  >
-    Likes
-  </button>
-</div>
-
-      <div className="mt-5 flex w-full flex-col gap-4 ">
+      {/* Posts */}
+      <div className="mt-5 flex w-full flex-col gap-4">
         {displayedPosts.length > 0 ? (
           displayedPosts.map((post) => (
             <PostCard
@@ -188,12 +188,9 @@ const ProfilePosts = ({ isOwnProfile }: ProfilePostsProps) => {
               content={post.content}
               likes={post.likes}
               comments={post.comments}
-             
               showDelete={activeTab === "posts" && isOwnProfile}
               onDelete={() => handleDeletePost(post.id)}
-            
               isLiked={activeTab === "likes"}
-            
               showUnlike={activeTab === "likes" && isOwnProfile}
               onUnlike={() => handleRemoveLike(post.id)}
             />
@@ -208,15 +205,17 @@ const ProfilePosts = ({ isOwnProfile }: ProfilePostsProps) => {
               justify-center
               rounded-xl
               border
-              border-(--color-border)]
-              bg-(--color-card)]
+              border-(--color-border)
+              bg-(--color-card)
               px-5
               text-center
               text-[14px]
-              text-(--color-content-secondary)]
+              text-(--color-content-secondary)
             "
           >
-            {activeTab === "posts" ? "No posts yet." : "No liked posts yet."}
+            {activeTab === "posts"
+              ? "No posts yet."
+              : "No liked posts yet."}
           </div>
         )}
       </div>

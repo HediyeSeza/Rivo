@@ -6,26 +6,54 @@ function Profile() {
   const isOwnProfile = true;
 
   return (
-    <div className="min-h-screen">
-      {/* Desktop Sidebar */}
-      <aside className="hidden pl-4 pt-24 lg:block">
-        <ProfileSidebar />
-      </aside>
+    <main
+      className="
+        mx-auto
+        w-full
+        px-6
+        pt-24
+        pb-10
+        sm:px-8
+        lg:px-10
+        xl:px-12
+      "
+    >
+      <div
+        className="
+          grid
+          w-full
+          grid-cols-1
+          gap-8
+          xl:grid-cols-[360px_minmax(0,1fr)]
+          2xl:grid-cols-[400px_minmax(0,1fr)]
+        "
+      >
+        {/* Left Sidebar */}
+        <aside className="hidden min-w-0 xl:block">
+          <ProfileSidebar />
+        </aside>
 
-      {/* Main Content */}
-      <main className="w-full px-4 pb-10 lg:pl-80  pt-24 lg:pt-0">
-        <div className="mx-auto flex w-full max-w-[840px] flex-col gap-4 items-center">
-          <div className="w-full max-w-[524px]">
-            <ProfileCard />
+        {/* Right Content */}
+        <section className="min-w-0 w-full">
+          {/* Profile Card */}
+          <div className="flex w-full justify-center">
+            <div
+              className="
+                w-full
+                max-w-[620px]
+              "
+            >
+              <ProfileCard />
+            </div>
           </div>
 
           {/* Posts / Likes */}
-          <div className="mt-6 w-full">
+          <div className="mt-10 w-full">
             <ProfilePosts isOwnProfile={isOwnProfile} />
           </div>
-        </div>
-      </main>
-    </div>
+        </section>
+      </div>
+    </main>
   );
 }
 
