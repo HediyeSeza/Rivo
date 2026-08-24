@@ -19,3 +19,24 @@ export const getPosts = async (): Promise<Post[]> => {
 
   return response.data;
 };
+
+export interface CreatePostPayload {
+  content: string;
+}
+
+interface CreatePostResponse {
+  message: string;
+  success: boolean;
+  data: Post;
+}
+
+export const createPost = async (
+  data: CreatePostPayload,
+): Promise<Post> => {
+  const response = await api.post<CreatePostResponse>(
+    "/api/posts",
+    data,
+  );
+
+  return response.data;
+};
