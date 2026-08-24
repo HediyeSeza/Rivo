@@ -4,8 +4,10 @@ import PostCard from "../PostCard/PostCard";
 import CreatePost from "../CreatePost/CreatePost";
 import Loading from "../../loading/Loading";
 import SuccessModal from "../../common/Modal/SuccessModal";
+import ConfirmModal from "../../common/Modal/ConfirmModal";
+import { useAuth } from "../../../context/AuthContext";
 
-import { getPosts, type Post } from "../../../services/postApi";
+import { deletePost, getPosts, type Post } from "../../../services/postApi";
 
 import { getUserById, type User } from "../../../services/userApi";
 
@@ -16,10 +18,13 @@ type PostWithAuthor = Post & {
 };
 
 const Feed = () => {
+  const { user } = useAuth();
   const [posts, setPosts] = useState<PostWithAuthor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [postToDelete, setPostToDelete] = useState<PostWithAuthor | null>(null);
 
   const fetchPosts = async (showLoading = true) => {
     try {
@@ -39,9 +44,7 @@ const Feed = () => {
         uniqueAuthorIds.map((id) => getUserById(id)),
       );
 
-      const usersMap = new Map(
-        users.map((user) => [user.id, user]),
-      );
+      const usersMap = new Map(users.map((user) => [user.id, user]));
 
       const postsWithAuthors = postsData
         .map((post) => {
@@ -56,16 +59,12 @@ const Feed = () => {
             author,
           };
         })
-        .filter(
-          (post): post is PostWithAuthor => post !== null,
-        );
+        .filter((post): post is PostWithAuthor => post !== null);
 
       setPosts(postsWithAuthors);
     } catch (error) {
       setError(
-        error instanceof Error
-          ? error.message
-          : "Failed to load posts.",
+        error instanceof Error ? error.message : "Failed to load posts.",
       );
     } finally {
       if (showLoading) {
@@ -79,13 +78,36 @@ const Feed = () => {
   }, []);
 
   const handlePostCreated = async () => {
-
+    setSuccessMessage("Post created successfully");
     setShowSuccess(true);
 
     window.setTimeout(() => {
       setShowSuccess(false);
     }, 5000);
     await fetchPosts(false);
+  };
+
+  const handleDeletePost = async () => {
+    if (!postToDelete) return;
+
+    try {
+      await deletePost(postToDelete.id);
+      setPosts((currentPosts) =>
+        currentPosts.filter((post) => post.id !== postToDelete.id),
+      );
+      setPostToDelete(null);
+      setSuccessMessage("Post deleted successfully");
+      setShowSuccess(true);
+
+      window.setTimeout(() => {
+        setShowSuccess(false);
+      }, 5000);
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : "Failed to delete post.",
+      );
+      setPostToDelete(null);
+    }
   };
 
   if (isLoading) {
@@ -107,8 +129,13 @@ const Feed = () => {
   return (
     <section className="w-full">
       <div className="mx-auto w-full">
-        {showSuccess && (
-          <SuccessModal message="Post created successfully" />
+        {showSuccess && <SuccessModal message={successMessage} />}
+
+        {postToDelete && (
+          <ConfirmModal
+            onCancel={() => setPostToDelete(null)}
+            onConfirm={handleDeletePost}
+          />
         )}
 
         <CreatePost onPostCreated={handlePostCreated} />
@@ -129,6 +156,8 @@ const Feed = () => {
                 likes={0}
                 comments={0}
                 avatar={post.author.avatar}
+                showDelete={post.author.id === user?.id}
+                onDelete={() => setPostToDelete(post)}
               />
             ))}
           </div>
