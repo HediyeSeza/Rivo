@@ -1,8 +1,6 @@
 import { useState } from "react";
 
 import PostCard from "../../Home/PostCard/PostCard";
-import ConfirmModal from "../../common/Modal/ConfirmModal";
-import SuccessModal from "../../common/Modal/SuccessModal";
 
 type ProfileTab = "posts" | "likes";
 
@@ -69,25 +67,17 @@ const userLikedPosts: ProfilePost[] = [
 const ProfilePosts = ({ isOwnProfile }: ProfilePostsProps) => {
   const [activeTab, setActiveTab] = useState<ProfileTab>("posts");
   const [posts, setPosts] = useState<ProfilePost[]>(userPosts);
-  const [likedPosts, setLikedPosts] = useState<ProfilePost[]>(userLikedPosts);
-  const [postToDelete, setPostToDelete] = useState<number | null>(null);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [likedPosts, setLikedPosts] =
+    useState<ProfilePost[]>(userLikedPosts);
 
   const displayedPosts = activeTab === "posts" ? posts : likedPosts;
 
-  const handleDeletePost = () => {
-    if (postToDelete === null) return;
+  const handleDeletePost = (postId: number) => {
     if (!isOwnProfile) return;
 
     setPosts((currentPosts) =>
-      currentPosts.filter((post) => post.id !== postToDelete),
+      currentPosts.filter((post) => post.id !== postId),
     );
-    setPostToDelete(null);
-    setShowSuccess(true);
-
-    window.setTimeout(() => {
-      setShowSuccess(false);
-    }, 5000);
   };
 
   const handleRemoveLike = (postId: number) => {
@@ -100,15 +90,6 @@ const ProfilePosts = ({ isOwnProfile }: ProfilePostsProps) => {
 
   return (
     <section className="w-full">
-      {showSuccess && <SuccessModal message="Post deleted successfully" />}
-
-      {postToDelete !== null && (
-        <ConfirmModal
-          onCancel={() => setPostToDelete(null)}
-          onConfirm={handleDeletePost}
-        />
-      )}
-
       {/* Tabs */}
       <div
         className="
@@ -208,7 +189,7 @@ const ProfilePosts = ({ isOwnProfile }: ProfilePostsProps) => {
               likes={post.likes}
               comments={post.comments}
               showDelete={activeTab === "posts" && isOwnProfile}
-              onDelete={() => setPostToDelete(post.id)}
+              onDelete={() => handleDeletePost(post.id)}
               isLiked={activeTab === "likes"}
               showUnlike={activeTab === "likes" && isOwnProfile}
               onUnlike={() => handleRemoveLike(post.id)}
@@ -232,7 +213,9 @@ const ProfilePosts = ({ isOwnProfile }: ProfilePostsProps) => {
               text-(--color-content-secondary)
             "
           >
-            {activeTab === "posts" ? "No posts yet." : "No liked posts yet."}
+            {activeTab === "posts"
+              ? "No posts yet."
+              : "No liked posts yet."}
           </div>
         )}
       </div>
