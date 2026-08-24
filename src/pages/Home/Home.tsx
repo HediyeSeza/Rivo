@@ -8,34 +8,68 @@ const Home = () => {
   const { isAuthenticated } = useAuth();
 
   return (
-    <main
-      className="
-        mx-auto
-        grid
-        w-full
-        grid-cols-1
-        gap-0
-        px-4
-        pt-24
-        md:px-5
-        lg:grid-cols-[360px_minmax(0,1fr)_360px]
-      "
-    >
-      {/* Left Sidebar */}
-      <aside className="hidden lg:block">
-        {isAuthenticated ? <ProfileSidebar /> : <WelcomeSection />}
-      </aside>
+    <div className="min-h-screen w-full pt-24">
+      {/* Central Layout */}
+      <div
+        className="
+          relative
+          mx-auto
+          flex
+          w-full
+          items-start
+          justify-center
+          gap-6
+          px-4
+          sm:px-6
+          2xl:gap-8
+        "
+      >
+        {/* Left Sidebar */}
+        <aside
+          className="
+            sticky
+            w-[230px]
+            xl:w-[294px]
+            2xl:w-[358px]
+            top-24
+            hidden
+            shrink-0
+            lg:block
+          "
+        >
+          {isAuthenticated ? <ProfileSidebar /> : <WelcomeSection />}
+        </aside>
 
-      {/* Main Feed */}
-      <section className="min-w-0 w-full">
-        <Feed />
-      </section>
+        {/* Main */}
+        <main
+          className="
+            min-w-0
+            flex-1
+            max-w-[742px]
+            overflow-y-auto
+            pb-10
+          "
+        >
+          <Feed />
+        </main>
 
-      {/* Right Sidebar */}
-      <aside className="hidden lg:block">
-        <RecommendedUsers />
-      </aside>
-    </main>
+        {/* Right Sidebar */}
+        <aside
+          className="
+            sticky
+            w-[230px]
+            xl:w-[294px]
+            2xl:w-[358px]
+            top-24
+            hidden
+            shrink-0
+            lg:block
+          "
+        >
+          <RecommendedUsers />
+        </aside>
+      </div>
+    </div>
   );
 };
 

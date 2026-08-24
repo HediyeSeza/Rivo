@@ -1,19 +1,26 @@
 import { useState } from "react";
+
 import { useNavigate } from "react-router-dom";
 
 import Logo from "../common/Logo/Logo";
+
 import Icon from "../common/Icon/Icon";
+
 import Button from "../common/Button/Button";
+
 import MobileMenu from "./MobileMenu/MobileMenu";
 
 import { useTheme } from "../../context/ThemeContext";
+
 import { useAuth } from "../../context/AuthContext";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const { theme, toggleTheme } = useTheme();
+
   const { signOut } = useAuth();
+
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -44,7 +51,9 @@ function Header() {
       >
         <Logo />
 
-        <h1 className="text-xl font-bold text-black dark:text-white">Rivo</h1>
+        <h1 className="text-xl font-bold text-black dark:text-white">
+          Rivo
+        </h1>
       </button>
 
       <nav className="relative mr-2 flex items-center gap-4">
@@ -63,7 +72,10 @@ function Header() {
               dark:hover:bg-white/5
             "
           >
-            <Icon name={theme === "dark" ? "Moon" : "Light"} size={18} />
+            <Icon
+              name={theme === "dark" ? "Moon" : "Light"}
+              size={18}
+            />
           </button>
         </div>
 
@@ -77,46 +89,55 @@ function Header() {
           <span />
         </Button>
 
-        <MobileMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
+        <MobileMenu
+          isOpen={isMenuOpen}
+          onClose={() => setIsMenuOpen(false)}
+        />
 
         {/* Home */}
         <Button
           type="button"
           className="!hidden md:!flex"
-          variant="secondary"
+          variant="pure"
           icon={<Icon name="Home" size={18} />}
           onClick={() => navigate("/")}
         >
-          <span className="text-[14px] font-normal">Home</span>
+          <span className="text-[14px] font-normal">
+            Home
+          </span>
         </Button>
 
         {/* Notifications */}
         <Button
           type="button"
           className="!hidden md:!flex"
-          variant="secondary"
+          variant="pure"
           icon={<Icon name="notif" size={18} />}
           onClick={() => navigate("/notifications")}
         >
-          <span className="text-[14px] font-normal">Notifications</span>
+          <span className="text-[14px] font-normal">
+            Notifications
+          </span>
         </Button>
 
         {/* Profile */}
         <Button
           type="button"
           className="!hidden md:!flex"
-          variant="secondary"
+          variant="pure"
           icon={<Icon name="Person" size={18} />}
           onClick={() => navigate("/profile")}
         >
-          <span className="text-[14px] font-normal">Profile</span>
+          <span className="text-[14px] font-normal">
+            Profile
+          </span>
         </Button>
 
         {/* Logout */}
         <Button
           type="button"
           className="!hidden md:!flex"
-          variant="secondary"
+          variant="pure"
           icon={<Icon name="Logout" size={18} />}
           onClick={handleSignOut}
           aria-label="Log out"

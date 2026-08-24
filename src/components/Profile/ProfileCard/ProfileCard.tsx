@@ -1,87 +1,162 @@
+import { useState } from "react";
+
 import Icon from "../../common/Icon/Icon";
 import Button from "../../common/Button/Button";
-import { useState } from "react";
 import EditProfileModal from "../EditProfileModal/EditProfileModal";
+
+import avatarImage from "../../../assets/Avatar/a.png";
 
 const ProfileCard = () => {
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+
   return (
     <div
       className="
-      h-[446px]
-        w-[524px]
+        min-h-[446px]
+        w-full
         rounded-2xl
-        border border-[#E5E5E5]
-        bg-white
+        border
+        border-(--color-border)
+        bg-(--color-card)
         p-5
         shadow-sm
-        dark:border-[#313131]
-        dark:bg-[#191919]
+        transition-colors
+        duration-300
       "
     >
       <div className="w-full">
         {/* Profile */}
         <div className="flex flex-col items-center">
           <img
-            src="src\assets\Avatar\a.png"
+            src={avatarImage}
             alt="Profile"
             className="h-20 w-20 rounded-full object-cover"
           />
 
-          <h2 className="mt-3 text-[20px] font-semibold">Pedram</h2>
+          <h2
+            className="
+              mt-3
+              text-[20px]
+              font-semibold
+              text-(--color-content-primary)
+            "
+          >
+            Pedram
+          </h2>
 
-          <span className="mt-1 text-[14px] text-gray-500">iran</span>
+          <span
+            className="
+              mt-1
+              text-[14px]
+              text-(--color-content-secondary)
+            "
+          >
+            iran
+          </span>
         </div>
 
         {/* Followers */}
-        <div className="flex items-center justify-between text-center mt-8">
+        <div className="mt-8 flex items-center justify-between text-center">
           <div>
-            <p className="text-[18px] font-medium">2</p>
-            <span className="text-[14px] text-gray-500">Followings</span>
+            <p className="text-[18px] font-medium text-(--color-content-primary)">
+              2
+            </p>
+            <span className="text-[14px] text-(--color-content-secondary)">
+              Followings
+            </span>
           </div>
 
           <div>
-            <p className="text-[18px] font-medium">2</p>
-            <span className="text-[14px] text-gray-500">Followers</span>
+            <p className="text-[18px] font-medium text-(--color-content-primary)">
+              2
+            </p>
+            <span className="text-[14px] text-(--color-content-secondary)">
+              Followers
+            </span>
           </div>
 
           <div>
-            <p className="text-[18px] font-medium">2</p>
-            <span className="text-[14px] text-gray-500">Posts</span>
+            <p className="text-[18px] font-medium text-(--color-content-primary)">
+              2
+            </p>
+            <span className="text-[14px] text-(--color-content-secondary)">
+              Posts
+            </span>
           </div>
         </div>
 
-        <div className="mt-4 h-px w-full mb-12">
+        {/* Edit Profile */}
+        <div className="mb-12 mt-4 w-full">
           <Button
             type="button"
             onClick={() => setIsEditProfileOpen(true)}
             variant="primary"
             className="w-full"
           >
-            <Icon name="Edit" reverseTheme size={20} className="pr-2" />
-            <p className="w-full">Edit profile</p>
+            <Icon
+              name="Edit"
+              size={20}
+              className="mr-2"
+            />
+
+            <span>Edit Profile</span>
           </Button>
         </div>
+
         <EditProfileModal
           isOpen={isEditProfileOpen}
           onClose={() => setIsEditProfileOpen(false)}
         />
 
         {/* Location */}
-        <div className="flex items-center gap-2 text-gray-500 pt-6">
+        <div
+          className="
+            flex
+            items-center
+            gap-2
+            pt-6
+            text-(--color-content-secondary)
+          "
+        >
           <Icon name="Location" size={20} />
-          <span className="text-[14px]">No location</span>
+
+          <span className="text-[14px]">
+            No location
+          </span>
         </div>
 
         {/* Website */}
-        <div className="mt-3 flex items-center gap-2 text-gray-500">
+        <div
+          className="
+            mt-3
+            flex
+            items-center
+            gap-2
+            text-(--color-content-secondary)
+          "
+        >
           <Icon name="Link" size={20} />
-          <span className="text-[14px]">No website</span>
+
+          <span className="text-[14px]">
+            No website
+          </span>
         </div>
 
-        <div className="mt-3 flex items-center gap-2 text-gray-500">
+        {/* Joined */}
+        <div
+          className="
+            mt-3
+            flex
+            items-center
+            gap-2
+            text-(--color-content-secondary)
+          "
+        >
           <Icon name="Calendar" size={20} />
-          <span className="text-[14px]">6 days ago</span>
+
+          <span className="text-[14px]">
+            6 days ago
+          </span>
         </div>
       </div>
     </div>

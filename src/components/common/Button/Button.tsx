@@ -1,17 +1,17 @@
 import type {
   ButtonHTMLAttributes,
   ReactNode,
-} from 'react';
+} from "react";
 
-import './Button.css';
+import "./Button.css";
 
 type ButtonVariant =
-  | 'primary'
-  | 'secondary'
-  | 'tertiary'
-  | 'pure';
+  | "primary"
+  | "secondary"
+  | "tertiary"
+  | "pure";
 
-type ButtonSize = 'large' | 'small';
+type ButtonSize = "large" | "small";
 
 interface ButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -22,16 +22,17 @@ interface ButtonProps
 }
 
 const Button = ({
-  variant = 'primary',
-  size = 'large',
+  variant = "primary",
+  size = "large",
   icon,
   children,
-  className = '',
+  className = "",
   disabled,
   ...props
 }: ButtonProps) => {
   return (
     <button
+      type="button"
       className={`button button--${variant} button--${size} ${className}`}
       disabled={disabled}
       {...props}

@@ -1,9 +1,18 @@
 export interface User {
-  id: string | number;
+  id: string;
   name: string;
   email: string;
-  username?: string;
-  avatar?: string;
+  emailVerified: boolean;
+  image: string | null;
+  bio: string | null;
+  location: string | null;
+  website: string | null;
+  createdAt: string;
+  updatedAt: string;
+
+  _count?: {
+    followers: number;
+  };
 }
 
 export interface AuthResponse {
