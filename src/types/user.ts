@@ -20,3 +20,10 @@ export interface AuthResponse {
   token?: string;
   accessToken?: string;
 }
+
+export interface AuthApiResponse {
+  data?: AuthResponse;
+  user?: User;
+  token?: string;
+  accessToken?: string;
+}
