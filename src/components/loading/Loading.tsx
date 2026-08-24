@@ -18,7 +18,7 @@ const Loading: FC = () => {
         isDark ? "bg-[#09090b]" : "bg-white"
       }`}
     >
-      <div className="flex -translate-y-30 flex-col items-center gap-3 text-center">
+      <div className="flex -translate-y-40 flex-col items-center gap-3 text-center">
         <div className="relative flex h-11 w-11 items-center justify-center sm:h-12 sm:w-12">
           <div
             className={`absolute inset-0 animate-spin rounded-full border-2 border-l-transparent ${
