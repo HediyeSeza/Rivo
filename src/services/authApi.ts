@@ -1,5 +1,5 @@
 import { api } from "./api";
-import type { AuthResponse, User } from "../types/user";
+import type { AuthApiResponse, AuthResponse, User } from "../types/user";
 
 export interface LoginPayload {
   email: string;
@@ -10,34 +10,44 @@ export interface RegisterPayload extends LoginPayload {
   name: string;
 }
 
-export const getUser = (response: AuthResponse | User): User =>
-  "user" in response && response.user ? response.user : (response as User);
+const unwrapResponse = (
+  response: AuthApiResponse | User,
+): AuthResponse | User =>
+  "data" in response && response.data ? response.data : response;
+
+export const getUser = (response: AuthApiResponse | User): User => {
+  const data = unwrapResponse(response);
+  return "user" in data && data.user ? data.user : (data as User);
+};
+
+const getToken = (response: AuthApiResponse | User) => {
+  const data = unwrapResponse(response);
+  return "token" in data ? data.token || data.accessToken : undefined;
+};
 
 export const login = async (payload: LoginPayload) => {
-  const response = await api.post<AuthResponse | User>(
+  const response = await api.post<AuthApiResponse | User>(
     "/api/authentication/login",
     payload,
   );
   return {
     user: getUser(response),
-    token:
-      "token" in response ? response.token || response.accessToken : undefined,
+    token: getToken(response),
   };
 };
 
 export const register = async (payload: RegisterPayload) => {
-  const response = await api.post<AuthResponse | User>(
+  const response = await api.post<AuthApiResponse | User>(
     "/api/authentication/register",
     payload,
   );
   return {
     user: getUser(response),
-    token:
-      "token" in response ? response.token || response.accessToken : undefined,
+    token: getToken(response),
   };
 };
 
 export const getSession = () =>
-  api.get<AuthResponse | User>("/api/authentication/session");
+  api.get<AuthApiResponse | User>("/api/authentication/session");
 
 export const logout = () => api.post<void>("/api/authentication/logout");
