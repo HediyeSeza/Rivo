@@ -1,13 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import PostCard from "../../Home/PostCard/PostCard";
 import ConfirmModal from "../../common/Modal/ConfirmModal";
 import SuccessModal from "../../common/Modal/SuccessModal";
-
+import type { User } from "../../../types/user";
+import { getUserLikedPosts, getUserPosts } from "../../../services/userApi";
 type ProfileTab = "posts" | "likes";
 
 interface ProfilePostsProps {
   isOwnProfile: boolean;
+  userId: string;
+  user: User;
 }
 
 interface ProfilePost {
@@ -20,58 +23,60 @@ interface ProfilePost {
   comments: number;
 }
 
-const userPosts: ProfilePost[] = [
-  {
-    id: 1,
-    name: "Pedram",
-    username: "pedram",
-    createdAt: "2025-08-15T10:00:00Z",
-    content:
-      "Sometimes the smallest steps in the right direction end up being the biggest steps of your life.",
-    likes: 24,
-    comments: 5,
-  },
-  {
-    id: 2,
-    name: "Pedram",
-    username: "pedram",
-    createdAt: "2025-08-14T12:00:00Z",
-    content:
-      "A clean interface is not just about how it looks. It is about how naturally it feels to use.",
-    likes: 31,
-    comments: 8,
-  },
-];
-
-const userLikedPosts: ProfilePost[] = [
-  {
-    id: 3,
-    name: "Sara",
-    username: "sara",
-    createdAt: "2025-08-15T08:00:00Z",
-    content:
-      "Working on something new today. Small progress is still progress. ✨",
-    likes: 18,
-    comments: 3,
-  },
-  {
-    id: 4,
-    name: "Matin",
-    username: "matin",
-    createdAt: "2025-08-14T12:00:00Z",
-    content:
-      "Good design is not only about appearance. It is about creating a simple and enjoyable experience.",
-    likes: 31,
-    comments: 8,
-  },
-];
-
-const ProfilePosts = ({ isOwnProfile }: ProfilePostsProps) => {
+const ProfilePosts = ({ isOwnProfile, userId, user }: ProfilePostsProps) => {
   const [activeTab, setActiveTab] = useState<ProfileTab>("posts");
-  const [posts, setPosts] = useState<ProfilePost[]>(userPosts);
-  const [likedPosts, setLikedPosts] = useState<ProfilePost[]>(userLikedPosts);
+
+  const [posts, setPosts] = useState<ProfilePost[]>([]);
+  const [likedPosts, setLikedPosts] = useState<ProfilePost[]>([]);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [postToDelete, setPostToDelete] = useState<number | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+
+  useEffect(() => {
+    const loadPosts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const data = await getUserPosts(userId);
+        const likedData = await getUserLikedPosts(userId);
+
+        setPosts(
+          data.map((post) => ({
+            id: Number(post.id),
+            name: user.name,
+            username: user.username ?? "",
+            createdAt: post.createdAt,
+            content: post.content,
+            likes: 0,
+            comments: 0,
+          })),
+        );
+        setLikedPosts(
+          likedData.map((post) => ({
+            id: Number(post.id),
+            name: user.name,
+            username: user.username ?? "",
+            createdAt: post.createdAt,
+            content: post.content,
+            likes: 0,
+            comments: 0,
+          })),
+        );
+      } catch (error) {
+        console.error("Failed to fetch user posts:", error);
+
+        setError("Failed to load posts.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPosts();
+  }, [userId]);
 
   const displayedPosts = activeTab === "posts" ? posts : likedPosts;
 
@@ -82,6 +87,7 @@ const ProfilePosts = ({ isOwnProfile }: ProfilePostsProps) => {
     setPosts((currentPosts) =>
       currentPosts.filter((post) => post.id !== postToDelete),
     );
+
     setPostToDelete(null);
     setShowSuccess(true);
 
@@ -195,47 +201,97 @@ const ProfilePosts = ({ isOwnProfile }: ProfilePostsProps) => {
         </button>
       </div>
 
+      {/* Loading */}
+      {loading && (
+        <div
+          className="
+            mt-5
+            flex
+            min-h-[180px]
+            w-full
+            items-center
+            justify-center
+            rounded-xl
+            border
+            border-(--color-border)
+            bg-(--color-card)
+            px-5
+            text-center
+            text-[14px]
+            text-(--color-content-secondary)
+          "
+        >
+          Loading...
+        </div>
+      )}
+
+      {/* Error */}
+      {!loading && error && (
+        <div
+          className="
+            mt-5
+            flex
+            min-h-[180px]
+            w-full
+            items-center
+            justify-center
+            rounded-xl
+            border
+            border-(--color-border)
+            bg-(--color-card)
+            px-5
+            text-center
+            text-[14px]
+            text-red-500
+          "
+        >
+          {error}
+        </div>
+      )}
+
       {/* Posts */}
-      <div className="mt-5 flex w-full flex-col gap-4">
-        {displayedPosts.length > 0 ? (
-          displayedPosts.map((post) => (
-            <PostCard
-              key={post.id}
-              name={post.name}
-              username={post.username}
-              createdAt={post.createdAt}
-              content={post.content}
-              likes={post.likes}
-              comments={post.comments}
-              showDelete={activeTab === "posts" && isOwnProfile}
-              onDelete={() => setPostToDelete(post.id)}
-              isLiked={activeTab === "likes"}
-              showUnlike={activeTab === "likes" && isOwnProfile}
-              onUnlike={() => handleRemoveLike(post.id)}
-            />
-          ))
-        ) : (
-          <div
-            className="
-              flex
-              min-h-[180px]
-              w-full
-              items-center
-              justify-center
-              rounded-xl
-              border
-              border-(--color-border)
-              bg-(--color-card)
-              px-5
-              text-center
-              text-[14px]
-              text-(--color-content-secondary)
-            "
-          >
-            {activeTab === "posts" ? "No posts yet." : "No liked posts yet."}
-          </div>
-        )}
-      </div>
+      {!loading && !error && (
+        <div className="mt-5 flex w-full flex-col gap-4">
+          {displayedPosts.length > 0 ? (
+            displayedPosts.map((post) => (
+              <PostCard
+                key={post.id}
+                name={post.name}
+                username={post.username}
+                createdAt={post.createdAt}
+                content={post.content}
+                likes={post.likes}
+                comments={post.comments}
+                showDelete={activeTab === "posts" && isOwnProfile}
+                onDelete={() => setPostToDelete(post.id)}
+                isLiked={activeTab === "likes"}
+                showUnlike={activeTab === "likes" && isOwnProfile}
+                onUnlike={() => handleRemoveLike(post.id)}
+              />
+            ))
+          ) : (
+            <div
+              className="
+                flex
+                min-h-[180px]
+                w-full
+                items-center
+                justify-center
+                rounded-xl
+                border
+                border-(--color-border)
+                bg-(--color-card)
+                px-5
+                text-center
+                text-[14px]
+                text-(--color-content-secondary)
+              "
+            >
+              {activeTab === "posts" ? "No posts yet." : "No liked posts yet."}
+            </div>
+          )}
+        </div>
+      )}
     </section>
   );
 };
