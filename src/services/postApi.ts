@@ -30,12 +30,19 @@ interface CreatePostResponse {
   data: Post;
 }
 
-export const createPost = async (data: CreatePostPayload): Promise<Post> => {
-  const response = await api.post<CreatePostResponse>("/api/posts", data);
+export const createPost = async (
+  data: CreatePostPayload,
+): Promise<Post> => {
+  const response = await api.post<CreatePostResponse>(
+    "/api/posts",
+    data,
+  );
 
   return response.data;
 };
 
-export const deletePost = async (postId: string): Promise<void> => {
+export const deletePost = async (
+  postId: string,
+): Promise<void> => {
   await api.delete(`/api/posts/${postId}`);
 };

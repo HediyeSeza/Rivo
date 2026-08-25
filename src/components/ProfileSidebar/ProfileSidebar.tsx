@@ -1,76 +1,162 @@
 import Icon from "../common/Icon/Icon";
-import { useTheme } from "../../context/ThemeContext";
 
-const ProfileSidebar = () => {
-  const { theme } = useTheme();
+import avatarImage from "../../assets/Avatar/a.png";
 
-  console.log("Sidebar theme:", theme);
+import type { User } from "../../services/userApi";
+import { getUsernameFromEmail } from "../../utils/getUsernameFromEmail";
 
-  console.log("Sidebar theme:", theme);
+interface ProfileSidebarProps {
+  user: User;
+}
+
+const ProfileSidebar = ({ user }: ProfileSidebarProps) => {
+  const profileAvatar = user.image || avatarImage;
+  const username = getUsernameFromEmail(user.email);
+
+  const followersCount = user._count?.followers ?? 0;
+  const followingCount = user._count?.followings ?? 0;
+
   return (
     <aside
-  className="
-    w-full
-    rounded-2xl
-    border border-[#E5E5E5]
-    bg-white
-    p-5
-    shadow-sm
-    transition-colors
-    duration-300
-    dark:border-[#262626]
-    dark:bg-[#191919]
-  "
->
-      <div className="flex justify-center items-center">
-        <div className="w-full">
-          {/* Profile */}
-          <div className="flex flex-col items-center">
-            <img
-              src="src\assets\Avatar\a.png"
-              alt="Profile"
-              className="h-20 w-20 rounded-full object-cover"
-            />
+      className="
+        w-full
+        rounded-2xl
+        border
+        border-(--color-border)
+        bg-(--color-card)
+        p-5
+        shadow-sm
+        transition-colors
+        duration-300
+      "
+    >
+      <div className="w-full">
+        {/* Profile */}
+        <div className="flex flex-col items-center">
+          <img
+            src={profileAvatar}
+            alt={`${user.name} avatar`}
+            className="h-20 w-20 rounded-full object-cover"
+          />
 
-            <h2 className="mt-3 text-[20px] font-semibold">Pedram</h2>
+          <h2
+            className="
+              mt-3
+              text-[20px]
+              font-semibold
+              text-(--color-content-primary)
+            "
+          >
+            {user.name}
+          </h2>
 
-            <span className="mt-1 text-[14px] text-gray-500">iran</span>
+          <span
+            className="
+              mt-1
+              text-[14px]
+              text-(--color-content-secondary)
+            "
+          >
+            {username}
+          </span>
+        </div>
+
+        {/* Divider */}
+        <div
+          className="
+            my-8
+            h-px
+            w-full
+            bg-(--color-border)
+          "
+        />
+
+        {/* Followers */}
+        <div className="flex items-center justify-between text-center">
+          <div>
+            <p
+              className="
+                text-[18px]
+                font-medium
+                text-(--color-content-primary)
+              "
+            >
+              {followingCount}
+            </p>
+
+            <span
+              className="
+                text-[14px]
+                text-(--color-content-secondary)
+              "
+            >
+              Followings
+            </span>
           </div>
 
-          {/* Divider */}
-          <div className="my-8 h-px w-full bg-[#E5E5E5]" />
+          <div>
+            <p
+              className="
+                text-[18px]
+                font-medium
+                text-(--color-content-primary)
+              "
+            >
+              {followersCount}
+            </p>
 
-          {/* Followers */}
-          <div className="flex items-center justify-between text-center">
-            <div>
-              <p className="text-[18px] font-medium">2</p>
-
-              <span className="text-[14px] text-gray-500">Followings</span>
-            </div>
-
-            <div>
-              <p className="text-[18px] font-medium">2</p>
-
-              <span className="text-[14px] text-gray-500">Followers</span>
-            </div>
+            <span
+              className="
+                text-[14px]
+                text-(--color-content-secondary)
+              "
+            >
+              Followers
+            </span>
           </div>
+        </div>
 
-          {/* Divider */}
-          <div className="my-6 h-px w-full bg-[#E5E5E5]" />
+        {/* Divider */}
+        <div
+          className="
+            my-6
+            h-px
+            w-full
+            bg-(--color-border)
+          "
+        />
 
-          {/* Location */}
-          <div className="flex items-center gap-2 text-gray-500">
-            <Icon name="Location" size={20} />
+        {/* Location */}
+        <div
+          className="
+            flex
+            items-center
+            gap-2
+            text-(--color-content-secondary)
+          "
+        >
+          <Icon name="Location" size={20} />
 
-            <span className="text-[14px]">No location</span>
-          </div>
+          <span className="text-[14px]">
+            {user.location || "No location"}
+          </span>
+        </div>
 
-          {/* Website */}
-          <div className="mt-4 flex items-center gap-2 text-gray-500">
-            <Icon name="Link" size={20} />
+        {/* Website */}
+        <div
+          className="
+            mt-4
+            flex
+            items-center
+            gap-2
+            text-(--color-content-secondary)
+          "
+        >
+          <Icon name="Link" size={20} />
 
-            <span className="text-[14px]">No website</span>
-          </div>
+          <span className="text-[14px]">
+            {user.website || "No website"}
+          </span>
         </div>
       </div>
     </aside>

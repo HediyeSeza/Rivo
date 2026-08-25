@@ -12,6 +12,8 @@ export interface User {
 
   _count?: {
     followers: number;
+    following: number;
+    posts: number;
   };
 }
 
