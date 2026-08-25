@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 
 import PostCard from "../../Home/PostCard/PostCard";
-import ConfirmModal from "../../common/Modal/ConfirmModal";
-import SuccessModal from "../../common/Modal/SuccessModal";
 
 import { deletePost } from "../../../services/postApi";
 
@@ -27,7 +25,7 @@ type ProfilePostWithRelations = ProfilePost & {
     name?: string;
     email?: string;
     image?: string | null;
-  };
+ };
 
   _count?: {
     likes?: number;
@@ -133,7 +131,6 @@ const ProfilePosts = ({
       setPostToDelete(null);
     }
   };
-
   const getPostAuthorName = (
     post: ProfilePost,
   ) => {
@@ -245,24 +242,23 @@ const ProfilePosts = ({
       </div>
     );
   }
+return (
+  <section className="w-full">
+    {showSuccess && (
+      <SuccessModal message="Post deleted successfully" />
+    )}
 
-  return (
-    <section className="w-full">
-      {showSuccess && (
-        <SuccessModal message="Post deleted successfully" />
-      )}
+    {postToDelete && (
+      <ConfirmModal
+        onCancel={() =>
+          setPostToDelete(null)
+        }
+        onConfirm={handleDeletePost}
+      />
+    )}
 
-      {postToDelete && (
-        <ConfirmModal
-          onCancel={() =>
-            setPostToDelete(null)
-          }
-          onConfirm={handleDeletePost}
-        />
-      )}
-
-      {/* Tabs */}
-      <div
+    {/* Tabs */}
+    <div>
         className="
           flex
           w-full
@@ -359,22 +355,28 @@ const ProfilePosts = ({
               username={getPostUsername(post)}
               createdAt={post.createdAt}
               content={post.content}
-              likes={getPostLikes(post)}
-              comments={getPostComments(post)}
-              showDelete={
-                activeTab === "posts" &&
-                isOwnProfile
-              }
-              onDelete={() =>
-                setPostToDelete(post)
-              }
-              isLiked={
-                activeTab === "likes"
-              }
-              showUnlike={false}
-            />
-          ))
-        ) : (
+    likes={getPostLikes(post)}
+    comments={getPostComments(post)}
+    showDelete={
+      activeTab === "posts" &&
+      isOwnProfile
+    }
+    onDelete={() =>
+      setPostToDelete(post)
+    }
+    isLiked={
+      activeTab === "likes"
+    }
+    showUnlike={
+      activeTab === "likes" &&
+      isOwnProfile
+    }
+    onUnlike={() =>
+      handleRemoveLike(post.id)
+    }
+/>
+))
+) : (
           <div
             className="
               flex

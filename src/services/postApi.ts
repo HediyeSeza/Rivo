@@ -37,7 +37,6 @@ export const createPost = async (
     "/api/posts",
     data,
   );
-
   return response.data;
 };
 
