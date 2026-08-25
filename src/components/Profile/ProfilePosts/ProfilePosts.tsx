@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
 
 import PostCard from "../../Home/PostCard/PostCard";
-import ConfirmModal from "../../common/Modal/ConfirmModal";
 import SuccessModal from "../../common/Modal/SuccessModal";
+
+import {
+  getUserLikedPosts,
+  getUserPosts,
+} from "../../../services/userApi";
+
 import type { User } from "../../../types/user";
-import { getUserLikedPosts, getUserPosts } from "../../../services/userApi";
+
 type ProfileTab = "posts" | "likes";
 
 interface ProfilePostsProps {
@@ -23,17 +28,27 @@ interface ProfilePost {
   comments: number;
 }
 
-const ProfilePosts = ({ isOwnProfile, userId, user }: ProfilePostsProps) => {
-  const [activeTab, setActiveTab] = useState<ProfileTab>("posts");
+const ProfilePosts = ({
+  isOwnProfile,
+  userId,
+  user,
+}: ProfilePostsProps) => {
+  const [activeTab, setActiveTab] =
+    useState<ProfileTab>("posts");
 
   const [posts, setPosts] = useState<ProfilePost[]>([]);
-  const [likedPosts, setLikedPosts] = useState<ProfilePost[]>([]);
+  const [likedPosts, setLikedPosts] =
+    useState<ProfilePost[]>([]);
 
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] =
+    useState<string | null>(null);
 
-  const [postToDelete, setPostToDelete] = useState<number | null>(null);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [postToDelete, setPostToDelete] =
+    useState<number | null>(null);
+
+  const [showSuccess, setShowSuccess] =
+    useState(false);
 
   useEffect(() => {
     const loadPosts = async () => {
@@ -41,11 +56,13 @@ const ProfilePosts = ({ isOwnProfile, userId, user }: ProfilePostsProps) => {
         setLoading(true);
         setError(null);
 
-        const data = await getUserPosts(userId);
-        const likedData = await getUserLikedPosts(userId);
+        const [data, likedData] = await Promise.all([
+          getUserPosts(userId),
+          getUserLikedPosts(userId),
+        ]);
 
-        setPosts(
-          data.map((post) => ({
+        const mappedPosts: ProfilePost[] = data.map(
+          (post) => ({
             id: Number(post.id),
             name: user.name,
             username: user.username ?? "",
@@ -53,9 +70,10 @@ const ProfilePosts = ({ isOwnProfile, userId, user }: ProfilePostsProps) => {
             content: post.content,
             likes: 0,
             comments: 0,
-          })),
+          }),
         );
-        setLikedPosts(
+
+        const mappedLikedPosts: ProfilePost[] =
           likedData.map((post) => ({
             id: Number(post.id),
             name: user.name,
@@ -64,10 +82,15 @@ const ProfilePosts = ({ isOwnProfile, userId, user }: ProfilePostsProps) => {
             content: post.content,
             likes: 0,
             comments: 0,
-          })),
-        );
+          }));
+
+        setPosts(mappedPosts);
+        setLikedPosts(mappedLikedPosts);
       } catch (error) {
-        console.error("Failed to fetch user posts:", error);
+        console.error(
+          "Failed to fetch user posts:",
+          error,
+        );
 
         setError("Failed to load posts.");
       } finally {
@@ -76,16 +99,19 @@ const ProfilePosts = ({ isOwnProfile, userId, user }: ProfilePostsProps) => {
     };
 
     loadPosts();
-  }, [userId]);
+  }, [userId, user]);
 
-  const displayedPosts = activeTab === "posts" ? posts : likedPosts;
+  const displayedPosts =
+    activeTab === "posts" ? posts : likedPosts;
 
   const handleDeletePost = () => {
     if (postToDelete === null) return;
     if (!isOwnProfile) return;
 
     setPosts((currentPosts) =>
-      currentPosts.filter((post) => post.id !== postToDelete),
+      currentPosts.filter(
+        (post) => post.id !== postToDelete,
+      ),
     );
 
     setPostToDelete(null);
@@ -100,20 +126,21 @@ const ProfilePosts = ({ isOwnProfile, userId, user }: ProfilePostsProps) => {
     if (!isOwnProfile) return;
 
     setLikedPosts((currentPosts) =>
-      currentPosts.filter((post) => post.id !== postId),
+      currentPosts.filter(
+        (post) => post.id !== postId,
+      ),
     );
   };
 
   return (
     <section className="w-full">
-      {showSuccess && <SuccessModal message="Post deleted successfully" />}
-
-      {postToDelete !== null && (
-        <ConfirmModal
-          onCancel={() => setPostToDelete(null)}
-          onConfirm={handleDeletePost}
-        />
+      {/* Success Modal */}
+      {showSuccess && (
+        <SuccessModal message="Post deleted successfully" />
       )}
+
+      {/* Confirm Delete Modal */}
+    
 
       {/* Tabs */}
       <div
@@ -144,6 +171,7 @@ const ProfilePosts = ({ isOwnProfile, userId, user }: ProfilePostsProps) => {
             font-medium
             transition-all
             duration-200
+
             ${
               activeTab === "posts"
                 ? `
@@ -181,6 +209,7 @@ const ProfilePosts = ({ isOwnProfile, userId, user }: ProfilePostsProps) => {
             font-medium
             transition-all
             duration-200
+
             ${
               activeTab === "likes"
                 ? `
@@ -262,11 +291,21 @@ const ProfilePosts = ({ isOwnProfile, userId, user }: ProfilePostsProps) => {
                 content={post.content}
                 likes={post.likes}
                 comments={post.comments}
-                showDelete={activeTab === "posts" && isOwnProfile}
-                onDelete={() => setPostToDelete(post.id)}
+                showDelete={
+                  activeTab === "posts" &&
+                  isOwnProfile
+                }
+                onDelete={() =>
+                  setPostToDelete(post.id)
+                }
                 isLiked={activeTab === "likes"}
-                showUnlike={activeTab === "likes" && isOwnProfile}
-                onUnlike={() => handleRemoveLike(post.id)}
+                showUnlike={
+                  activeTab === "likes" &&
+                  isOwnProfile
+                }
+                onUnlike={() =>
+                  handleRemoveLike(post.id)
+                }
               />
             ))
           ) : (
@@ -287,7 +326,9 @@ const ProfilePosts = ({ isOwnProfile, userId, user }: ProfilePostsProps) => {
                 text-(--color-content-secondary)
               "
             >
-              {activeTab === "posts" ? "No posts yet." : "No liked posts yet."}
+              {activeTab === "posts"
+                ? "No posts yet."
+                : "No liked posts yet."}
             </div>
           )}
         </div>
