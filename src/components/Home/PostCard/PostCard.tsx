@@ -23,7 +23,7 @@ interface PostCardProps {
   avatar?: string;
 
   commentsData: PostComment[];
-  onCommentAdded?: () => void;
+  onCommentAdded?: (comment: PostComment) => void;
 
   showDelete?: boolean;
   onDelete?: () => void;

@@ -8,7 +8,12 @@ import ConfirmModal from "../../common/Modal/ConfirmModal";
 
 import { useAuth } from "../../../context/AuthContext";
 
-import { deletePost, getPosts, type Post } from "../../../services/postApi";
+import {
+  deletePost,
+  getPosts,
+  type Post,
+  type PostComment,
+} from "../../../services/postApi";
 
 import { getUsernameFromEmail } from "../../../utils/getUsernameFromEmail";
 
@@ -72,6 +77,20 @@ const Feed = () => {
     }, 5000);
 
     await fetchPosts(false);
+  };
+
+  const handleCommentAdded = (postId: string, comment: PostComment) => {
+    setPosts((currentPosts) =>
+      currentPosts.map((post) =>
+        post.id === postId
+          ? {
+              ...post,
+              comments: [...post.comments, comment],
+              _count: { ...post._count, comments: post._count.comments + 1 },
+            }
+          : post,
+      ),
+    );
   };
 
   const handleDeletePost = async () => {
@@ -150,6 +169,9 @@ const Feed = () => {
                 likes={post._count.likes}
                 comments={post._count.comments}
                 commentsData={post.comments}
+                onCommentAdded={(comment) =>
+                  handleCommentAdded(post.id, comment)
+                }
                 avatar={post.author.image ?? post.author.avatar ?? undefined}
                 showDelete={post.author.id === user?.id}
                 onDelete={() => setPostToDelete(post)}
