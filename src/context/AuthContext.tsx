@@ -36,6 +36,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           const sessionUser = getUser(response);
           setUser(sessionUser);
           localStorage.setItem(USER_KEY, JSON.stringify(sessionUser));
+
+          const sessionToken =
+            response && "data" in response && response.data?.session?.token;
+
+          if (sessionToken) {
+            localStorage.setItem(TOKEN_KEY, sessionToken);
+          }
         }
       })
       .catch(() => {

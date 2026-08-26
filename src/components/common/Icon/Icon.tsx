@@ -51,6 +51,9 @@ import sendLight from "../../../assets/icons/Light/Send.svg";
 import tashDark from "../../../assets/icons/Dark/Tash.svg";
 import tashLight from "../../../assets/icons/Light/Tash.svg";
 
+import heartFillDark from "../../../assets/icons/Dark/heart-fill.svg";
+import heartFillLight from "../../../assets/icons/Light/heart-fill.svg";
+
 const icons = {
   Chat: {
     dark: chatDark,
@@ -62,10 +65,8 @@ const icons = {
     light: editLight,
   },
 
-  Heart: {
-    dark: heartDark,
-    light: heartLight,
-  },
+  Heart: { dark: heartDark, light: heartLight },
+  HeartFill: { dark: heartFillDark, light: heartFillLight },
 
   Home: {
     dark: homeDark,

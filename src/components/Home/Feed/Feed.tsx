@@ -6,7 +6,6 @@ import Loading from "../../loading/Loading";
 import SuccessModal from "../../common/Modal/SuccessModal";
 
 import { getPosts, type Post } from "../../../services/postApi";
-
 import { getUserById, type User } from "../../../services/userApi";
 
 import { getUsernameFromEmail } from "../../../utils/getUsernameFromEmail";
@@ -20,6 +19,7 @@ const Feed = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [likeMessage, setLikeMessage] = useState<string | null>(null);
 
   const fetchPosts = async (showLoading = true) => {
     try {
@@ -39,9 +39,7 @@ const Feed = () => {
         uniqueAuthorIds.map((id) => getUserById(id)),
       );
 
-      const usersMap = new Map(
-        users.map((user) => [user.id, user]),
-      );
+      const usersMap = new Map(users.map((user) => [user.id, user]));
 
       const postsWithAuthors = postsData
         .map((post) => {
@@ -56,16 +54,14 @@ const Feed = () => {
             author,
           };
         })
-        .filter(
-          (post): post is PostWithAuthor => post !== null,
-        );
+        .filter((post): post is PostWithAuthor => post !== null);
 
       setPosts(postsWithAuthors);
     } catch (error) {
+      console.error("Failed to fetch posts:", error);
+
       setError(
-        error instanceof Error
-          ? error.message
-          : "Failed to load posts.",
+        error instanceof Error ? error.message : "Failed to load posts.",
       );
     } finally {
       if (showLoading) {
@@ -75,16 +71,22 @@ const Feed = () => {
   };
 
   useEffect(() => {
-    fetchPosts();
+    const timer = window.setTimeout(() => {
+      fetchPosts();
+    }, 0);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
   }, []);
 
   const handlePostCreated = async () => {
-
     setShowSuccess(true);
 
     window.setTimeout(() => {
       setShowSuccess(false);
     }, 5000);
+
     await fetchPosts(false);
   };
 
@@ -96,7 +98,31 @@ const Feed = () => {
     return (
       <section className="w-full">
         <div className="mx-auto w-full">
-          <p className="text-center text-sm text-[var(--color-content-secondary)]">
+          {likeMessage && (
+            <div
+              className="
+      mb-4
+      w-full
+      rounded-lg
+      border
+      border-[var(--color-border)]
+      bg-[var(--color-card)]
+      px-4
+      py-3
+      text-sm
+      text-[var(--color-content-primary)]
+    "
+            >
+              {likeMessage}
+            </div>
+          )}
+          <p
+            className="
+              text-center
+              text-sm
+              text-[var(--color-content-secondary)]
+            "
+          >
             {error}
           </p>
         </div>
@@ -106,15 +132,35 @@ const Feed = () => {
 
   return (
     <section className="w-full">
+      {likeMessage && (
+        <div
+          className="
+          fixed top-4 left-1/2 -translate-x-1/2 z-50
+          rounded-lg border border-[var(--color-border)]
+          bg-[var(--color-card)] px-4 py-2
+          text-sm text-[var(--color-content-primary)]
+          shadow-md
+        "
+        >
+          {likeMessage}
+        </div>
+      )}
       <div className="mx-auto w-full">
-        {showSuccess && (
-          <SuccessModal message="Post created successfully" />
-        )}
+        {/* Success message */}
+        {showSuccess && <SuccessModal message="Post created successfully" />}
 
+        {/* Create Post */}
         <CreatePost onPostCreated={handlePostCreated} />
 
+        {/* Posts */}
         {posts.length === 0 ? (
-          <p className="text-center text-sm text-[var(--color-content-secondary)]">
+          <p
+            className="
+              text-center
+              text-sm
+              text-[var(--color-content-secondary)]
+            "
+          >
             No posts yet.
           </p>
         ) : (
@@ -122,13 +168,21 @@ const Feed = () => {
             {posts.map((post) => (
               <PostCard
                 key={post.id}
+                postId={post.id}
                 name={post.author.name}
                 username={getUsernameFromEmail(post.author.email)}
                 createdAt={post.createdAt}
                 content={post.content}
-                likes={0}
-                comments={0}
-                avatar={post.author.avatar}
+                likes={post._count.likes}
+                comments={post._count.comments}
+                avatar={post.author.image ?? undefined}
+                likesData={post.likes}
+                onLikeMessage={(message) => {
+                  setLikeMessage(message);
+                  window.setTimeout(() => {
+                    setLikeMessage(null);
+                  }, 2000);
+                }}
               />
             ))}
           </div>
