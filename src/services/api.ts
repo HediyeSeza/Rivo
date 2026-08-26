@@ -1,5 +1,10 @@
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "https://socially-nextjs-six.vercel.app";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+export const API_ERROR_EVENT = "rivo:api-error";
+export const API_ERROR_MESSAGE = "Something went wrong. Please try again.";
+
+const notifyApiError = () => {
+  window.dispatchEvent(new CustomEvent(API_ERROR_EVENT));
+};
 
 export class ApiError extends Error {
   readonly status: number;
@@ -16,33 +21,32 @@ const request = async <T>(
   endpoint: string,
   options: RequestInit = {},
 ): Promise<T> => {
-  if (!API_BASE_URL) {
-    throw new ApiError(
-      "VITE_API_URL is not configured. Add it to the project's .env file.",
-      0,
-    );
-  }
-
   const token = localStorage.getItem("rivo_token");
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    credentials: "include",
+  let response: Response;
 
-    headers: {
-      "Content-Type": "application/json",
+  try {
+    response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
 
-      ...(token
-        ? {
-            Authorization: `Bearer ${token}`,
-          }
-        : {}),
+        ...(token
+          ? {
+              Authorization: `Bearer ${token}`,
+            }
+          : {}),
 
-      ...options.headers,
-    },
-  });
+        ...options.headers,
+      },
+    });
+  } catch (error) {
+    notifyApiError();
+    throw error;
+  }
 
   if (!response.ok) {
+    notifyApiError();
     let message = `API Error: ${response.status}`;
 
     try {
@@ -53,10 +57,7 @@ const request = async <T>(
       };
 
       message =
-        errorBody.message ||
-        errorBody.error ||
-        errorBody.detail ||
-        message;
+        errorBody.message || errorBody.error || errorBody.detail || message;
     } catch {
       // Some error responses do not contain JSON.
     }
