@@ -6,6 +6,23 @@ export interface Post {
   content: string;
   createdAt: string;
   updatedAt: string;
+
+  author?: {
+    name: string;
+    email: string;
+    image: string | null;
+  };
+
+  likes: {
+    userId: string;
+  }[];
+
+  comments: PostComment[];
+
+  _count: {
+    likes: number;
+    comments: number;
+  };
 }
 
 interface PostsResponse {
@@ -30,18 +47,42 @@ interface CreatePostResponse {
   data: Post;
 }
 
-export const createPost = async (
-  data: CreatePostPayload,
-): Promise<Post> => {
-  const response = await api.post<CreatePostResponse>(
-    "/api/posts",
-    data,
-  );
+export const createPost = async (data: CreatePostPayload): Promise<Post> => {
+  const response = await api.post<CreatePostResponse>("/api/posts", data);
   return response.data;
 };
 
-export const deletePost = async (
-  postId: string,
-): Promise<void> => {
+export const deletePost = async (postId: string): Promise<void> => {
   await api.delete(`/api/posts/${postId}`);
+};
+
+export interface PostComment {
+  id: string;
+  content: string;
+  createdAt: string;
+  author: {
+    name: string;
+    email: string;
+    image: string | null;
+  };
+}
+
+interface CreateCommentResponse {
+  message: string;
+  success: boolean;
+  data: PostComment;
+}
+
+export const createComment = async (
+  postId: string,
+  content: string,
+): Promise<PostComment> => {
+  const response = await api.post<CreateCommentResponse>(
+    `/api/posts/${postId}/comment`,
+    {
+      content,
+    },
+  );
+
+  return response.data;
 };

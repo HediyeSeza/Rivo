@@ -8,11 +8,7 @@ import ConfirmModal from "../../common/Modal/ConfirmModal";
 
 import { useAuth } from "../../../context/AuthContext";
 
-import {
-  deletePost,
-  getPosts,
-  type Post,
-} from "../../../services/postApi";
+import { deletePost, getPosts, type Post } from "../../../services/postApi";
 
 import { getUsernameFromEmail } from "../../../utils/getUsernameFromEmail";
 
@@ -36,8 +32,7 @@ const Feed = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
-  const [postToDelete, setPostToDelete] =
-    useState<PostWithAuthor | null>(null);
+  const [postToDelete, setPostToDelete] = useState<PostWithAuthor | null>(null);
 
   const fetchPosts = async (showLoading = true) => {
     try {
@@ -55,9 +50,7 @@ const Feed = () => {
       console.error("Failed to load posts:", error);
 
       setError(
-        error instanceof Error
-          ? error.message
-          : "Failed to load posts.",
+        error instanceof Error ? error.message : "Failed to load posts.",
       );
     } finally {
       if (showLoading) {
@@ -88,9 +81,7 @@ const Feed = () => {
       await deletePost(postToDelete.id);
 
       setPosts((currentPosts) =>
-        currentPosts.filter(
-          (post) => post.id !== postToDelete.id,
-        ),
+        currentPosts.filter((post) => post.id !== postToDelete.id),
       );
 
       setPostToDelete(null);
@@ -105,9 +96,7 @@ const Feed = () => {
       console.error("Failed to delete post:", error);
 
       setError(
-        error instanceof Error
-          ? error.message
-          : "Failed to delete post.",
+        error instanceof Error ? error.message : "Failed to delete post.",
       );
 
       setPostToDelete(null);
@@ -133,9 +122,7 @@ const Feed = () => {
   return (
     <section className="w-full">
       <div className="mx-auto w-full">
-        {showSuccess && (
-          <SuccessModal message={successMessage} />
-        )}
+        {showSuccess && <SuccessModal message={successMessage} />}
 
         {postToDelete && (
           <ConfirmModal
@@ -155,19 +142,15 @@ const Feed = () => {
             {posts.map((post) => (
               <PostCard
                 key={post.id}
+                postId={post.id}
                 name={post.author.name}
-                username={getUsernameFromEmail(
-                  post.author.email,
-                )}
+                username={getUsernameFromEmail(post.author.email)}
                 createdAt={post.createdAt}
                 content={post.content}
-                likes={0}
-                comments={0}
-                avatar={
-                  post.author.image ??
-                  post.author.avatar ??
-                  undefined
-                }
+                likes={post._count.likes}
+                comments={post._count.comments}
+                commentsData={post.comments}
+                avatar={post.author.image ?? post.author.avatar ?? undefined}
                 showDelete={post.author.id === user?.id}
                 onDelete={() => setPostToDelete(post)}
               />

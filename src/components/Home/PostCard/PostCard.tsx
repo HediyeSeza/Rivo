@@ -1,23 +1,34 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
+
 import Icon from "../../common/Icon/Icon";
 import Avatar from "../../common/Avatar/Avatar";
 
 import avatarImage from "../../../assets/Avatar/a.png";
 
+import { type PostComment } from "../../../services/postApi";
+
+import Comments from "./Comments/Comments";
+
 interface PostCardProps {
+  postId: string;
+
   name: string;
   username: string;
   createdAt: string;
   content: string;
+
   likes?: number;
   comments?: number;
   avatar?: string;
+
+  commentsData: PostComment[];
+  onCommentAdded?: () => void;
 
   showDelete?: boolean;
   onDelete?: () => void;
 
   isLiked?: boolean;
-
   showUnlike?: boolean;
   onUnlike?: () => void;
 }
@@ -26,9 +37,7 @@ const formatPostTime = (createdAt: string) => {
   const postDate = new Date(createdAt);
   const now = new Date();
 
-  const diffInSeconds = Math.floor(
-    (now.getTime() - postDate.getTime()) / 1000,
-  );
+  const diffInSeconds = Math.floor((now.getTime() - postDate.getTime()) / 1000);
 
   if (diffInSeconds < 60) {
     return "just now";
@@ -37,39 +46,31 @@ const formatPostTime = (createdAt: string) => {
   const diffInMinutes = Math.floor(diffInSeconds / 60);
 
   if (diffInMinutes < 60) {
-    return `${diffInMinutes} ${
-      diffInMinutes === 1 ? "minute" : "minutes"
-    } ago`;
+    return `${diffInMinutes} ${diffInMinutes === 1 ? "minute" : "minutes"} ago`;
   }
 
   const diffInHours = Math.floor(diffInMinutes / 60);
 
   if (diffInHours < 24) {
-    return `${diffInHours} ${
-      diffInHours === 1 ? "hour" : "hours"
-    } ago`;
+    return `${diffInHours} ${diffInHours === 1 ? "hour" : "hours"} ago`;
   }
 
   const diffInDays = Math.floor(diffInHours / 24);
 
   if (diffInDays < 7) {
-    return `${diffInDays} ${
-      diffInDays === 1 ? "day" : "days"
-    } ago`;
+    return `${diffInDays} ${diffInDays === 1 ? "day" : "days"} ago`;
   }
 
   const diffInWeeks = Math.floor(diffInDays / 7);
 
   if (diffInWeeks < 4) {
-    return `${diffInWeeks} ${
-      diffInWeeks === 1 ? "week" : "weeks"
-    } ago`;
+    return `${diffInWeeks} ${diffInWeeks === 1 ? "week" : "weeks"} ago`;
   }
 
   return postDate.toLocaleDateString();
 };
-
 const PostCard = ({
+  postId,
   name,
   username,
   createdAt,
@@ -77,31 +78,30 @@ const PostCard = ({
   likes = 0,
   comments = 0,
   avatar,
-
+  commentsData,
+  onCommentAdded,
   showDelete = false,
   onDelete,
-
   isLiked = false,
-
   showUnlike = false,
   onUnlike,
 }: PostCardProps) => {
+  const [showComments, setShowComments] = useState(false);
+
   return (
     <article
       className="
         w-full
         rounded-xl
         border border-[#E5E5E5]
-      bg-white
+        bg-white
         p-5
         shadow-sm
-      dark:border-[#313131]
-      dark:bg-[#191919]
-        bg-(--color-card)]
-        text-(--color-content-primary)]
+        dark:border-[#313131]
+        dark:bg-[#191919]
+        text-[var(--color-content-primary)]
         transition-colors
         duration-200
-       
       "
     >
       {/* Post Header */}
@@ -110,49 +110,64 @@ const PostCard = ({
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-            <h3 className="text-[16px] font-bold leading-5 text-(--color-content-primary)]">
+            <h3
+              className="
+                text-[16px]
+                font-bold
+                leading-5
+                text-[var(--color-content-primary)]
+              "
+            >
               {name}
             </h3>
 
             <Link
-  to={`/profile/${username}`}
-  className="
-    cursor-pointer
-    text-[12px]
-    leading-5
-   !text-(--color-content-muted)
-    transition-colors
-    duration-200
-    hover:text-(--color-content-primary)
-  "
->
-  @{username}
-</Link>
+              to={`/profile/${username}`}
+              className="
+                cursor-pointer
+                text-[12px]
+                leading-5
+                !text-[var(--color-content-muted)]
+                transition-colors
+                duration-200
+                hover:text-[var(--color-content-primary)]
+              "
+            >
+              @{username}
+            </Link>
 
-            <span className="text-[12px] leading-5 text-(--color-content-muted)">
+            <span
+              className="
+                text-[12px]
+                leading-5
+                text-[var(--color-content-muted)]
+              "
+            >
               {formatPostTime(createdAt)}
             </span>
           </div>
         </div>
+
+        {/* Delete */}
         {showDelete && (
           <button
             type="button"
             onClick={onDelete}
             aria-label="Delete post"
             className="
-        flex
-        h-9
-        w-9
-        shrink-0
-        cursor-pointer
-        items-center
-        justify-center
-        rounded-lg
-        transition-colors
-        duration-200
-        hover:bg-black/5
-        dark:hover:bg-white/5
-      "
+              flex
+              h-9
+              w-9
+              shrink-0
+              cursor-pointer
+              items-center
+              justify-center
+              rounded-lg
+              transition-colors
+              duration-200
+              hover:bg-black/5
+              dark:hover:bg-white/5
+            "
           >
             <Icon name="Tash" size={20} />
           </button>
@@ -167,7 +182,7 @@ const PostCard = ({
             break-words
             text-[14px]
             leading-5
-            text-(--color-content-primary)]
+            text-[var(--color-content-primary)]
           "
         >
           {content}
@@ -179,7 +194,8 @@ const PostCard = ({
         {/* Like */}
         <button
           type="button"
-          aria-label="Like post"
+          aria-label={isLiked ? "Unlike post" : "Like post"}
+          onClick={isLiked ? onUnlike : undefined}
           className="
             flex
             cursor-pointer
@@ -196,14 +212,16 @@ const PostCard = ({
           "
         >
           <Icon name="Heart" size={18} />
+
           <span className="text-[14px]">{likes}</span>
         </button>
 
         {/* Comment */}
         <button
           type="button"
-          aria-label="Comment on post"
-          className="
+          aria-label={showComments ? "Hide comments" : "Show comments"}
+          onClick={() => setShowComments((prev) => !prev)}
+          className={`
             flex
             cursor-pointer
             items-center
@@ -216,12 +234,32 @@ const PostCard = ({
             duration-200
             hover:bg-black/5
             dark:hover:bg-white/5
-          "
+            ${showComments ? "bg-black/5 dark:bg-white/5" : ""}
+          `}
         >
           <Icon name="Chat" size={18} />
+
           <span className="text-[14px]">{comments}</span>
         </button>
       </div>
+
+      {/* Comments */}
+      {showComments && (
+        <div
+          className="
+            mt-4
+            border-t
+            border-[var(--color-border)]
+            pt-4
+          "
+        >
+          <Comments
+            postId={postId}
+            comments={commentsData}
+            onCommentAdded={onCommentAdded ?? (() => {})}
+          />
+        </div>
+      )}
     </article>
   );
 };
