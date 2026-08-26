@@ -2,13 +2,11 @@ import { useEffect, useState } from "react";
 
 import PostCard from "../PostCard/PostCard";
 import CreatePost from "../CreatePost/CreatePost";
-
 import Loading from "../../loading/Loading";
 import SuccessModal from "../../common/Modal/SuccessModal";
 import ConfirmModal from "../../common/Modal/ConfirmModal";
 
 import { useAuth } from "../../../context/AuthContext";
-import { getPosts, type Post } from "../../../services/postApi";
 
 import {
   deletePost,
@@ -35,13 +33,13 @@ const Feed = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
- const [showSuccess, setShowSuccess] = useState(false);
-const [successMessage, setSuccessMessage] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
-const [postToDelete, setPostToDelete] =
-  useState<PostWithAuthor | null>(null);
+  const [postToDelete, setPostToDelete] =
+    useState<PostWithAuthor | null>(null);
 
-const fetchPosts = async (showLoading = true) => {
+  const fetchPosts = async (showLoading = true) => {
     try {
       if (showLoading) {
         setIsLoading(true);
@@ -49,40 +47,13 @@ const fetchPosts = async (showLoading = true) => {
 
       setError(null);
 
-      const postsData = await getPosts();
+      const postsData = (await getPosts()) as PostWithAuthor[];
 
-const uniqueAuthorIds = [
-  ...new Set(postsData.map((post) => post.authorId)),
-];
+      // Author information is already included in the posts response.
+      setPosts(postsData);
+    } catch (error) {
+      console.error("Failed to load posts:", error);
 
-const users = await Promise.all(
-  uniqueAuthorIds.map((id) => getUserById(id)),
-);
-
-const usersMap = new Map(
-  users.map((user) => [user.id, user]),
-);
-
-const postsWithAuthors = postsData
-  .map((post) => {
-    const author = usersMap.get(post.authorId);
-
-    if (!author) {
-      return null;
-    }
-
-    return {
-      ...post,
-      author,
-    };
-  })
-  .filter(
-    (post): post is PostWithAuthor => post !== null,
-  );
-
-setPosts(postsWithAuthors);
-} catch (error) {
-  console.error("Failed to load posts:", error);
       setError(
         error instanceof Error
           ? error.message
@@ -100,7 +71,7 @@ setPosts(postsWithAuthors);
   }, []);
 
   const handlePostCreated = async () => {
-
+    setSuccessMessage("Post created successfully");
     setShowSuccess(true);
 
     window.setTimeout(() => {
@@ -108,7 +79,7 @@ setPosts(postsWithAuthors);
     }, 5000);
 
     await fetchPosts(false);
-   };
+  };
 
   const handleDeletePost = async () => {
     if (!postToDelete) return;
@@ -162,7 +133,7 @@ setPosts(postsWithAuthors);
   return (
     <section className="w-full">
       <div className="mx-auto w-full">
-               {showSuccess && (
+        {showSuccess && (
           <SuccessModal message={successMessage} />
         )}
 
@@ -192,19 +163,15 @@ setPosts(postsWithAuthors);
                 content={post.content}
                 likes={0}
                 comments={0}
-avatar={
-  post.author.image ??
-  post.author.avatar ??
-  undefined
-}
-showDelete={
-  post.author.id === user?.id
-}
-onDelete={() =>
-  setPostToDelete(post)
-}
-/>
-))}
+                avatar={
+                  post.author.image ??
+                  post.author.avatar ??
+                  undefined
+                }
+                showDelete={post.author.id === user?.id}
+                onDelete={() => setPostToDelete(post)}
+              />
+            ))}
           </div>
         )}
       </div>

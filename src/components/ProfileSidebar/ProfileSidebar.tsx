@@ -3,18 +3,31 @@ import Icon from "../common/Icon/Icon";
 import avatarImage from "../../assets/Avatar/a.png";
 
 import type { User } from "../../services/userApi";
+
 import { getUsernameFromEmail } from "../../utils/getUsernameFromEmail";
 
 interface ProfileSidebarProps {
-  user: User;
+  user: User | null | undefined;
 }
 
-const ProfileSidebar = ({ user }: ProfileSidebarProps) => {
-  const profileAvatar = user.image || avatarImage;
-  const username = getUsernameFromEmail(user.email);
+const ProfileSidebar = ({
+  user,
+}: ProfileSidebarProps) => {
+  if (!user) {
+    return null;
+  }
 
-  const followersCount = user._count?.followers ?? 0;
-  const followingCount = user._count?.followings ?? 0;
+  const profileAvatar = user.image || avatarImage;
+
+  const username = getUsernameFromEmail(
+    user.email,
+  );
+
+  const followersCount =
+    user._count?.followers ?? 0;
+
+  const followingCount =
+    user._count?.followings ?? 0;
 
   return (
     <aside

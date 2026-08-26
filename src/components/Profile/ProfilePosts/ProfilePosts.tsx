@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 
 import PostCard from "../../Home/PostCard/PostCard";
 
+import ConfirmModal from "../../common/Modal/ConfirmModal";
+import SuccessModal from "../../common/Modal/SuccessModal";
+
 import { deletePost } from "../../../services/postApi";
 
 import {
@@ -25,13 +28,11 @@ type ProfilePostWithRelations = ProfilePost & {
     name?: string;
     email?: string;
     image?: string | null;
- };
-
+  };
   _count?: {
     likes?: number;
     comments?: number;
   };
-
   likes?: unknown[];
   comments?: unknown[];
 };
@@ -43,11 +44,15 @@ const ProfilePosts = ({
   const [activeTab, setActiveTab] =
     useState<ProfileTab>("posts");
 
-  const [posts, setPosts] = useState<ProfilePost[]>([]);
+  const [posts, setPosts] =
+    useState<ProfilePost[]>([]);
+
   const [likedPosts, setLikedPosts] =
     useState<ProfilePost[]>([]);
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] =
+    useState(true);
+
   const [error, setError] =
     useState<string | null>(null);
 
@@ -131,6 +136,7 @@ const ProfilePosts = ({
       setPostToDelete(null);
     }
   };
+
   const getPostAuthorName = (
     post: ProfilePost,
   ) => {
@@ -242,23 +248,26 @@ const ProfilePosts = ({
       </div>
     );
   }
-return (
-  <section className="w-full">
-    {showSuccess && (
-      <SuccessModal message="Post deleted successfully" />
-    )}
 
-    {postToDelete && (
-      <ConfirmModal
-        onCancel={() =>
-          setPostToDelete(null)
-        }
-        onConfirm={handleDeletePost}
-      />
-    )}
+  return (
+    <section className="w-full">
+      {showSuccess && (
+        <SuccessModal
+          message="Post deleted successfully"
+        />
+      )}
 
-    {/* Tabs */}
-    <div>
+      {postToDelete && (
+        <ConfirmModal
+          onCancel={() =>
+            setPostToDelete(null)
+          }
+          onConfirm={handleDeletePost}
+        />
+      )}
+
+      {/* Tabs */}
+      <div
         className="
           flex
           w-full
@@ -286,7 +295,6 @@ return (
             font-medium
             transition-all
             duration-200
-
             ${
               activeTab === "posts"
                 ? `
@@ -324,7 +332,6 @@ return (
             font-medium
             transition-all
             duration-200
-
             ${
               activeTab === "likes"
                 ? `
@@ -346,7 +353,15 @@ return (
       </div>
 
       {/* Posts */}
-      <div className="mt-5 flex w-full flex-col gap-4">
+      <div
+        className="
+          mt-5
+          flex
+          w-full
+          flex-col
+          gap-4
+        "
+      >
         {displayedPosts.length > 0 ? (
           displayedPosts.map((post) => (
             <PostCard
@@ -355,28 +370,22 @@ return (
               username={getPostUsername(post)}
               createdAt={post.createdAt}
               content={post.content}
-    likes={getPostLikes(post)}
-    comments={getPostComments(post)}
-    showDelete={
-      activeTab === "posts" &&
-      isOwnProfile
-    }
-    onDelete={() =>
-      setPostToDelete(post)
-    }
-    isLiked={
-      activeTab === "likes"
-    }
-    showUnlike={
-      activeTab === "likes" &&
-      isOwnProfile
-    }
-    onUnlike={() =>
-      handleRemoveLike(post.id)
-    }
-/>
-))
-) : (
+              likes={getPostLikes(post)}
+              comments={getPostComments(post)}
+              showDelete={
+                activeTab === "posts" &&
+                isOwnProfile
+              }
+              onDelete={() =>
+                setPostToDelete(post)
+              }
+              isLiked={
+                activeTab === "likes"
+              }
+              showUnlike={false}
+            />
+          ))
+        ) : (
           <div
             className="
               flex
