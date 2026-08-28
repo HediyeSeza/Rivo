@@ -1,6 +1,7 @@
 export interface User {
   id: string;
   name: string;
+  username?: string;
   email: string;
   emailVerified: boolean;
   image: string | null;
@@ -9,6 +10,7 @@ export interface User {
   website: string | null;
   createdAt: string;
   updatedAt: string;
+  avatar?: string;
 
   _count?: {
     followers: number;
@@ -18,7 +20,7 @@ export interface User {
 }
 
 export interface AuthResponse {
-  user?: User;
+   user?: User;
   token?: string;
    accessToken?: string;
 }

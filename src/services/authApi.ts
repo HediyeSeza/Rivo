@@ -18,8 +18,12 @@ export const getUser = (
     return response.user;
   }
 
-  if ("data" in response && response.data) {
-    return response.data;
+  if (
+    "data" in response &&
+    response.data &&
+    typeof response.data === "object"
+  ) {
+    return response.data as User;
   }
 
   return response as User;
@@ -35,7 +39,7 @@ export const login = async (
     payload,
   );
 
-  const data = response.data;
+  const data = response;
 
   return {
     user: getUser(data),
@@ -56,7 +60,7 @@ export const register = async (
     payload,
   );
 
-  const data = response.data;
+  const data = response;
 
   return {
     user: getUser(data),
@@ -72,7 +76,7 @@ export const getSession = async () => {
     AuthResponse | User
   >("/api/authentication/session");
 
-  return response.data;
+  return response;
 };
 
 export const logout = () =>

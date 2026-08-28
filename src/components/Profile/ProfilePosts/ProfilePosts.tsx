@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 
 import PostCard from "../../Home/PostCard/PostCard";
-
-import ConfirmModal from "../../common/Modal/ConfirmModal";
 import SuccessModal from "../../common/Modal/SuccessModal";
+import ConfirmModal from "../../common/Modal/ConfirmModal";
 
 import { deletePost } from "../../../services/postApi";
 
@@ -51,12 +50,19 @@ const ProfilePosts = ({
   isOwnProfile = false,
   profileImage,
 }: ProfilePostsProps) => {
-  const [activeTab, setActiveTab] = useState<ProfileTab>("posts");
+  const [activeTab, setActiveTab] =
+    useState<ProfileTab>("posts");
+
   const [posts, setPosts] = useState<ProfilePost[]>([]);
-  const [likedPosts, setLikedPosts] = useState<ProfilePost[]>([]);
+  const [likedPosts, setLikedPosts] =
+    useState<ProfilePost[]>([]);
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [postToDelete, setPostToDelete] = useState<ProfilePost | null>(null);
+
+  const [postToDelete, setPostToDelete] =
+    useState<ProfilePost | null>(null);
+
   const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
@@ -76,7 +82,10 @@ const ProfilePosts = ({
         const liked = await getUserLikedPosts(userId);
         setLikedPosts(liked);
       } catch (error) {
-        console.error("Failed to load profile posts:", error);
+        console.error(
+          "Failed to load profile posts:",
+          error,
+        );
 
         setError(
           error instanceof Error
@@ -91,7 +100,8 @@ const ProfilePosts = ({
     void loadProfilePosts();
   }, [userId]);
 
-  const displayedPosts = activeTab === "posts" ? posts : likedPosts;
+  const displayedPosts =
+    activeTab === "posts" ? posts : likedPosts;
 
   const handleDeletePost = async () => {
     if (!postToDelete || !isOwnProfile) {
@@ -102,7 +112,15 @@ const ProfilePosts = ({
       await deletePost(postToDelete.id);
 
       setPosts((currentPosts) =>
-        currentPosts.filter((post) => post.id !== postToDelete.id),
+        currentPosts.filter(
+          (post) => post.id !== postToDelete.id,
+        ),
+      );
+
+      setLikedPosts((currentPosts) =>
+        currentPosts.filter(
+          (post) => post.id !== postToDelete.id,
+        ),
       );
 
       setPostToDelete(null);
@@ -112,18 +130,26 @@ const ProfilePosts = ({
         setShowSuccess(false);
       }, 5000);
     } catch (error) {
-      console.error("Failed to delete post:", error);
+      console.error(
+        "Failed to delete post:",
+        error,
+      );
+
       setPostToDelete(null);
     }
   };
 
   const getPostAuthorName = (post: ProfilePost) => {
-    const currentPost = post as ProfilePostWithRelations;
+    const currentPost =
+      post as ProfilePostWithRelations;
+
     return currentPost.author?.name || "User";
   };
 
   const getPostUsername = (post: ProfilePost) => {
-    const currentPost = post as ProfilePostWithRelations;
+    const currentPost =
+      post as ProfilePostWithRelations;
+
     const email = currentPost.author?.email;
 
     if (email) {
@@ -134,9 +160,12 @@ const ProfilePosts = ({
   };
 
   const getPostLikes = (post: ProfilePost) => {
-    const currentPost = post as ProfilePostWithRelations;
+    const currentPost =
+      post as ProfilePostWithRelations;
 
-    if (typeof currentPost._count?.likes === "number") {
+    if (
+      typeof currentPost._count?.likes === "number"
+    ) {
       return currentPost._count.likes;
     }
 
@@ -148,9 +177,12 @@ const ProfilePosts = ({
   };
 
   const getPostComments = (post: ProfilePost) => {
-    const currentPost = post as ProfilePostWithRelations;
+    const currentPost =
+      post as ProfilePostWithRelations;
 
-    if (typeof currentPost._count?.comments === "number") {
+    if (
+      typeof currentPost._count?.comments === "number"
+    ) {
       return currentPost._count.comments;
     }
 
@@ -162,9 +194,12 @@ const ProfilePosts = ({
   };
 
   const getPostAvatar = (post: ProfilePost) => {
-    const currentPost = post as ProfilePostWithRelations;
+    const currentPost =
+      post as ProfilePostWithRelations;
 
-    const authorId = currentPost.author?.id || currentPost.post?.author?.id;
+    const authorId =
+      currentPost.author?.id ||
+      currentPost.post?.author?.id;
 
     const snapshotImage =
       currentPost.author?.image ||
@@ -172,9 +207,13 @@ const ProfilePosts = ({
       undefined;
 
     const isProfileAuthor =
-      authorId === userId || (isOwnProfile && activeTab === "posts");
+      authorId === userId ||
+      (isOwnProfile && activeTab === "posts");
 
-    if (isProfileAuthor && profileImage !== undefined) {
+    if (
+      isProfileAuthor &&
+      profileImage !== undefined
+    ) {
       return profileImage || undefined;
     }
 
@@ -199,7 +238,9 @@ const ProfilePosts = ({
 
   return (
     <section className="w-full">
-      {showSuccess && <SuccessModal message="Post deleted successfully" />}
+      {showSuccess && (
+        <SuccessModal message="Post deleted successfully" />
+      )}
 
       {postToDelete && (
         <ConfirmModal
@@ -252,7 +293,10 @@ const ProfilePosts = ({
               content={post.content}
               likes={getPostLikes(post)}
               comments={getPostComments(post)}
-              showDelete={activeTab === "posts" && isOwnProfile}
+              showDelete={
+                activeTab === "posts" &&
+                isOwnProfile
+              }
               onDelete={() => setPostToDelete(post)}
               isLiked={activeTab === "likes"}
               showUnlike={false}
@@ -260,7 +304,9 @@ const ProfilePosts = ({
           ))
         ) : (
           <div className="flex min-h-[180px] w-full items-center justify-center rounded-xl border border-(--color-border) bg-(--color-card) px-5 text-center text-[14px] text-(--color-content-secondary)">
-            {activeTab === "posts" ? "No posts yet." : "No liked posts yet."}
+            {activeTab === "posts"
+              ? "No posts yet."
+              : "No liked posts yet."}
           </div>
         )}
       </div>
