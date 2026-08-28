@@ -77,9 +77,28 @@ export interface CreatePostPayload {
 export const createPost = async (data: CreatePostPayload): Promise<Post> => {
   const response = await api.post<CreatePostResponse>("/api/posts", data);
 
-  return response.data;
+  return response.data.data;
 };
 
 export const deletePost = async (postId: string): Promise<void> => {
   await api.delete(`/api/posts/${postId}`);
+};
+
+export interface CreateCommentResponse {
+  message: string;
+  success: boolean;
+}
+
+export const createComment = async (
+  postId: string,
+  content: string,
+): Promise<CreateCommentResponse> => {
+  const response = await api.post<CreateCommentResponse>(
+    `/api/posts/${postId}/comment`,
+    {
+      content,
+    },
+  );
+
+  return response;
 };

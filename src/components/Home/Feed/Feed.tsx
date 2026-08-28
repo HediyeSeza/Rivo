@@ -4,6 +4,7 @@ import PostCard from "../PostCard/PostCard";
 import CreatePost from "../CreatePost/CreatePost";
 
 import Loading from "../../loading/Loading";
+
 import SuccessModal from "../../common/Modal/SuccessModal";
 import ConfirmModal from "../../common/Modal/ConfirmModal";
 
@@ -13,6 +14,7 @@ import {
   deletePost,
   getPosts,
   type Post,
+  type PostComment,
 } from "../../../services/postApi";
 
 import { getUsernameFromEmail } from "../../../utils/getUsernameFromEmail";
@@ -36,11 +38,11 @@ const Feed = () => {
 
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [commentMessage, setCommentMessage] = useState<string | null>(null);
 
   const [likeMessage, setLikeMessage] = useState<string | null>(null);
 
-  const [postToDelete, setPostToDelete] =
-    useState<PostWithAuthor | null>(null);
+  const [postToDelete, setPostToDelete] = useState<PostWithAuthor | null>(null);
 
   const fetchPosts = async (showLoading = true) => {
     try {
@@ -57,9 +59,7 @@ const Feed = () => {
       console.error("Failed to load posts:", error);
 
       setError(
-        error instanceof Error
-          ? error.message
-          : "Failed to load posts.",
+        error instanceof Error ? error.message : "Failed to load posts.",
       );
     } finally {
       if (showLoading) {
@@ -91,6 +91,22 @@ const Feed = () => {
     }, 2000);
   };
 
+  const handleCommentAdded = async (postId: string) => {
+    try {
+      await fetchPosts(false);
+    } catch (error) {
+      console.error(`Failed to refresh post ${postId}:`, error);
+    }
+  };
+
+  const handleCommentMessage = (message: string) => {
+    setCommentMessage(message);
+
+    window.setTimeout(() => {
+      setCommentMessage(null);
+    }, 3000);
+  };
+
   const handleDeletePost = async () => {
     if (!postToDelete) {
       return;
@@ -100,9 +116,7 @@ const Feed = () => {
       await deletePost(postToDelete.id);
 
       setPosts((currentPosts) =>
-        currentPosts.filter(
-          (post) => post.id !== postToDelete.id,
-        ),
+        currentPosts.filter((post) => post.id !== postToDelete.id),
       );
 
       setPostToDelete(null);
@@ -117,9 +131,7 @@ const Feed = () => {
       console.error("Failed to delete post:", error);
 
       setError(
-        error instanceof Error
-          ? error.message
-          : "Failed to delete post.",
+        error instanceof Error ? error.message : "Failed to delete post.",
       );
 
       setPostToDelete(null);
@@ -174,11 +186,32 @@ const Feed = () => {
         </div>
       )}
 
+      {commentMessage && (
+        <div
+          className="
+      fixed
+      left-1/2
+      top-4
+      z-50
+      -translate-x-1/2
+      rounded-lg
+      border
+      border-[var(--color-border)]
+      bg-[var(--color-card)]
+      px-4
+      py-2
+      text-sm
+      text-[var(--color-content-primary)]
+      shadow-md
+    "
+        >
+          {commentMessage}
+        </div>
+      )}
+
       <div className="mx-auto w-full">
         {/* Success message */}
-        {showSuccess && (
-          <SuccessModal message={successMessage} />
-        )}
+        {showSuccess && <SuccessModal message={successMessage} />}
 
         {/* Delete confirmation */}
         {postToDelete && (
@@ -209,9 +242,7 @@ const Feed = () => {
                 key={post.id}
                 postId={post.id}
                 name={post.author?.name ?? "User"}
-                username={getUsernameFromEmail(
-                  post.author?.email ?? "",
-                )}
+                username={getUsernameFromEmail(post.author?.email ?? "")}
                 createdAt={post.createdAt}
                 content={post.content}
                 likes={post._count?.likes ?? 0}
@@ -222,6 +253,8 @@ const Feed = () => {
                 showDelete={post.author?.id === user?.id}
                 onDelete={() => setPostToDelete(post)}
                 onLikeMessage={handleLikeMessage}
+                onCommentAdded={handleCommentAdded}
+                onCommentMessage={handleCommentMessage}
               />
             ))}
           </div>
