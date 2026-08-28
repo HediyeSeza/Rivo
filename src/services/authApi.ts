@@ -10,8 +10,23 @@ export interface RegisterPayload extends LoginPayload {
   name: string;
 }
 
-export const getUser = (response: AuthResponse | User): User =>
-  "user" in response && response.user ? response.user : (response as User);
+export const getUser = (response: AuthResponse | User): User => {
+  if (
+    "data" in response &&
+    response.data &&
+    typeof response.data === "object" &&
+    "user" in response.data &&
+    response.data.user
+  ) {
+    return response.data.user;
+  }
+
+  if ("user" in response && response.user) {
+    return response.user;
+  }
+
+  return response as User;
+};
 
 export const login = async (payload: LoginPayload) => {
   const response = await api.post<AuthResponse | User>(

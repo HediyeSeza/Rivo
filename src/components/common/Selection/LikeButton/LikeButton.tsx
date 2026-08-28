@@ -1,17 +1,44 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Icon from "../../Icon/Icon";
+
 import { toggleLikePost } from "../../../../services/postApi";
+
 import { useAuth } from "../../../../context/AuthContext";
 
 interface LikeButtonProps {
   postId: string;
+
   likes: {
     userId: string;
   }[];
+
   likesCount: number;
+
   onMessage?: (message: string) => void;
 }
+
+const LIKED_POSTS_KEY = "rivo_liked_posts";
+
+const getLikedPosts = (userId: string): string[] => {
+  try {
+    const stored = localStorage.getItem(`${LIKED_POSTS_KEY}_${userId}`);
+
+    if (!stored) {
+      return [];
+    }
+
+    const parsed = JSON.parse(stored);
+
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveLikedPosts = (userId: string, postIds: string[]) => {
+  localStorage.setItem(`${LIKED_POSTS_KEY}_${userId}`, JSON.stringify(postIds));
+};
 
 const LikeButton = ({
   postId,
@@ -21,24 +48,36 @@ const LikeButton = ({
 }: LikeButtonProps) => {
   const { user } = useAuth();
 
-  // مقدار واقعی که از پراپ‌ها (دیتای بک‌اند) محاسبه می‌شه
-  const derivedIsLiked =
-    !!user && likes.some((like) => like.userId === user.id);
-
-  // این state فقط برای override موقت بعد از کلیک خود کاربره
-  const [likeOverride, setLikeOverride] = useState<boolean | null>(null);
-  const [prevLikes, setPrevLikes] = useState(likes);
-
-  // اگه پراپ likes عوض شد (یعنی دیتای تازه از بک‌اند اومد)، override رو ریست کن
-  if (likes !== prevLikes) {
-    setPrevLikes(likes);
-    setLikeOverride(null);
-  }
-
-  const isLiked = likeOverride ?? derivedIsLiked;
+  const [isLiked, setIsLiked] = useState(false);
 
   const [count, setCount] = useState(likesCount);
+
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      setIsLiked(false);
+      return;
+    }
+
+    /*
+     * First check localStorage.
+     * This keeps the UI state after refresh.
+     */
+    const likedPosts = getLikedPosts(user.id);
+
+    const isStoredLiked = likedPosts.includes(postId);
+
+    /*
+     * If backend provides the user's like,
+     * use that information as well.
+     */
+    const isBackendLiked = likes.some((like) => like.userId === user.id);
+
+    setIsLiked(isStoredLiked || isBackendLiked);
+
+    setCount(likesCount);
+  }, [postId, user, likes, likesCount]);
 
   const handleLike = async () => {
     if (!user || isLoading) {
@@ -50,12 +89,6 @@ const LikeButton = ({
 
       const response = await toggleLikePost(postId);
 
-      // Backend response:
-      // {
-      //   message: "...",
-      //   success: true/false
-      // }
-
       onMessage?.(response.message);
 
       if (!response.success) {
@@ -64,32 +97,43 @@ const LikeButton = ({
 
       const liked = response.message === "Post liked successfully";
 
-      setLikeOverride(liked);
+      const likedPosts = getLikedPosts(user.id);
 
-      setCount((currentCount) =>
-        liked ? currentCount + 1 : Math.max(0, currentCount - 1),
-      );
+      if (liked) {
+        /*
+         * Save this post as liked.
+         */
+        if (!likedPosts.includes(postId)) {
+          likedPosts.push(postId);
+        }
+
+        saveLikedPosts(user.id, likedPosts);
+
+        setIsLiked(true);
+
+        setCount((currentCount) => currentCount + 1);
+      } else {
+        /*
+         * Remove this post from liked posts.
+         */
+        const updatedLikedPosts = likedPosts.filter((id) => id !== postId);
+
+        saveLikedPosts(user.id, updatedLikedPosts);
+
+        setIsLiked(false);
+
+        setCount((currentCount) => Math.max(0, currentCount - 1));
+      }
     } catch (error) {
       console.error("Failed to like/unlike post:", error);
 
-      if (error instanceof Error) {
-        onMessage?.(error.message);
-      } else {
-        onMessage?.("Something went wrong");
-      }
+      onMessage?.(
+        error instanceof Error ? error.message : "Something went wrong",
+      );
     } finally {
       setIsLoading(false);
     }
   };
-
-  console.log({
-    postId,
-    userId: user?.id,
-    likesUserIds: likes.map((l) => l.userId),
-    derivedIsLiked,
-    likeOverride,
-    finalIsLiked: isLiked,
-  });
 
   return (
     <button

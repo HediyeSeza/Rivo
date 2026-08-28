@@ -15,14 +15,9 @@ const ProfileCard = () => {
     >
       {/* Profile Header */}
       <div className="flex flex-col items-center text-center">
-        <Avatar
-          src=""
-          alt="Profile avatar"
-        />
+        <Avatar src="" alt="Profile avatar" />
 
-        <h2 className="mt-3 text-[16px] font-bold">
-          Hediye
-        </h2>
+        <h2 className="mt-3 text-[16px] font-bold">Hediye</h2>
 
         <p className="mt-1 text-[14px] text-[var(--color-content-secondary)]">
           @hediye
@@ -52,9 +47,7 @@ const ProfileCard = () => {
         "
       >
         <div className="text-center">
-          <p className="text-[16px] font-bold">
-            120
-          </p>
+          <p className="text-[16px] font-bold">120</p>
 
           <p className="mt-1 text-[14px] text-[var(--color-content-secondary)]">
             Followers
@@ -67,9 +60,7 @@ const ProfileCard = () => {
             text-center
           "
         >
-          <p className="text-[16px] font-bold">
-            86
-          </p>
+          <p className="text-[16px] font-bold">86</p>
 
           <p className="mt-1 text-[14px] text-[var(--color-content-secondary)]">
             Following
@@ -80,10 +71,7 @@ const ProfileCard = () => {
       {/* Profile Details */}
       <div className="mt-4 flex flex-col gap-3">
         <div className="flex items-center gap-2">
-          <Avatar
-            src=""
-            alt=""
-          />
+          <Avatar src="" alt="" />
 
           <span className="text-[14px] text-[var(--color-content-secondary)]">
             Tehran, Iran

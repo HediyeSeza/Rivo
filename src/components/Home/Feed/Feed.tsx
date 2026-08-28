@@ -6,16 +6,10 @@ import Loading from "../../loading/Loading";
 import SuccessModal from "../../common/Modal/SuccessModal";
 
 import { getPosts, type Post } from "../../../services/postApi";
-import { getUserById, type User } from "../../../services/userApi";
-
 import { getUsernameFromEmail } from "../../../utils/getUsernameFromEmail";
 
-type PostWithAuthor = Post & {
-  author: User;
-};
-
 const Feed = () => {
-  const [posts, setPosts] = useState<PostWithAuthor[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -31,32 +25,18 @@ const Feed = () => {
 
       const postsData = await getPosts();
 
-      const uniqueAuthorIds = [
-        ...new Set(postsData.map((post) => post.authorId)),
-      ];
+      console.log("POSTS FROM API:", postsData);
 
-      const users = await Promise.all(
-        uniqueAuthorIds.map((id) => getUserById(id)),
+      console.log(
+        "POST LIKES:",
+        postsData.map((post) => ({
+          postId: post.id,
+          likes: post.likes,
+          likesCount: post._count?.likes,
+        })),
       );
 
-      const usersMap = new Map(users.map((user) => [user.id, user]));
-
-      const postsWithAuthors = postsData
-        .map((post) => {
-          const author = usersMap.get(post.authorId);
-
-          if (!author) {
-            return null;
-          }
-
-          return {
-            ...post,
-            author,
-          };
-        })
-        .filter((post): post is PostWithAuthor => post !== null);
-
-      setPosts(postsWithAuthors);
+      setPosts(postsData);
     } catch (error) {
       console.error("Failed to fetch posts:", error);
 
@@ -71,13 +51,7 @@ const Feed = () => {
   };
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
-      fetchPosts();
-    }, 0);
-
-    return () => {
-      window.clearTimeout(timer);
-    };
+    void fetchPosts();
   }, []);
 
   const handlePostCreated = async () => {
@@ -90,6 +64,14 @@ const Feed = () => {
     await fetchPosts(false);
   };
 
+  const handleLikeMessage = (message: string) => {
+    setLikeMessage(message);
+
+    window.setTimeout(() => {
+      setLikeMessage(null);
+    }, 2000);
+  };
+
   if (isLoading) {
     return <Loading />;
   }
@@ -98,24 +80,6 @@ const Feed = () => {
     return (
       <section className="w-full">
         <div className="mx-auto w-full">
-          {likeMessage && (
-            <div
-              className="
-      mb-4
-      w-full
-      rounded-lg
-      border
-      border-[var(--color-border)]
-      bg-[var(--color-card)]
-      px-4
-      py-3
-      text-sm
-      text-[var(--color-content-primary)]
-    "
-            >
-              {likeMessage}
-            </div>
-          )}
           <p
             className="
               text-center
@@ -135,16 +99,26 @@ const Feed = () => {
       {likeMessage && (
         <div
           className="
-          fixed top-4 left-1/2 -translate-x-1/2 z-50
-          rounded-lg border border-[var(--color-border)]
-          bg-[var(--color-card)] px-4 py-2
-          text-sm text-[var(--color-content-primary)]
-          shadow-md
-        "
+            fixed
+            top-4
+            left-1/2
+            z-50
+            -translate-x-1/2
+            rounded-lg
+            border
+            border-[var(--color-border)]
+            bg-[var(--color-card)]
+            px-4
+            py-2
+            text-sm
+            text-[var(--color-content-primary)]
+            shadow-md
+          "
         >
           {likeMessage}
         </div>
       )}
+
       <div className="mx-auto w-full">
         {/* Success message */}
         {showSuccess && <SuccessModal message="Post created successfully" />}
@@ -169,20 +143,15 @@ const Feed = () => {
               <PostCard
                 key={post.id}
                 postId={post.id}
-                name={post.author.name}
-                username={getUsernameFromEmail(post.author.email)}
+                name={post.author?.name ?? "User"}
+                username={getUsernameFromEmail(post.author?.email ?? "")}
                 createdAt={post.createdAt}
                 content={post.content}
-                likes={post._count.likes}
-                comments={post._count.comments}
-                avatar={post.author.image ?? undefined}
-                likesData={post.likes}
-                onLikeMessage={(message) => {
-                  setLikeMessage(message);
-                  window.setTimeout(() => {
-                    setLikeMessage(null);
-                  }, 2000);
-                }}
+                likes={post._count?.likes ?? 0}
+                comments={post._count?.comments ?? 0}
+                avatar={post.author?.image ?? undefined}
+                likesData={post.likes ?? []}
+                onLikeMessage={handleLikeMessage}
               />
             ))}
           </div>

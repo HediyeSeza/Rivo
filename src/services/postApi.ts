@@ -23,6 +23,7 @@ export interface Post {
   updatedAt: string;
 
   author?: {
+    id: string;
     name: string;
     email: string;
     image: string | null;
@@ -50,11 +51,7 @@ export interface ToggleLikeResponse {
 }
 
 export const getPosts = async (): Promise<Post[]> => {
-  const response = await api.get<PostsResponse | Post[]>("/api/posts");
-
-  if (Array.isArray(response)) {
-    return response;
-  }
+  const response = await api.get<PostsResponse>("/api/posts");
 
   return response.data ?? [];
 };
@@ -62,7 +59,7 @@ export const getPosts = async (): Promise<Post[]> => {
 export const toggleLikePost = async (
   postId: string,
 ): Promise<ToggleLikeResponse> => {
-  return await api.patch<ToggleLikeResponse>(`/api/posts/${postId}`);
+  return api.patch<ToggleLikeResponse>(`/api/posts/${postId}`);
 };
 
 interface CreatePostResponse {
