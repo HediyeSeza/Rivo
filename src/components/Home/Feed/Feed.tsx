@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 
 import PostCard from "../PostCard/PostCard";
 import CreatePost from "../CreatePost/CreatePost";
+
 import Loading from "../../loading/Loading";
+
 import SuccessModal from "../../common/Modal/SuccessModal";
 import ConfirmModal from "../../common/Modal/ConfirmModal";
 
@@ -37,9 +39,11 @@ const Feed = () => {
 
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [commentMessage, setCommentMessage] = useState<string | null>(null);
 
-  const [postToDelete, setPostToDelete] =
-    useState<PostWithAuthor | null>(null);
+  const [likeMessage, setLikeMessage] = useState<string | null>(null);
+
+  const [postToDelete, setPostToDelete] = useState<PostWithAuthor | null>(null);
 
   const fetchPosts = async (showLoading = true) => {
     try {
@@ -49,7 +53,7 @@ const Feed = () => {
 
       setError(null);
 
-      const postsData = (await getPosts()) as PostWithAuthor[];
+      const postsData = await getPosts();
 
       const uniqueAuthorIds = [
         ...new Set(postsData.map((post) => post.authorId)),
@@ -87,13 +91,12 @@ const Feed = () => {
 );
 
 setPosts(postsWithAuthors);
+
     } catch (error) {
       console.error("Failed to load posts:", error);
 
       setError(
-        error instanceof Error
-          ? error.message
-          : "Failed to load posts.",
+        error instanceof Error ? error.message : "Failed to load posts.",
       );
     } finally {
       if (showLoading) {
@@ -117,16 +120,40 @@ setPosts(postsWithAuthors);
     await fetchPosts(false);
   };
 
+  const handleLikeMessage = (message: string) => {
+    setLikeMessage(message);
+
+    window.setTimeout(() => {
+      setLikeMessage(null);
+    }, 2000);
+  };
+
+  const handleCommentAdded = async (postId: string) => {
+    try {
+      await fetchPosts(false);
+    } catch (error) {
+      console.error(`Failed to refresh post ${postId}:`, error);
+    }
+  };
+
+  const handleCommentMessage = (message: string) => {
+    setCommentMessage(message);
+
+    window.setTimeout(() => {
+      setCommentMessage(null);
+    }, 3000);
+  };
+
   const handleDeletePost = async () => {
-    if (!postToDelete) return;
+    if (!postToDelete) {
+      return;
+    }
 
     try {
       await deletePost(postToDelete.id);
 
       setPosts((currentPosts) =>
-        currentPosts.filter(
-          (post) => post.id !== postToDelete.id,
-        ),
+        currentPosts.filter((post) => post.id !== postToDelete.id),
       );
 
       setPostToDelete(null);
@@ -141,9 +168,7 @@ setPosts(postsWithAuthors);
       console.error("Failed to delete post:", error);
 
       setError(
-        error instanceof Error
-          ? error.message
-          : "Failed to delete post.",
+        error instanceof Error ? error.message : "Failed to delete post.",
       );
 
       setPostToDelete(null);
@@ -158,7 +183,13 @@ setPosts(postsWithAuthors);
     return (
       <section className="w-full">
         <div className="mx-auto w-full">
-          <p className="text-center text-sm text-[var(--color-content-secondary)]">
+          <p
+            className="
+              text-center
+              text-sm
+              text-[var(--color-content-secondary)]
+            "
+          >
             {error}
           </p>
         </div>
@@ -168,11 +199,58 @@ setPosts(postsWithAuthors);
 
   return (
     <section className="w-full">
-      <div className="mx-auto w-full">
-        {showSuccess && (
-          <SuccessModal message={successMessage} />
-        )}
+      {/* Like message */}
+      {likeMessage && (
+        <div
+          className="
+            fixed
+            left-1/2
+            top-4
+            z-50
+            -translate-x-1/2
+            rounded-lg
+            border
+            border-[var(--color-border)]
+            bg-[var(--color-card)]
+            px-4
+            py-2
+            text-sm
+            text-[var(--color-content-primary)]
+            shadow-md
+          "
+        >
+          {likeMessage}
+        </div>
+      )}
 
+      {commentMessage && (
+        <div
+          className="
+      fixed
+      left-1/2
+      top-4
+      z-50
+      -translate-x-1/2
+      rounded-lg
+      border
+      border-[var(--color-border)]
+      bg-[var(--color-card)]
+      px-4
+      py-2
+      text-sm
+      text-[var(--color-content-primary)]
+      shadow-md
+    "
+        >
+          {commentMessage}
+        </div>
+      )}
+
+      <div className="mx-auto w-full">
+        {/* Success message */}
+        {showSuccess && <SuccessModal message={successMessage} />}
+
+        {/* Delete confirmation */}
         {postToDelete && (
           <ConfirmModal
             onCancel={() => setPostToDelete(null)}
@@ -180,10 +258,18 @@ setPosts(postsWithAuthors);
           />
         )}
 
+        {/* Create Post */}
         <CreatePost onPostCreated={handlePostCreated} />
 
+        {/* Posts */}
         {posts.length === 0 ? (
-          <p className="text-center text-sm text-[var(--color-content-secondary)]">
+          <p
+            className="
+              text-center
+              text-sm
+              text-[var(--color-content-secondary)]
+            "
+          >
             No posts yet.
           </p>
         ) : (
@@ -191,21 +277,21 @@ setPosts(postsWithAuthors);
             {posts.map((post) => (
               <PostCard
                 key={post.id}
-                name={post.author.name}
-                username={getUsernameFromEmail(
-                  post.author.email,
-                )}
+                postId={post.id}
+                name={post.author?.name ?? "User"}
+                username={getUsernameFromEmail(post.author?.email ?? "")}
                 createdAt={post.createdAt}
                 content={post.content}
-                likes={0}
-                comments={0}
-                avatar={
-                  post.author.image ??
-                  post.author.avatar ??
-                  undefined
-                }
-                showDelete={post.author.id === user?.id}
+                likes={post._count?.likes ?? 0}
+                comments={post._count?.comments ?? 0}
+                avatar={post.author?.image ?? undefined}
+                likesData={post.likes ?? []}
+                commentsData={post.comments ?? []}
+                showDelete={post.author?.id === user?.id}
                 onDelete={() => setPostToDelete(post)}
+                onLikeMessage={handleLikeMessage}
+                onCommentAdded={handleCommentAdded}
+                onCommentMessage={handleCommentMessage}
               />
             ))}
           </div>

@@ -143,14 +143,20 @@ const ProfilePosts = ({
     const currentPost =
       post as ProfilePostWithRelations;
 
-    return currentPost.author?.name || "User";
+    return (
+      currentPost.author?.name ||
+      currentPost.post?.author?.name ||
+      "User"
+    );
   };
 
   const getPostUsername = (post: ProfilePost) => {
     const currentPost =
       post as ProfilePostWithRelations;
 
-    const email = currentPost.author?.email;
+    const email =
+      currentPost.author?.email ||
+      currentPost.post?.author?.email;
 
     if (email) {
       return getUsernameFromEmail(email);
@@ -220,6 +226,22 @@ const ProfilePosts = ({
     return snapshotImage;
   };
 
+  const getPostLikesData = (post: ProfilePost) => {
+    const currentPost =
+      post as ProfilePostWithRelations;
+
+    return currentPost.likes ?? [];
+  };
+
+  const getPostCommentsData = (
+    post: ProfilePost,
+  ) => {
+    const currentPost =
+      post as ProfilePostWithRelations;
+
+    return currentPost.comments ?? [];
+  };
+
   if (isLoading) {
     return (
       <div className="flex min-h-[180px] w-full items-center justify-center text-[14px] text-(--color-content-secondary)">
@@ -286,6 +308,7 @@ const ProfilePosts = ({
           displayedPosts.map((post) => (
             <PostCard
               key={post.id}
+              postId={post.id}
               name={getPostAuthorName(post)}
               username={getPostUsername(post)}
               avatar={getPostAvatar(post)}
@@ -293,13 +316,12 @@ const ProfilePosts = ({
               content={post.content}
               likes={getPostLikes(post)}
               comments={getPostComments(post)}
+              likesData={getPostLikesData(post)}
+              commentsData={getPostCommentsData(post)}
               showDelete={
-                activeTab === "posts" &&
-                isOwnProfile
+                activeTab === "posts" && isOwnProfile
               }
               onDelete={() => setPostToDelete(post)}
-              isLiked={activeTab === "likes"}
-              showUnlike={false}
             />
           ))
         ) : (

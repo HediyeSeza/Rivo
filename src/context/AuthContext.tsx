@@ -45,11 +45,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         const sessionUser = getUser(response);
 
-        console.log("AUTH SESSION USER:", sessionUser);
-
         setUser(sessionUser);
 
         localStorage.setItem(USER_KEY, JSON.stringify(sessionUser));
+
+        const sessionToken =
+          "data" in response && response.data && "session" in response.data
+            ? response.data.session?.token
+            : undefined;
+
+        if (sessionToken) {
+          localStorage.setItem(TOKEN_KEY, sessionToken);
+        }
       })
       .catch((error) => {
         console.error("Failed to get session:", error);
@@ -59,7 +66,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
 
         setUser(null);
+
         localStorage.removeItem(USER_KEY);
+        localStorage.removeItem(TOKEN_KEY);
       });
 
     return () => {
@@ -87,15 +96,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       await logout();
     } catch {
-      // Clear the local session even when the server request fails.
+      // Clear local session even if server request fails.
     } finally {
       setUser(null);
+
       localStorage.removeItem(USER_KEY);
       localStorage.removeItem(TOKEN_KEY);
     }
   };
-
-  console.log("AUTH CONTEXT USER:", user);
 
   return (
     <AuthContext.Provider

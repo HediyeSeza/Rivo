@@ -20,13 +20,28 @@ export interface User {
 }
 
 export interface AuthResponse {
-   user?: User;
+  user?: User;
+
+  data?: {
+    user?: User;
+    session?: {
+      token?: string;
+      expiresAt?: string;
+    };
+  };
+
   token?: string;
-   accessToken?: string;
+  accessToken?: string;
 }
 
 export interface AuthApiResponse {
-  data?: AuthResponse;
+  data?: {
+    user?: User;
+    session?: {
+      token?: string;
+      expiresAt?: string;
+    };
+  };
   user?: User;
   token?: string;
   accessToken?: string;
