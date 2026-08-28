@@ -1,9 +1,77 @@
+import { useEffect, useState } from "react";
+
 import ProfileCard from "../../components/Profile/ProfileCard/ProfileCard";
 import ProfilePosts from "../../components/Profile/ProfilePosts/ProfilePosts";
 import ProfileSidebar from "../../components/ProfileSidebar/ProfileSidebar";
 
+import { useAuth } from "../../context/AuthContext";
+import { getUserById } from "../../services/userApi";
+
+import type { User } from "../../services/userApi";
+
 function Profile() {
-  const isOwnProfile = true;
+  const { user: authUser } = useAuth();
+
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      if (!authUser?.id) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const profileUser = await getUserById(authUser.id);
+
+        console.log("PROFILE USER:", profileUser);
+        console.log("PROFILE COUNT:", profileUser._count);
+
+        setUser(profileUser);
+      } catch (error) {
+        console.error("Failed to load profile:", error);
+
+        setError(
+          error instanceof Error
+            ? error.message
+            : "Failed to load profile.",
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void loadProfile();
+  }, [authUser?.id]);
+
+  if (isLoading) {
+    return (
+      <main className="flex min-h-screen items-center justify-center">
+        <span className="text-[14px] text-(--color-content-secondary)">
+          Loading profile...
+        </span>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="flex min-h-screen items-center justify-center px-6">
+        <span className="text-[14px] text-red-500">
+          {error}
+        </span>
+      </main>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <main
@@ -30,26 +98,22 @@ function Profile() {
       >
         {/* Left Sidebar */}
         <aside className="hidden min-w-0 xl:block">
-          <ProfileSidebar />
+          <ProfileSidebar user={user} />
         </aside>
 
-        {/* Right Content */}
+        {/* Profile Content */}
         <section className="min-w-0 w-full">
-          {/* Profile Card */}
           <div className="flex w-full justify-center">
-            <div
-              className="
-                w-full
-                max-w-[620px]
-              "
-            >
-              <ProfileCard />
+            <div className="w-full max-w-[620px]">
+              <ProfileCard user={user} />
             </div>
           </div>
 
-          {/* Posts / Likes */}
           <div className="mt-10 w-full">
-            <ProfilePosts isOwnProfile={isOwnProfile} />
+            <ProfilePosts
+              userId={user.id}
+              isOwnProfile={true}
+            />
           </div>
         </section>
       </div>

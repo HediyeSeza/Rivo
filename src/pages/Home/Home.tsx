@@ -1,11 +1,18 @@
 import Feed from "../../components/Home/Feed/Feed";
+
 import WelcomeSection from "../../components/WelcomeSection/WelcomeSection";
+
 import RecommendedUsers from "../../components/RecommendedUsers/RecommendedUsers";
+
 import ProfileSidebar from "../../components/ProfileSidebar/ProfileSidebar";
+
 import { useAuth } from "../../context/AuthContext";
 
 const Home = () => {
-  const { isAuthenticated } = useAuth();
+  const {
+    user,
+    isAuthenticated,
+  } = useAuth();
 
   return (
     <div className="min-h-screen w-full pt-24">
@@ -28,19 +35,23 @@ const Home = () => {
         <aside
           className="
             sticky
-            w-[230px]
-            xl:w-[294px]
-            2xl:w-[358px]
             top-24
             hidden
+            w-[230px]
             shrink-0
             lg:block
+            xl:w-[294px]
+            2xl:w-[358px]
           "
         >
-          {isAuthenticated ? <ProfileSidebar /> : <WelcomeSection />}
+          {isAuthenticated ? (
+            <ProfileSidebar user={user} />
+          ) : (
+            <WelcomeSection />
+          )}
         </aside>
 
-        {/* Main */}
+        {/* Main Feed */}
         <main
           className="
             min-w-0
@@ -57,13 +68,13 @@ const Home = () => {
         <aside
           className="
             sticky
-            w-[230px]
-            xl:w-[294px]
-            2xl:w-[358px]
             top-24
             hidden
+            w-[230px]
             shrink-0
             lg:block
+            xl:w-[294px]
+            2xl:w-[358px]
           "
         >
           <RecommendedUsers />

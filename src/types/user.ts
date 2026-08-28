@@ -12,6 +12,8 @@ export interface User {
 
   _count?: {
     followers: number;
+    following: number;
+    posts: number;
   };
 }
 
@@ -24,6 +26,13 @@ export interface AuthResponse {
       expiresAt?: string;
     };
   };
+  token?: string;
+   accessToken?: string;
+}
+
+export interface AuthApiResponse {
+  data?: AuthResponse;
+  user?: User;
   token?: string;
   accessToken?: string;
 }

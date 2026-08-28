@@ -51,7 +51,10 @@ export interface ToggleLikeResponse {
 }
 
 export const getPosts = async (): Promise<Post[]> => {
-  const response = await api.get<PostsResponse>("/api/posts");
+  const response =
+    await api.get<PostsResponse>(
+      "/api/posts",
+    );
 
   return response.data ?? [];
 };
@@ -59,7 +62,12 @@ export const getPosts = async (): Promise<Post[]> => {
 export const toggleLikePost = async (
   postId: string,
 ): Promise<ToggleLikeResponse> => {
-  return api.patch<ToggleLikeResponse>(`/api/posts/${postId}`);
+  const response =
+    await api.patch<ToggleLikeResponse>(
+      `/api/posts/${postId}`,
+    );
+
+  return response.data;
 };
 
 interface CreatePostResponse {
@@ -68,8 +76,24 @@ interface CreatePostResponse {
   data: Post;
 }
 
-export const createPost = async (data: { content: string }): Promise<Post> => {
-  const response = await api.post<CreatePostResponse>("/api/posts", data);
+export interface CreatePostPayload {
+  content: string;
+}
+
+export const createPost = async (
+  data: CreatePostPayload,
+): Promise<Post> => {
+  const response =
+    await api.post<CreatePostResponse>(
+      "/api/posts",
+      data,
+    );
 
   return response.data;
+};
+
+export const deletePost = async (
+  postId: string,
+): Promise<void> => {
+  await api.delete(`/api/posts/${postId}`);
 };

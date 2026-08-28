@@ -1,95 +1,271 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import PostCard from "../../Home/PostCard/PostCard";
+
+import ConfirmModal from "../../common/Modal/ConfirmModal";
+import SuccessModal from "../../common/Modal/SuccessModal";
+
+import { deletePost } from "../../../services/postApi";
+
+import {
+  getUserLikedPosts,
+  getUserPosts,
+  type ProfilePost,
+} from "../../../services/userApi";
+
+import { getUsernameFromEmail } from "../../../utils/getUsernameFromEmail";
 
 type ProfileTab = "posts" | "likes";
 
 interface ProfilePostsProps {
+  userId: string;
   isOwnProfile: boolean;
 }
 
-interface ProfilePost {
-  id: number;
-  name: string;
-  username: string;
-  createdAt: string;
-  content: string;
-  likes: number;
-  comments: number;
-}
+type ProfilePostWithRelations = ProfilePost & {
+  author?: {
+    id?: string;
+    name?: string;
+    email?: string;
+    image?: string | null;
+  };
+  _count?: {
+    likes?: number;
+    comments?: number;
+  };
+  likes?: unknown[];
+  comments?: unknown[];
+};
 
-const userPosts: ProfilePost[] = [
-  {
-    id: 1,
-    name: "Pedram",
-    username: "pedram",
-    createdAt: "2025-08-15T10:00:00Z",
-    content:
-      "Sometimes the smallest steps in the right direction end up being the biggest steps of your life.",
-    likes: 24,
-    comments: 5,
-  },
-  {
-    id: 2,
-    name: "Pedram",
-    username: "pedram",
-    createdAt: "2025-08-14T12:00:00Z",
-    content:
-      "A clean interface is not just about how it looks. It is about how naturally it feels to use.",
-    likes: 31,
-    comments: 8,
-  },
-];
+const ProfilePosts = ({
+  userId,
+  isOwnProfile,
+}: ProfilePostsProps) => {
+  const [activeTab, setActiveTab] =
+    useState<ProfileTab>("posts");
 
-const userLikedPosts: ProfilePost[] = [
-  {
-    id: 3,
-    name: "Sara",
-    username: "sara",
-    createdAt: "2025-08-15T08:00:00Z",
-    content:
-      "Working on something new today. Small progress is still progress. ✨",
-    likes: 18,
-    comments: 3,
-  },
-  {
-    id: 4,
-    name: "Matin",
-    username: "matin",
-    createdAt: "2025-08-14T12:00:00Z",
-    content:
-      "Good design is not only about appearance. It is about creating a simple and enjoyable experience.",
-    likes: 31,
-    comments: 8,
-  },
-];
+  const [posts, setPosts] =
+    useState<ProfilePost[]>([]);
 
-const ProfilePosts = ({ isOwnProfile }: ProfilePostsProps) => {
-  const [activeTab, setActiveTab] = useState<ProfileTab>("posts");
-  const [posts, setPosts] = useState<ProfilePost[]>(userPosts);
   const [likedPosts, setLikedPosts] =
-    useState<ProfilePost[]>(userLikedPosts);
+    useState<ProfilePost[]>([]);
 
-  const displayedPosts = activeTab === "posts" ? posts : likedPosts;
+  const [isLoading, setIsLoading] =
+    useState(true);
 
-  const handleDeletePost = (postId: number) => {
-    if (!isOwnProfile) return;
+  const [error, setError] =
+    useState<string | null>(null);
 
-    setPosts((currentPosts) =>
-      currentPosts.filter((post) => post.id !== postId),
+  const [postToDelete, setPostToDelete] =
+    useState<ProfilePost | null>(null);
+
+  const [showSuccess, setShowSuccess] =
+    useState(false);
+
+  useEffect(() => {
+    const loadProfilePosts = async () => {
+      if (!userId) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const userPosts =
+          await getUserPosts(userId);
+
+        setPosts(userPosts);
+
+        const liked =
+          await getUserLikedPosts(userId);
+
+        setLikedPosts(liked);
+      } catch (error) {
+        console.error(
+          "Failed to load profile posts:",
+          error,
+        );
+
+        setError(
+          error instanceof Error
+            ? error.message
+            : "Failed to load profile posts.",
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void loadProfilePosts();
+  }, [userId]);
+
+  const displayedPosts =
+    activeTab === "posts"
+      ? posts
+      : likedPosts;
+
+  const handleDeletePost = async () => {
+    if (!postToDelete || !isOwnProfile) {
+      return;
+    }
+
+    try {
+      await deletePost(postToDelete.id);
+
+      setPosts((currentPosts) =>
+        currentPosts.filter(
+          (post) =>
+            post.id !== postToDelete.id,
+        ),
+      );
+
+      setPostToDelete(null);
+      setShowSuccess(true);
+
+      window.setTimeout(() => {
+        setShowSuccess(false);
+      }, 5000);
+    } catch (error) {
+      console.error(
+        "Failed to delete post:",
+        error,
+      );
+
+      setPostToDelete(null);
+    }
+  };
+
+  const getPostAuthorName = (
+    post: ProfilePost,
+  ) => {
+    const currentPost =
+      post as ProfilePostWithRelations;
+
+    return (
+      currentPost.author?.name ||
+      "User"
     );
   };
 
-  const handleRemoveLike = (postId: number) => {
-    if (!isOwnProfile) return;
+  const getPostUsername = (
+    post: ProfilePost,
+  ) => {
+    const currentPost =
+      post as ProfilePostWithRelations;
 
-    setLikedPosts((currentPosts) =>
-      currentPosts.filter((post) => post.id !== postId),
-    );
+    const email =
+      currentPost.author?.email;
+
+    if (email) {
+      return getUsernameFromEmail(email);
+    }
+
+    return "user";
   };
+
+  const getPostLikes = (
+    post: ProfilePost,
+  ) => {
+    const currentPost =
+      post as ProfilePostWithRelations;
+
+    if (
+      typeof currentPost._count?.likes ===
+      "number"
+    ) {
+      return currentPost._count.likes;
+    }
+
+    if (Array.isArray(currentPost.likes)) {
+      return currentPost.likes.length;
+    }
+
+    return 0;
+  };
+
+  const getPostComments = (
+    post: ProfilePost,
+  ) => {
+    const currentPost =
+      post as ProfilePostWithRelations;
+
+    if (
+      typeof currentPost._count?.comments ===
+      "number"
+    ) {
+      return currentPost._count.comments;
+    }
+
+    if (
+      Array.isArray(currentPost.comments)
+    ) {
+      return currentPost.comments.length;
+    }
+
+    return 0;
+  };
+
+  if (isLoading) {
+    return (
+      <div
+        className="
+          flex
+          min-h-[180px]
+          w-full
+          items-center
+          justify-center
+          text-[14px]
+          text-(--color-content-secondary)
+        "
+      >
+        Loading posts...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div
+        className="
+          flex
+          min-h-[180px]
+          w-full
+          items-center
+          justify-center
+          rounded-xl
+          border
+          border-(--color-border)
+          bg-(--color-card)
+          px-5
+          text-center
+          text-[14px]
+          text-red-500
+        "
+      >
+        {error}
+      </div>
+    );
+  }
 
   return (
     <section className="w-full">
+      {showSuccess && (
+        <SuccessModal
+          message="Post deleted successfully"
+        />
+      )}
+
+      {postToDelete && (
+        <ConfirmModal
+          onCancel={() =>
+            setPostToDelete(null)
+          }
+          onConfirm={handleDeletePost}
+        />
+      )}
+
       {/* Tabs */}
       <div
         className="
@@ -101,11 +277,11 @@ const ProfilePosts = ({ isOwnProfile }: ProfilePostsProps) => {
           p-1
         "
       >
-        {/* Posts */}
         <button
           type="button"
-          onClick={() => setActiveTab("posts")}
-          aria-pressed={activeTab === "posts"}
+          onClick={() =>
+            setActiveTab("posts")
+          }
           className={`
             flex
             min-h-[36px]
@@ -138,11 +314,11 @@ const ProfilePosts = ({ isOwnProfile }: ProfilePostsProps) => {
           Posts
         </button>
 
-        {/* Likes */}
         <button
           type="button"
-          onClick={() => setActiveTab("likes")}
-          aria-pressed={activeTab === "likes"}
+          onClick={() =>
+            setActiveTab("likes")
+          }
           className={`
             flex
             min-h-[36px]
@@ -177,22 +353,36 @@ const ProfilePosts = ({ isOwnProfile }: ProfilePostsProps) => {
       </div>
 
       {/* Posts */}
-      <div className="mt-5 flex w-full flex-col gap-4">
+      <div
+        className="
+          mt-5
+          flex
+          w-full
+          flex-col
+          gap-4
+        "
+      >
         {displayedPosts.length > 0 ? (
           displayedPosts.map((post) => (
             <PostCard
               key={post.id}
-              name={post.name}
-              username={post.username}
+              name={getPostAuthorName(post)}
+              username={getPostUsername(post)}
               createdAt={post.createdAt}
               content={post.content}
-              likes={post.likes}
-              comments={post.comments}
-              showDelete={activeTab === "posts" && isOwnProfile}
-              onDelete={() => handleDeletePost(post.id)}
-              isLiked={activeTab === "likes"}
-              showUnlike={activeTab === "likes" && isOwnProfile}
-              onUnlike={() => handleRemoveLike(post.id)}
+              likes={getPostLikes(post)}
+              comments={getPostComments(post)}
+              showDelete={
+                activeTab === "posts" &&
+                isOwnProfile
+              }
+              onDelete={() =>
+                setPostToDelete(post)
+              }
+              isLiked={
+                activeTab === "likes"
+              }
+              showUnlike={false}
             />
           ))
         ) : (

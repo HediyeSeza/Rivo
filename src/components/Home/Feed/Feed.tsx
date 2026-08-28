@@ -2,18 +2,45 @@ import { useEffect, useState } from "react";
 
 import PostCard from "../PostCard/PostCard";
 import CreatePost from "../CreatePost/CreatePost";
+
 import Loading from "../../loading/Loading";
 import SuccessModal from "../../common/Modal/SuccessModal";
+import ConfirmModal from "../../common/Modal/ConfirmModal";
 
-import { getPosts, type Post } from "../../../services/postApi";
+import { useAuth } from "../../../context/AuthContext";
+
+import {
+  deletePost,
+  getPosts,
+  type Post,
+} from "../../../services/postApi";
+
 import { getUsernameFromEmail } from "../../../utils/getUsernameFromEmail";
 
+type PostWithAuthor = Post & {
+  author: {
+    id: string;
+    name: string;
+    email: string;
+    image?: string | null;
+    avatar?: string | null;
+  };
+};
+
 const Feed = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
+  const { user } = useAuth();
+
+  const [posts, setPosts] = useState<PostWithAuthor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
   const [showSuccess, setShowSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+
   const [likeMessage, setLikeMessage] = useState<string | null>(null);
+
+  const [postToDelete, setPostToDelete] =
+    useState<PostWithAuthor | null>(null);
 
   const fetchPosts = async (showLoading = true) => {
     try {
@@ -25,23 +52,14 @@ const Feed = () => {
 
       const postsData = await getPosts();
 
-      console.log("POSTS FROM API:", postsData);
-
-      console.log(
-        "POST LIKES:",
-        postsData.map((post) => ({
-          postId: post.id,
-          likes: post.likes,
-          likesCount: post._count?.likes,
-        })),
-      );
-
-      setPosts(postsData);
+      setPosts(postsData as PostWithAuthor[]);
     } catch (error) {
-      console.error("Failed to fetch posts:", error);
+      console.error("Failed to load posts:", error);
 
       setError(
-        error instanceof Error ? error.message : "Failed to load posts.",
+        error instanceof Error
+          ? error.message
+          : "Failed to load posts.",
       );
     } finally {
       if (showLoading) {
@@ -55,6 +73,7 @@ const Feed = () => {
   }, []);
 
   const handlePostCreated = async () => {
+    setSuccessMessage("Post created successfully");
     setShowSuccess(true);
 
     window.setTimeout(() => {
@@ -70,6 +89,41 @@ const Feed = () => {
     window.setTimeout(() => {
       setLikeMessage(null);
     }, 2000);
+  };
+
+  const handleDeletePost = async () => {
+    if (!postToDelete) {
+      return;
+    }
+
+    try {
+      await deletePost(postToDelete.id);
+
+      setPosts((currentPosts) =>
+        currentPosts.filter(
+          (post) => post.id !== postToDelete.id,
+        ),
+      );
+
+      setPostToDelete(null);
+
+      setSuccessMessage("Post deleted successfully");
+      setShowSuccess(true);
+
+      window.setTimeout(() => {
+        setShowSuccess(false);
+      }, 5000);
+    } catch (error) {
+      console.error("Failed to delete post:", error);
+
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Failed to delete post.",
+      );
+
+      setPostToDelete(null);
+    }
   };
 
   if (isLoading) {
@@ -96,12 +150,13 @@ const Feed = () => {
 
   return (
     <section className="w-full">
+      {/* Like message */}
       {likeMessage && (
         <div
           className="
             fixed
-            top-4
             left-1/2
+            top-4
             z-50
             -translate-x-1/2
             rounded-lg
@@ -121,7 +176,17 @@ const Feed = () => {
 
       <div className="mx-auto w-full">
         {/* Success message */}
-        {showSuccess && <SuccessModal message="Post created successfully" />}
+        {showSuccess && (
+          <SuccessModal message={successMessage} />
+        )}
+
+        {/* Delete confirmation */}
+        {postToDelete && (
+          <ConfirmModal
+            onCancel={() => setPostToDelete(null)}
+            onConfirm={handleDeletePost}
+          />
+        )}
 
         {/* Create Post */}
         <CreatePost onPostCreated={handlePostCreated} />
@@ -144,13 +209,18 @@ const Feed = () => {
                 key={post.id}
                 postId={post.id}
                 name={post.author?.name ?? "User"}
-                username={getUsernameFromEmail(post.author?.email ?? "")}
+                username={getUsernameFromEmail(
+                  post.author?.email ?? "",
+                )}
                 createdAt={post.createdAt}
                 content={post.content}
                 likes={post._count?.likes ?? 0}
                 comments={post._count?.comments ?? 0}
                 avatar={post.author?.image ?? undefined}
                 likesData={post.likes ?? []}
+                commentsData={post.comments ?? []}
+                showDelete={post.author?.id === user?.id}
+                onDelete={() => setPostToDelete(post)}
                 onLikeMessage={handleLikeMessage}
               />
             ))}

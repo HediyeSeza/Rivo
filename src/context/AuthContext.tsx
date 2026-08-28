@@ -1,7 +1,18 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+
 import type { ReactNode } from "react";
 import type { User } from "../types/user";
-import { getSession, getUser, logout } from "../services/authApi";
+
+import {
+  getSession,
+  getUser,
+  logout,
+} from "../services/authApi";
 
 interface AuthContextValue {
   user: User | null;
@@ -12,12 +23,24 @@ interface AuthContextValue {
 
 const USER_KEY = "rivo_user";
 const TOKEN_KEY = "rivo_token";
-const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+const AuthContext =
+  createContext<AuthContextValue | undefined>(
+    undefined,
+  );
+
+export const AuthProvider = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
   const [user, setUser] = useState<User | null>(() => {
-    const savedUser = localStorage.getItem(USER_KEY);
-    if (!savedUser) return null;
+    const savedUser =
+      localStorage.getItem(USER_KEY);
+
+    if (!savedUser) {
+      return null;
+    }
 
     try {
       return JSON.parse(savedUser) as User;
@@ -32,24 +55,45 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     getSession()
       .then((response) => {
-        if (isActive) {
-          const sessionUser = getUser(response);
-          setUser(sessionUser);
-          localStorage.setItem(USER_KEY, JSON.stringify(sessionUser));
+        if (!isActive) {
+          return;
+        }
 
-          const sessionToken =
-            response && "data" in response && response.data?.session?.token;
+        const sessionUser = getUser(response);
 
-          if (sessionToken) {
-            localStorage.setItem(TOKEN_KEY, sessionToken);
-          }
+        setUser(sessionUser);
+
+        localStorage.setItem(
+          USER_KEY,
+          JSON.stringify(sessionUser),
+        );
+
+        const sessionToken =
+          response &&
+          "data" in response &&
+          response.data?.session?.token;
+
+        if (sessionToken) {
+          localStorage.setItem(
+            TOKEN_KEY,
+            sessionToken,
+          );
         }
       })
-      .catch(() => {
-        if (isActive) {
-          setUser(null);
-          localStorage.removeItem(USER_KEY);
+      .catch((error) => {
+        console.error(
+          "Failed to get session:",
+          error,
+        );
+
+        if (!isActive) {
+          return;
         }
+
+        setUser(null);
+
+        localStorage.removeItem(USER_KEY);
+        localStorage.removeItem(TOKEN_KEY);
       });
 
     return () => {
@@ -57,19 +101,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
-  const signIn = (nextUser: User, token?: string) => {
+  const signIn = (
+    nextUser: User,
+    token?: string,
+  ) => {
     setUser(nextUser);
-    localStorage.setItem(USER_KEY, JSON.stringify(nextUser));
-    if (token) localStorage.setItem(TOKEN_KEY, token);
+
+    localStorage.setItem(
+      USER_KEY,
+      JSON.stringify(nextUser),
+    );
+
+    if (token) {
+      localStorage.setItem(
+        TOKEN_KEY,
+        token,
+      );
+    }
   };
 
   const signOut = async () => {
     try {
       await logout();
     } catch {
-      // Clear the local session even when the server request fails.
+      // Clear local session even if server request fails.
     } finally {
       setUser(null);
+
       localStorage.removeItem(USER_KEY);
       localStorage.removeItem(TOKEN_KEY);
     }
@@ -77,7 +135,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, isAuthenticated: Boolean(user), signIn, signOut }}
+      value={{
+        user,
+        isAuthenticated: Boolean(user),
+        signIn,
+        signOut,
+      }}
     >
       {children}
     </AuthContext.Provider>
@@ -87,6 +150,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 // eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used inside AuthProvider");
+
+  if (!context) {
+    throw new Error(
+      "useAuth must be used inside AuthProvider",
+    );
+  }
+
   return context;
 };
