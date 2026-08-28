@@ -1,4 +1,5 @@
 import { api } from "./api";
+
 import type { AuthResponse, User } from "../types/user";
 
 export interface LoginPayload {
@@ -19,7 +20,8 @@ export const getUser = (response: AuthResponse | User): User => {
     "data" in response &&
     response.data &&
     typeof response.data === "object" &&
-    "user" in response.data
+    "user" in response.data &&
+    response.data.user
   ) {
     return response.data.user as User;
   }
@@ -36,8 +38,10 @@ export const login = async (payload: LoginPayload) => {
     "/api/authentication/login",
     payload,
   );
+
   return {
     user: getUser(response),
+
     token:
       "token" in response ? response.token || response.accessToken : undefined,
   };
@@ -48,8 +52,10 @@ export const register = async (payload: RegisterPayload) => {
     "/api/authentication/register",
     payload,
   );
+
   return {
     user: getUser(response),
+
     token:
       "token" in response ? response.token || response.accessToken : undefined,
   };

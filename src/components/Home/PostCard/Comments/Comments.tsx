@@ -9,7 +9,8 @@ import avatarImage from "../../../../assets/Avatar/a.png";
 interface CommentsProps {
   postId: string;
   comments: PostComment[];
-  onCommentAdded: (comment: PostComment) => void;
+  onCommentAdded: (postId: string) => void | Promise<void>;
+  onMessage?: (message: string) => void;
 }
 
 const formatCommentTime = (createdAt: string) => {
@@ -39,7 +40,12 @@ const formatCommentTime = (createdAt: string) => {
   return `${diffInDays} ${diffInDays === 1 ? "day" : "days"} ago`;
 };
 
-const Comments = ({ postId, comments, onCommentAdded }: CommentsProps) => {
+const Comments = ({
+  postId,
+  comments,
+  onMessage,
+  onCommentAdded,
+}: CommentsProps) => {
   const { user } = useAuth();
 
   const [content, setContent] = useState("");
@@ -57,17 +63,26 @@ const Comments = ({ postId, comments, onCommentAdded }: CommentsProps) => {
       setIsSubmitting(true);
       setError(null);
 
-      const newComment = await createComment(postId, trimmedContent);
+      const response = await createComment(postId, trimmedContent);
 
-      onCommentAdded(newComment);
+      onMessage?.(response.message);
+
+      if (!response.success) {
+        setError(response.message);
+        return;
+      }
 
       setContent("");
+
+      await onCommentAdded(postId);
     } catch (error) {
       console.error("Failed to create comment:", error);
 
-      setError(
-        error instanceof Error ? error.message : "Failed to add comment.",
-      );
+      const message =
+        error instanceof Error ? error.message : "Failed to add comment.";
+
+      onMessage?.(message);
+      setError(message);
     } finally {
       setIsSubmitting(false);
     }

@@ -4,6 +4,8 @@ import { useState } from "react";
 import Icon from "../../common/Icon/Icon";
 import Avatar from "../../common/Avatar/Avatar";
 
+import LikeButton from "../../common/Selection/LikeButton/LikeButton";
+
 import avatarImage from "../../../assets/Avatar/a.png";
 
 import { type PostComment } from "../../../services/postApi";
@@ -22,15 +24,19 @@ interface PostCardProps {
   comments?: number;
   avatar?: string;
 
+  likesData: {
+    userId: string;
+  }[];
+
   commentsData: PostComment[];
-  onCommentAdded?: (comment: PostComment) => void;
+
+  onLikeMessage?: (message: string) => void;
+
+  onCommentAdded?: (postId: string) => void | Promise<void>;
+  onCommentMessage?: (message: string) => void;
 
   showDelete?: boolean;
   onDelete?: () => void;
-
-  isLiked?: boolean;
-  showUnlike?: boolean;
-  onUnlike?: () => void;
 }
 
 const formatPostTime = (createdAt: string) => {
@@ -69,6 +75,7 @@ const formatPostTime = (createdAt: string) => {
 
   return postDate.toLocaleDateString();
 };
+
 const PostCard = ({
   postId,
   name,
@@ -78,13 +85,13 @@ const PostCard = ({
   likes = 0,
   comments = 0,
   avatar,
+  likesData,
   commentsData,
+  onLikeMessage,
   onCommentAdded,
+  onCommentMessage,
   showDelete = false,
   onDelete,
-  isLiked = false,
-  showUnlike = false,
-  onUnlike,
 }: PostCardProps) => {
   const [showComments, setShowComments] = useState(false);
 
@@ -93,7 +100,8 @@ const PostCard = ({
       className="
         w-full
         rounded-xl
-        border border-[#E5E5E5]
+        border
+        border-[#E5E5E5]
         bg-white
         p-5
         shadow-sm
@@ -192,29 +200,12 @@ const PostCard = ({
       {/* Actions */}
       <div className="mt-3 flex items-center gap-2">
         {/* Like */}
-        <button
-          type="button"
-          aria-label={isLiked ? "Unlike post" : "Like post"}
-          onClick={isLiked ? onUnlike : undefined}
-          className="
-            flex
-            cursor-pointer
-            items-center
-            gap-2
-            rounded-lg
-            px-2
-            py-1
-            text-[var(--color-content-secondary)]
-            transition-colors
-            duration-200
-            hover:bg-black/5
-            dark:hover:bg-white/5
-          "
-        >
-          <Icon name="Heart" size={18} />
-
-          <span className="text-[14px]">{likes}</span>
-        </button>
+        <LikeButton
+          postId={postId}
+          likes={likesData}
+          likesCount={likes}
+          onMessage={onLikeMessage}
+        />
 
         {/* Comment */}
         <button
@@ -257,6 +248,7 @@ const PostCard = ({
             postId={postId}
             comments={commentsData}
             onCommentAdded={onCommentAdded ?? (() => {})}
+            onMessage={onCommentMessage}
           />
         </div>
       )}

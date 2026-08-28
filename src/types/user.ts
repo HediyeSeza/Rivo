@@ -19,6 +19,13 @@ export interface User {
 
 export interface AuthResponse {
   user?: User;
+  data?: {
+    user?: User;
+    session?: {
+      token?: string;
+      expiresAt?: string;
+    };
+  };
   token?: string;
    accessToken?: string;
 }
