@@ -1,24 +1,8 @@
 import { api } from "./api";
 import type { Post } from "./postApi";
+import type { User } from "../types/user";
 
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  emailVerified: boolean;
-  image: string | null;
-  bio: string | null;
-  location: string | null;
-  website: string | null;
-  createdAt: string;
-  updatedAt: string;
-
-  _count?: {
-    followers: number;
-    followings: number;
-    posts: number;
-  };
-}
+export type { User };
 
 interface UserResponse {
   message: string;
@@ -38,7 +22,62 @@ interface PostsResponse {
   data?: Post[];
 }
 
-export const getUserById = async (id: string): Promise<User> => {
+export interface UpdateProfilePayload {
+  name: string;
+  bio: string;
+  location: string;
+  website: string;
+  image?: string | null; // UUID برگشتی از upload
+}
+
+const UUID_PATTERN =
+  /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+
+const extractImageId = (value: unknown): string | null => {
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    return trimmed.match(UUID_PATTERN)?.[0] ?? null;
+  }
+
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+
+  const record = value as Record<string, unknown>;
+  const keys = ["id", "uuid", "file", "image", "url", "data", "result"];
+
+  for (const key of keys) {
+    const found = extractImageId(record[key]);
+    if (found) return found;
+  }
+
+  try {
+    return JSON.stringify(value).match(UUID_PATTERN)?.[0] ?? null;
+  } catch {
+    return null;
+  }
+};
+
+
+export const uploadImage = async (file: File): Promise<string> => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await api.post<unknown>("/api/upload", formData);
+  const imageId = extractImageId(response);
+
+  if (!imageId) {
+    throw new Error("Could not upload photo. Please try again.");
+  }
+
+  return imageId;
+};
+
+
+export const getUserById = async (
+  id: string,
+): Promise<User> => {
   const response = await api.get<UserResponse | User>(
     `/api/users/${id}`,
   );
@@ -48,6 +87,22 @@ export const getUserById = async (id: string): Promise<User> => {
   }
 
   return response as User;
+};
+
+export const updateUserProfile = async (
+  userId: string,
+  data: UpdateProfilePayload,
+): Promise<User> => {
+  const response = await api.put<UserResponse | User>(
+    `/api/users/${userId}`,
+    data,
+  );
+
+  if ("data" in response && response.data) {
+    return response.data;
+  }
+
+  return getUserById(userId);
 };
 
 export const getRecommendedUsers = async (): Promise<User[]> => {
@@ -71,11 +126,9 @@ export interface FollowResponse {
 export const toggleFollowUser = async (
   userId: string,
 ): Promise<FollowResponse> => {
-  const response = await api.patch<FollowResponse>(
+  return api.patch<FollowResponse>(
     `/api/users/${userId}`,
   );
-
-  return response;
 };
 
 /* =========================

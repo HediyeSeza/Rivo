@@ -1,4 +1,5 @@
 import Icon from "../common/Icon/Icon";
+import Avatar from "../common/Avatar/Avatar";
 
 import avatarImage from "../../assets/Avatar/a.png";
 
@@ -27,7 +28,7 @@ const ProfileSidebar = ({
     user._count?.followers ?? 0;
 
   const followingCount =
-    user._count?.followings ?? 0;
+    user._count?.following ?? 0;
 
   return (
     <aside
@@ -44,12 +45,11 @@ const ProfileSidebar = ({
       "
     >
       <div className="w-full">
-        {/* Profile */}
         <div className="flex flex-col items-center">
-          <img
+          <Avatar
             src={profileAvatar}
             alt={`${user.name} avatar`}
-            className="h-20 w-20 rounded-full object-cover"
+            size={80}
           />
 
           <h2
@@ -74,7 +74,6 @@ const ProfileSidebar = ({
           </span>
         </div>
 
-        {/* Divider */}
         <div
           className="
             my-8
@@ -84,7 +83,6 @@ const ProfileSidebar = ({
           "
         />
 
-        {/* Followers */}
         <div className="flex items-center justify-between text-center">
           <div>
             <p
@@ -129,7 +127,6 @@ const ProfileSidebar = ({
           </div>
         </div>
 
-        {/* Divider */}
         <div
           className="
             my-6
@@ -139,7 +136,6 @@ const ProfileSidebar = ({
           "
         />
 
-        {/* Location */}
         <div
           className="
             flex
@@ -155,7 +151,6 @@ const ProfileSidebar = ({
           </span>
         </div>
 
-        {/* Website */}
         <div
           className="
             mt-4
