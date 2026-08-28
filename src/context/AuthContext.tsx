@@ -34,23 +34,21 @@ export const AuthProvider = ({
 }: {
   children: ReactNode;
 }) => {
-  const [user, setUser] = useState<User | null>(
-    () => {
-      const savedUser =
-        localStorage.getItem(USER_KEY);
+  const [user, setUser] = useState<User | null>(() => {
+    const savedUser =
+      localStorage.getItem(USER_KEY);
 
-      if (!savedUser) {
-        return null;
-      }
+    if (!savedUser) {
+      return null;
+    }
 
-      try {
-        return JSON.parse(savedUser) as User;
-      } catch {
-        localStorage.removeItem(USER_KEY);
-        return null;
-      }
-    },
-  );
+    try {
+      return JSON.parse(savedUser) as User;
+    } catch {
+      localStorage.removeItem(USER_KEY);
+      return null;
+    }
+  });
 
   useEffect(() => {
     let isActive = true;
@@ -63,17 +61,24 @@ export const AuthProvider = ({
 
         const sessionUser = getUser(response);
 
-        console.log(
-          "AUTH SESSION USER:",
-          sessionUser,
-        );
-
         setUser(sessionUser);
 
         localStorage.setItem(
           USER_KEY,
           JSON.stringify(sessionUser),
         );
+
+        const sessionToken =
+          response &&
+          "data" in response &&
+          response.data?.session?.token;
+
+        if (sessionToken) {
+          localStorage.setItem(
+            TOKEN_KEY,
+            sessionToken,
+          );
+        }
       })
       .catch((error) => {
         console.error(
@@ -86,7 +91,9 @@ export const AuthProvider = ({
         }
 
         setUser(null);
+
         localStorage.removeItem(USER_KEY);
+        localStorage.removeItem(TOKEN_KEY);
       });
 
     return () => {
@@ -117,15 +124,14 @@ export const AuthProvider = ({
     try {
       await logout();
     } catch {
-      // Clear the local session even when the server request fails.
+      // Clear local session even if server request fails.
     } finally {
       setUser(null);
+
       localStorage.removeItem(USER_KEY);
       localStorage.removeItem(TOKEN_KEY);
     }
   };
-
-  console.log("AUTH CONTEXT USER:", user);
 
   return (
     <AuthContext.Provider

@@ -1,11 +1,42 @@
 import { api } from "./api";
 
+export interface PostLike {
+  userId: string;
+}
+
+export interface PostComment {
+  id: string;
+  content: string;
+  createdAt: string;
+  author: {
+    name: string;
+    email: string;
+    image: string | null;
+  };
+}
+
 export interface Post {
   id: string;
   authorId: string;
   content: string;
   createdAt: string;
   updatedAt: string;
+
+  author?: {
+    id: string;
+    name: string;
+    email: string;
+    image: string | null;
+  };
+
+  likes: PostLike[];
+
+  comments: PostComment[];
+
+  _count: {
+    likes: number;
+    comments: number;
+  };
 }
 
 interface PostsResponse {
@@ -14,15 +45,30 @@ interface PostsResponse {
   data: Post[];
 }
 
+export interface ToggleLikeResponse {
+  message: string;
+  success: boolean;
+}
+
 export const getPosts = async (): Promise<Post[]> => {
-  const response = await api.get<PostsResponse>("/api/posts");
+  const response =
+    await api.get<PostsResponse>(
+      "/api/posts",
+    );
+
+  return response.data ?? [];
+};
+
+export const toggleLikePost = async (
+  postId: string,
+): Promise<ToggleLikeResponse> => {
+  const response =
+    await api.patch<ToggleLikeResponse>(
+      `/api/posts/${postId}`,
+    );
 
   return response.data;
 };
-
-export interface CreatePostPayload {
-  content: string;
-}
 
 interface CreatePostResponse {
   message: string;
@@ -30,13 +76,19 @@ interface CreatePostResponse {
   data: Post;
 }
 
+export interface CreatePostPayload {
+  content: string;
+}
+
 export const createPost = async (
   data: CreatePostPayload,
 ): Promise<Post> => {
-  const response = await api.post<CreatePostResponse>(
-    "/api/posts",
-    data,
-  );
+  const response =
+    await api.post<CreatePostResponse>(
+      "/api/posts",
+      data,
+    );
+
   return response.data;
 };
 

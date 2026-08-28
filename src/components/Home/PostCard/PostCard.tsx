@@ -1,34 +1,36 @@
 import { Link } from "react-router-dom";
 import Icon from "../../common/Icon/Icon";
 import Avatar from "../../common/Avatar/Avatar";
+import LikeButton from "../../common/Selection/LikeButton/LikeButton";
 
 import avatarImage from "../../../assets/Avatar/a.png";
 
 interface PostCardProps {
+  postId: string;
+
   name: string;
   username: string;
   createdAt: string;
   content: string;
+
   likes?: number;
   comments?: number;
   avatar?: string;
+  onLikeMessage?: (message: string) => void;
+
+  likesData: {
+    userId: string;
+  }[];
 
   showDelete?: boolean;
   onDelete?: () => void;
-
-  isLiked?: boolean;
-
-  showUnlike?: boolean;
-  onUnlike?: () => void;
 }
 
 const formatPostTime = (createdAt: string) => {
   const postDate = new Date(createdAt);
   const now = new Date();
 
-  const diffInSeconds = Math.floor(
-    (now.getTime() - postDate.getTime()) / 1000,
-  );
+  const diffInSeconds = Math.floor((now.getTime() - postDate.getTime()) / 1000);
 
   if (diffInSeconds < 60) {
     return "just now";
@@ -37,39 +39,32 @@ const formatPostTime = (createdAt: string) => {
   const diffInMinutes = Math.floor(diffInSeconds / 60);
 
   if (diffInMinutes < 60) {
-    return `${diffInMinutes} ${
-      diffInMinutes === 1 ? "minute" : "minutes"
-    } ago`;
+    return `${diffInMinutes} ${diffInMinutes === 1 ? "minute" : "minutes"} ago`;
   }
 
   const diffInHours = Math.floor(diffInMinutes / 60);
 
   if (diffInHours < 24) {
-    return `${diffInHours} ${
-      diffInHours === 1 ? "hour" : "hours"
-    } ago`;
+    return `${diffInHours} ${diffInHours === 1 ? "hour" : "hours"} ago`;
   }
 
   const diffInDays = Math.floor(diffInHours / 24);
 
   if (diffInDays < 7) {
-    return `${diffInDays} ${
-      diffInDays === 1 ? "day" : "days"
-    } ago`;
+    return `${diffInDays} ${diffInDays === 1 ? "day" : "days"} ago`;
   }
 
   const diffInWeeks = Math.floor(diffInDays / 7);
 
   if (diffInWeeks < 4) {
-    return `${diffInWeeks} ${
-      diffInWeeks === 1 ? "week" : "weeks"
-    } ago`;
+    return `${diffInWeeks} ${diffInWeeks === 1 ? "week" : "weeks"} ago`;
   }
 
   return postDate.toLocaleDateString();
 };
 
 const PostCard = ({
+  postId,
   name,
   username,
   createdAt,
@@ -77,14 +72,10 @@ const PostCard = ({
   likes = 0,
   comments = 0,
   avatar,
-
+  likesData,
   showDelete = false,
   onDelete,
-
-  isLiked = false,
-
-  showUnlike = false,
-  onUnlike,
+  onLikeMessage,
 }: PostCardProps) => {
   return (
     <article
@@ -115,8 +106,8 @@ const PostCard = ({
             </h3>
 
             <Link
-  to={`/profile/${username}`}
-  className="
+              to={`/profile/${username}`}
+              className="
     cursor-pointer
     text-[12px]
     leading-5
@@ -125,9 +116,9 @@ const PostCard = ({
     duration-200
     hover:text-(--color-content-primary)
   "
->
-  @{username}
-</Link>
+            >
+              @{username}
+            </Link>
 
             <span className="text-[12px] leading-5 text-(--color-content-muted)">
               {formatPostTime(createdAt)}
@@ -177,27 +168,12 @@ const PostCard = ({
       {/* Actions */}
       <div className="mt-3 flex items-center gap-2">
         {/* Like */}
-        <button
-          type="button"
-          aria-label="Like post"
-          className="
-            flex
-            cursor-pointer
-            items-center
-            gap-2
-            rounded-lg
-            px-2
-            py-1
-            text-[var(--color-content-secondary)]
-            transition-colors
-            duration-200
-            hover:bg-black/5
-            dark:hover:bg-white/5
-          "
-        >
-          <Icon name="Heart" size={18} />
-          <span className="text-[14px]">{likes}</span>
-        </button>
+        <LikeButton
+          postId={postId}
+          likes={likesData}
+          likesCount={likes}
+          onMessage={onLikeMessage}
+        />
 
         {/* Comment */}
         <button

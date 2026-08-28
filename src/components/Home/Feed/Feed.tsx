@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import PostCard from "../PostCard/PostCard";
 import CreatePost from "../CreatePost/CreatePost";
+
 import Loading from "../../loading/Loading";
 import SuccessModal from "../../common/Modal/SuccessModal";
 import ConfirmModal from "../../common/Modal/ConfirmModal";
@@ -36,6 +37,8 @@ const Feed = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
+  const [likeMessage, setLikeMessage] = useState<string | null>(null);
+
   const [postToDelete, setPostToDelete] =
     useState<PostWithAuthor | null>(null);
 
@@ -47,10 +50,9 @@ const Feed = () => {
 
       setError(null);
 
-      const postsData = (await getPosts()) as PostWithAuthor[];
+      const postsData = await getPosts();
 
-      // Author information is already included in the posts response.
-      setPosts(postsData);
+      setPosts(postsData as PostWithAuthor[]);
     } catch (error) {
       console.error("Failed to load posts:", error);
 
@@ -81,8 +83,18 @@ const Feed = () => {
     await fetchPosts(false);
   };
 
+  const handleLikeMessage = (message: string) => {
+    setLikeMessage(message);
+
+    window.setTimeout(() => {
+      setLikeMessage(null);
+    }, 2000);
+  };
+
   const handleDeletePost = async () => {
-    if (!postToDelete) return;
+    if (!postToDelete) {
+      return;
+    }
 
     try {
       await deletePost(postToDelete.id);
@@ -122,7 +134,13 @@ const Feed = () => {
     return (
       <section className="w-full">
         <div className="mx-auto w-full">
-          <p className="text-center text-sm text-[var(--color-content-secondary)]">
+          <p
+            className="
+              text-center
+              text-sm
+              text-[var(--color-content-secondary)]
+            "
+          >
             {error}
           </p>
         </div>
@@ -132,11 +150,37 @@ const Feed = () => {
 
   return (
     <section className="w-full">
+      {/* Like message */}
+      {likeMessage && (
+        <div
+          className="
+            fixed
+            left-1/2
+            top-4
+            z-50
+            -translate-x-1/2
+            rounded-lg
+            border
+            border-[var(--color-border)]
+            bg-[var(--color-card)]
+            px-4
+            py-2
+            text-sm
+            text-[var(--color-content-primary)]
+            shadow-md
+          "
+        >
+          {likeMessage}
+        </div>
+      )}
+
       <div className="mx-auto w-full">
+        {/* Success message */}
         {showSuccess && (
           <SuccessModal message={successMessage} />
         )}
 
+        {/* Delete confirmation */}
         {postToDelete && (
           <ConfirmModal
             onCancel={() => setPostToDelete(null)}
@@ -144,10 +188,18 @@ const Feed = () => {
           />
         )}
 
+        {/* Create Post */}
         <CreatePost onPostCreated={handlePostCreated} />
 
+        {/* Posts */}
         {posts.length === 0 ? (
-          <p className="text-center text-sm text-[var(--color-content-secondary)]">
+          <p
+            className="
+              text-center
+              text-sm
+              text-[var(--color-content-secondary)]
+            "
+          >
             No posts yet.
           </p>
         ) : (
@@ -155,21 +207,21 @@ const Feed = () => {
             {posts.map((post) => (
               <PostCard
                 key={post.id}
-                name={post.author.name}
+                postId={post.id}
+                name={post.author?.name ?? "User"}
                 username={getUsernameFromEmail(
-                  post.author.email,
+                  post.author?.email ?? "",
                 )}
                 createdAt={post.createdAt}
                 content={post.content}
-                likes={0}
-                comments={0}
-                avatar={
-                  post.author.image ??
-                  post.author.avatar ??
-                  undefined
-                }
-                showDelete={post.author.id === user?.id}
+                likes={post._count?.likes ?? 0}
+                comments={post._count?.comments ?? 0}
+                avatar={post.author?.image ?? undefined}
+                likesData={post.likes ?? []}
+                commentsData={post.comments ?? []}
+                showDelete={post.author?.id === user?.id}
                 onDelete={() => setPostToDelete(post)}
+                onLikeMessage={handleLikeMessage}
               />
             ))}
           </div>

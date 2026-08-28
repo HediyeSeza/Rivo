@@ -1,19 +1,33 @@
 import { api } from "./api";
 
-import type { AuthResponse, User } from "../types/user";
+import type {
+  AuthResponse,
+  User,
+} from "../types/user";
 
 export interface LoginPayload {
   email: string;
   password: string;
 }
 
-export interface RegisterPayload extends LoginPayload {
+export interface RegisterPayload
+  extends LoginPayload {
   name: string;
 }
 
 export const getUser = (
   response: AuthResponse | User,
 ): User => {
+  if (
+    "data" in response &&
+    response.data &&
+    typeof response.data === "object" &&
+    "user" in response.data &&
+    response.data.user
+  ) {
+    return response.data.user;
+  }
+
   if ("user" in response && response.user) {
     return response.user;
   }
@@ -70,7 +84,9 @@ export const register = async (
 export const getSession = async () => {
   const response = await api.get<
     AuthResponse | User
-  >("/api/authentication/session");
+  >(
+    "/api/authentication/session",
+  );
 
   return response.data;
 };
