@@ -5,16 +5,33 @@ import ProfilePosts from "../../components/Profile/ProfilePosts/ProfilePosts";
 import ProfileSidebar from "../../components/ProfileSidebar/ProfileSidebar";
 
 import { useAuth } from "../../context/AuthContext";
-import { getUserById } from "../../services/userApi";
 
-import type { User } from "../../services/userApi";
+import {
+  getUserById,
+  updateUserProfile,
+} from "../../services/userApi";
+
+import type {
+  UpdateProfilePayload,
+  User,
+} from "../../services/userApi";
 
 function Profile() {
   const { user: authUser } = useAuth();
 
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+
+  const [isLoading, setIsLoading] =
+    useState(true);
+
+  const [error, setError] =
+    useState<string | null>(null);
+
+  const [isSaving, setIsSaving] =
+    useState(false);
+
+  const [saveError, setSaveError] =
+    useState<string | null>(null);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -27,14 +44,15 @@ function Profile() {
         setIsLoading(true);
         setError(null);
 
-        const profileUser = await getUserById(authUser.id);
-
-        console.log("PROFILE USER:", profileUser);
-        console.log("PROFILE COUNT:", profileUser._count);
+        const profileUser =
+          await getUserById(authUser.id);
 
         setUser(profileUser);
       } catch (error) {
-        console.error("Failed to load profile:", error);
+        console.error(
+          "Failed to load profile:",
+          error,
+        );
 
         setError(
           error instanceof Error
@@ -48,6 +66,42 @@ function Profile() {
 
     void loadProfile();
   }, [authUser?.id]);
+
+  const handleSaveProfile = async (
+    data: UpdateProfilePayload,
+  ) => {
+    if (!user) {
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      setSaveError(null);
+
+      const updatedUser =
+        await updateUserProfile(
+          user.id,
+          data,
+        );
+
+      setUser(updatedUser);
+    } catch (error) {
+      console.error(
+        "Failed to update profile:",
+        error,
+      );
+
+      setSaveError(
+        error instanceof Error
+          ? error.message
+          : "Failed to update profile.",
+      );
+
+      throw error;
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -105,7 +159,12 @@ function Profile() {
         <section className="min-w-0 w-full">
           <div className="flex w-full justify-center">
             <div className="w-full max-w-[620px]">
-              <ProfileCard user={user} />
+              <ProfileCard
+                user={user}
+                onSaveProfile={handleSaveProfile}
+                isSaving={isSaving}
+                saveError={saveError}
+              />
             </div>
           </div>
 
@@ -113,6 +172,7 @@ function Profile() {
             <ProfilePosts
               userId={user.id}
               isOwnProfile={true}
+              profileImage={user.image}
             />
           </div>
         </section>
