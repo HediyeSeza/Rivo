@@ -228,7 +228,7 @@ const PostCard = ({
             ${showComments ? "bg-black/5 dark:bg-white/5" : ""}
           `}
         >
-          <Icon name="Chat" size={18} />
+          <Icon name={showComments ? "ChatFill" : "Chat"} size={18} />
 
           <span className="text-[14px]">{comments}</span>
         </button>

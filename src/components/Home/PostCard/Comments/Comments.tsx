@@ -2,10 +2,7 @@ import { useState } from "react";
 
 import Avatar from "../../../common/Avatar/Avatar";
 
-import {
-  createComment,
-  type PostComment,
-} from "../../../../services/postApi";
+import { createComment, type PostComment } from "../../../../services/postApi";
 
 import { useAuth } from "../../../../context/AuthContext";
 
@@ -16,9 +13,7 @@ import CommentItem from "./CommentItem";
 interface CommentsProps {
   postId: string;
   comments: PostComment[];
-  onCommentAdded: (
-    postId: string,
-  ) => void | Promise<void>;
+  onCommentAdded: (postId: string) => void | Promise<void>;
   onMessage?: (message: string) => void;
 }
 
@@ -31,20 +26,13 @@ const Comments = ({
   const { user } = useAuth();
 
   const [content, setContent] = useState("");
-  const [isSubmitting, setIsSubmitting] =
-    useState(false);
-  const [error, setError] = useState<
-    string | null
-  >(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
     const trimmedContent = content.trim();
 
-    if (
-      !trimmedContent ||
-      isSubmitting ||
-      !user
-    ) {
+    if (!trimmedContent || isSubmitting || !user) {
       return;
     }
 
@@ -52,10 +40,7 @@ const Comments = ({
       setIsSubmitting(true);
       setError(null);
 
-      const response = await createComment(
-        postId,
-        trimmedContent,
-      );
+      const response = await createComment(postId, trimmedContent);
 
       onMessage?.(response.message);
 
@@ -68,15 +53,10 @@ const Comments = ({
 
       await onCommentAdded(postId);
     } catch (error) {
-      console.error(
-        "Failed to create comment:",
-        error,
-      );
+      console.error("Failed to create comment:", error);
 
       const message =
-        error instanceof Error
-          ? error.message
-          : "Failed to add comment.";
+        error instanceof Error ? error.message : "Failed to add comment.";
 
       onMessage?.(message);
       setError(message);
@@ -91,10 +71,7 @@ const Comments = ({
       {comments.length > 0 && (
         <div className="flex flex-col gap-4">
           {comments.map((comment) => (
-            <CommentItem
-              key={comment.id}
-              comment={comment}
-            />
+            <CommentItem key={comment.id} comment={comment} />
           ))}
         </div>
       )}
@@ -108,18 +85,12 @@ const Comments = ({
           ${comments.length > 0 ? "mt-5" : ""}
         `}
       >
-        <Avatar
-          src={user?.image || avatarImage}
-          alt="Your avatar"
-          size={36}
-        />
+        <Avatar src={user?.image || avatarImage} alt="Your avatar" size={36} />
 
         <div className="min-w-0 flex-1">
           <textarea
             value={content}
-            onChange={(event) =>
-              setContent(event.target.value)
-            }
+            onChange={(event) => setContent(event.target.value)}
             placeholder="Write a comment..."
             rows={3}
             disabled={!user || isSubmitting}
@@ -144,21 +115,13 @@ const Comments = ({
             "
           />
 
-          {error && (
-            <p className="mt-2 text-[12px] text-red-500">
-              {error}
-            </p>
-          )}
+          {error && <p className="mt-2 text-[12px] text-red-500">{error}</p>}
 
           <div className="mt-2 flex justify-end">
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={
-                !content.trim() ||
-                !user ||
-                isSubmitting
-              }
+              disabled={!content.trim() || !user || isSubmitting}
               className="
                 rounded-lg
                 bg-[var(--color-content-primary)]
@@ -172,11 +135,10 @@ const Comments = ({
                 hover:opacity-80
                 disabled:cursor-not-allowed
                 disabled:opacity-50
+                cursor-pointer
               "
             >
-              {isSubmitting
-                ? "Commenting..."
-                : "Comment"}
+              {isSubmitting ? "Commenting..." : "Comment"}
             </button>
           </div>
         </div>
