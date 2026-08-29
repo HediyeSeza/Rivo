@@ -20,6 +20,7 @@ interface ProfilePostsProps {
   userId: string;
   isOwnProfile: boolean;
   profileImage?: string | null;
+  onPostsCountChange?: (count: number) => void;
 }
 
 type ProfilePostWithRelations = ProfilePost & {
@@ -49,6 +50,7 @@ const ProfilePosts = ({
   userId,
   isOwnProfile = false,
   profileImage,
+  onPostsCountChange,
 }: ProfilePostsProps) => {
   const [activeTab, setActiveTab] = useState<ProfileTab>("posts");
 
@@ -78,6 +80,7 @@ const ProfilePosts = ({
         const userPosts = await getUserPosts(userId);
 
         setPosts(userPosts);
+        onPostsCountChange?.(userPosts.length);
 
         const liked = await getUserLikedPosts(userId);
 
@@ -107,10 +110,18 @@ const ProfilePosts = ({
 
     try {
       await deletePost(postToDelete.id);
+      
+      window.dispatchEvent(new Event("posts:changed"));
 
-      setPosts((currentPosts) =>
-        currentPosts.filter((post) => post.id !== postToDelete.id),
-      );
+      setPosts((currentPosts) => {
+        const updatedPosts = currentPosts.filter(
+          (post) => post.id !== postToDelete.id,
+        );
+
+        onPostsCountChange?.(updatedPosts.length);
+
+        return updatedPosts;
+      });
 
       setLikedPosts((currentPosts) =>
         currentPosts.filter((post) => post.id !== postToDelete.id),

@@ -3,29 +3,22 @@ import Avatar from "../common/Avatar/Avatar";
 import avatarImage from "../../assets/Avatar/a.png";
 import type { User } from "../../services/userApi";
 import { getUsernameFromEmail } from "../../utils/getUsernameFromEmail";
-
+import { getUserCounts } from "../../utils/getUserCounts";
 interface ProfileSidebarProps {
   user: User | null | undefined;
 }
 
-const ProfileSidebar = ({
-  user,
-}: ProfileSidebarProps) => {
+const ProfileSidebar = ({ user }: ProfileSidebarProps) => {
   if (!user) {
     return null;
   }
 
   const profileAvatar = user.image || avatarImage;
 
-  const username = getUsernameFromEmail(
-    user.email,
-  );
+  const username = getUsernameFromEmail(user.email);
 
-  const followersCount =
-    user._count?.followers ?? 0;
-
-  const followingCount =
-    user._count?.following ?? 0;
+  const { followers: followersCount, following: followingCount } =
+    getUserCounts(user);
 
   return (
     <aside
@@ -43,10 +36,7 @@ const ProfileSidebar = ({
     >
       <div className="w-full">
         <div className="flex flex-col items-center">
-          <Avatar
-            src={profileAvatar}
-            size={64}
-          />
+          <Avatar src={profileAvatar} size={64} />
 
           <h2
             className="
@@ -157,9 +147,7 @@ const ProfileSidebar = ({
         >
           <Icon name="Location" size={18} />
 
-          <span className="text-[13px]">
-            {user.location || "No location"}
-          </span>
+          <span className="text-[13px]">{user.location || "No location"}</span>
         </div>
 
         <div
@@ -173,9 +161,7 @@ const ProfileSidebar = ({
         >
           <Icon name="Link" size={18} />
 
-          <span className="text-[13px]">
-            {user.website || "No website"}
-          </span>
+          <span className="text-[13px]">{user.website || "No website"}</span>
         </div>
       </div>
     </aside>

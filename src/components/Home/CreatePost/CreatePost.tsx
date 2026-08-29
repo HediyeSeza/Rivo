@@ -48,7 +48,10 @@ const CreatePost = ({ onPostCreated }: CreatePostProps) => {
 
       setContent("");
 
+      window.dispatchEvent(new Event("posts:changed"));
+
       await onPostCreated();
+      
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create post.");
     } finally {
