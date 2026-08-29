@@ -66,6 +66,8 @@ import closeLight from "../../../assets/icons/Light/Close.svg";
 import searchDark from "../../../assets/icons/Dark/search.svg";
 import searchLight from "../../../assets/icons/Light/search.svg";
 
+import chatFillDark from "../../../assets/icons/Dark/fill-chat.svg";
+import chatFillLight from "../../../assets/icons/Light/fill-chat.svg";
 
 const icons = {
   Chat: {
@@ -78,25 +80,28 @@ const icons = {
     light: editLight,
   },
 
-  
   Search: {
     dark: searchDark,
     light: searchLight,
   },
   Reply: {
-  dark: replyDark,
-  light: replyLight,
-},
+    dark: replyDark,
+    light: replyLight,
+  },
+  ChatFill: {
+    dark: chatFillDark,
+    light: chatFillLight,
+  },
 
-Close: {
-  dark: closeDark,
-  light: closeLight,
-},
+  Close: {
+    dark: closeDark,
+    light: closeLight,
+  },
 
-Camera: {
-  dark: cameraDark,
-  light: cameraLight,
-},
+  Camera: {
+    dark: cameraDark,
+    light: cameraLight,
+  },
 
   Heart: { dark: heartDark, light: heartLight },
   HeartFill: { dark: heartFillDark, light: heartFillLight },

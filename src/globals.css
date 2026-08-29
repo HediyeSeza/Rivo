@@ -62,3 +62,33 @@ ol {
 #root {
   min-height: 100vh;
 }
+
+@keyframes toast-slide-in {
+  from {
+    transform: translate(-50%, -20px);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes toast-slide-out {
+  from {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+  to {
+    transform: translate(-50%, -20px);
+    opacity: 0;
+  }
+}
+
+.toast-enter {
+  animation: toast-slide-in 250ms ease-out forwards;
+}
+
+.toast-exit {
+  animation: toast-slide-out 250ms ease-in forwards;
+}

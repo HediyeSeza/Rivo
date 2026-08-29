@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import Icon from "../common/Icon/Icon";
+import Avatar from "../common/Avatar/Avatar";
 import FollowButton from "../FollowButton/FollowButton";
 
 import type { User } from "../../types/user";
@@ -109,29 +110,11 @@ const RecommendedUsers = () => {
           {users.map((user) => (
             <div key={user.id} className="flex items-center gap-3">
               {/* Avatar */}
-              <div
-                className="
-                  flex
-                  h-10
-                  w-10
-                  shrink-0
-                  items-center
-                  justify-center
-                  overflow-hidden
-                  rounded-full
-                  border border-[var(--color-border)]
-                "
-              >
-                {user.image ? (
-                  <img
-                    src={user.image}
-                    alt={user.name}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <Icon name="Person" size={18} />
-                )}
-              </div>
+              <Avatar
+                src={user.image ?? undefined}
+                alt={`${user.name} avatar`}
+                size={40}
+              />
 
               {/* User Info */}
               <div className="min-w-0 flex-1">
