@@ -57,6 +57,12 @@ import heartFillLight from "../../../assets/icons/Light/heart-fill.svg";
 import replyDark from "../../../assets/icons/Dark/arrow-Reply.svg";
 import replyLight from "../../../assets/icons/Light/arrow-Reply.svg";
 
+import cameraDark from "../../../assets/icons/Dark/camera.svg";
+import cameraLight from "../../../assets/icons/Light/camera.svg";
+
+import closeDark from "../../../assets/icons/Dark/Close.svg";
+import closeLight from "../../../assets/icons/Light/Close.svg";
+
 const icons = {
   Chat: {
     dark: chatDark,
@@ -71,6 +77,16 @@ const icons = {
   Reply: {
   dark: replyDark,
   light: replyLight,
+},
+
+Close: {
+  dark: closeDark,
+  light: closeLight,
+},
+
+Camera: {
+  dark: cameraDark,
+  light: cameraLight,
 },
 
   Heart: { dark: heartDark, light: heartLight },

@@ -253,12 +253,11 @@ const ProfileCard = ({
       <div className="w-full">
         {/* Profile */}
         <div className="flex flex-col items-center">
+          {/* Profile photo is display-only inside the card */}
           <ProfilePhoto
             image={user.image}
             name={user.name}
-            editable
-            onFileSelect={handleFileSelect}
-            onDelete={() => setIsDeletePhotoOpen(true)}
+            editable={false}
           />
 
           <h2 className="mt-3 text-[20px] font-semibold text-(--color-content-primary)">
@@ -329,13 +328,14 @@ const ProfileCard = ({
         </div>
 
         <EditProfileModal
-          isOpen={isEditProfileOpen}
-          user={user}
-          isSaving={isSaving}
-          error={saveError}
-          onClose={() => setIsEditProfileOpen(false)}
-          onSave={handleSaveProfile}
-        />
+  isOpen={isEditProfileOpen}
+  user={user}
+  isSaving={isSaving}
+  error={saveError}
+  onClose={() => setIsEditProfileOpen(false)}
+  onSave={handleSaveProfile}
+  onChangeAvatar={handleFileSelect}
+/>
 
         {/* Crop Modal */}
         {isCropOpen && selectedImage && (
@@ -364,7 +364,9 @@ const ProfileCard = ({
               </div>
 
               {avatarError && (
-                <p className="mt-3 text-[13px] text-red-500">{avatarError}</p>
+                <p className="mt-3 text-[13px] text-red-500">
+                  {avatarError}
+                </p>
               )}
 
               <div className="mt-5 flex justify-end gap-3">
@@ -400,30 +402,24 @@ const ProfileCard = ({
             onConfirm={handleDeletePhoto}
           />
         )}
+{/* Location */}
+<div className="flex items-center gap-2 pt-6 text-(--color-content-secondary)">
+  <Icon name="Location" size={20} />
+  <span className="text-[14px]">{user.location || "No location"}</span>
+</div>
 
-        {/* Location */}
-        <div className="flex items-center gap-2 pt-6 text-(--color-content-secondary)">
-          <Icon name="Location" size={20} />
+/* Website */
+<div className="mt-3 flex items-center gap-2 text-(--color-content-secondary)">
+  <Icon name="Link" size={20} />
+  <span className="text-[14px]">{user.website || "No website"}</span>
+</div>
 
-          <span className="text-[14px]">{user.location || "No location"}</span>
-        </div>
+/* Joined */
+<div className="mt-3 flex items-center gap-2 text-(--color-content-secondary)">
+  <Icon name="Calendar" size={20} />
+  <span className="text-[14px]">{getJoinedTime(user.createdAt)}</span>
+</div>
 
-        {/* Website */}
-        <div className="mt-3 flex items-center gap-2 text-(--color-content-secondary)">
-          <Icon name="Link" size={20} />
-
-          <span className="text-[14px]">{user.website || "No website"}</span>
-        </div>
-
-        {/* Joined */}
-        <div className="mt-3 flex items-center gap-2 text-(--color-content-secondary)">
-          <Icon name="Calendar" size={20} />
-
-          <span className="text-[14px]">{getJoinedTime(user.createdAt)}</span>
-        </div>
-      </div>
-    </div>
-  );
 };
 
 export default ProfileCard;
