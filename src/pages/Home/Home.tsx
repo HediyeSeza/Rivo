@@ -88,20 +88,22 @@ const Home = () => {
         </main>
 
         {/* Right Sidebar */}
-        <aside
-          className="
-            sticky
-            top-24
-            hidden
-            w-[230px]
-            shrink-0
-            lg:block
-            xl:w-[294px]
-            2xl:w-[358px]
-          "
-        >
-          <RecommendedUsers />
-        </aside>
+        {isAuthenticated && (
+          <aside
+            className="
+              sticky
+              top-24
+              hidden
+              w-[230px]
+              shrink-0
+              lg:block
+              xl:w-[294px]
+              2xl:w-[358px]
+            "
+          >
+            <RecommendedUsers />
+          </aside>
+        )}
       </div>
     </div>
   );
