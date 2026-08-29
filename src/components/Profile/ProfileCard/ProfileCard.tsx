@@ -184,6 +184,7 @@ const ProfileCard = ({
       closeCropper();
     } catch (error) {
       console.error("Avatar save failed:", error);
+
       setAvatarError(
         error instanceof Error
           ? error.message
@@ -209,6 +210,7 @@ const ProfileCard = ({
       setIsDeletePhotoOpen(false);
     } catch (error) {
       console.error("Avatar delete failed:", error);
+
       setAvatarError(
         error instanceof Error
           ? error.message
@@ -243,12 +245,11 @@ const ProfileCard = ({
 
       <div className="w-full">
         <div className="flex flex-col items-center">
+          {/* Profile photo is display-only inside the card */}
           <ProfilePhoto
             image={user.image}
             name={user.name}
-            editable
-            onFileSelect={handleFileSelect}
-            onDelete={() => setIsDeletePhotoOpen(true)}
+            editable={false}
           />
 
           <h2 className="mt-3 text-[20px] font-semibold text-(--color-content-primary)">
@@ -314,13 +315,14 @@ const ProfileCard = ({
         </div>
 
         <EditProfileModal
-          isOpen={isEditProfileOpen}
-          user={user}
-          isSaving={isSaving}
-          error={saveError}
-          onClose={() => setIsEditProfileOpen(false)}
-          onSave={handleSaveProfile}
-        />
+  isOpen={isEditProfileOpen}
+  user={user}
+  isSaving={isSaving}
+  error={saveError}
+  onClose={() => setIsEditProfileOpen(false)}
+  onSave={handleSaveProfile}
+  onChangeAvatar={handleFileSelect}
+/>
 
         {isCropOpen && selectedImage && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -348,7 +350,9 @@ const ProfileCard = ({
               </div>
 
               {avatarError && (
-                <p className="mt-3 text-[13px] text-red-500">{avatarError}</p>
+                <p className="mt-3 text-[13px] text-red-500">
+                  {avatarError}
+                </p>
               )}
 
               <div className="mt-5 flex justify-end gap-3">
@@ -386,17 +390,23 @@ const ProfileCard = ({
 
         <div className="flex items-center gap-2 pt-6 text-(--color-content-secondary)">
           <Icon name="Location" size={20} />
-          <span className="text-[14px]">{user.location || "No location"}</span>
+          <span className="text-[14px]">
+            {user.location || "No location"}
+          </span>
         </div>
 
         <div className="mt-3 flex items-center gap-2 text-(--color-content-secondary)">
           <Icon name="Link" size={20} />
-          <span className="text-[14px]">{user.website || "No website"}</span>
+          <span className="text-[14px]">
+            {user.website || "No website"}
+          </span>
         </div>
 
         <div className="mt-3 flex items-center gap-2 text-(--color-content-secondary)">
           <Icon name="Calendar" size={20} />
-          <span className="text-[14px]">{getJoinedTime(user.createdAt)}</span>
+          <span className="text-[14px]">
+            {getJoinedTime(user.createdAt)}
+          </span>
         </div>
       </div>
     </div>
