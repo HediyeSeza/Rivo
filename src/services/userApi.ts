@@ -1,8 +1,14 @@
 import { api } from "./api";
+
 import type { Post } from "./postApi";
+
 import type { User } from "../types/user";
 
 export type { User };
+
+/* =========================
+   Response Types
+========================= */
 
 interface UserResponse {
   message: string;
@@ -22,13 +28,33 @@ interface PostsResponse {
   data?: Post[];
 }
 
+export interface SearchUsersResponse {
+  message: string;
+  success: boolean;
+  data?: User[];
+}
+
+export interface FollowResponse {
+  message: string;
+  success: boolean;
+  data?: unknown;
+}
+
+/* =========================
+   Profile
+========================= */
+
 export interface UpdateProfilePayload {
   name: string;
   bio: string;
   location: string;
   website: string;
-  image?: string | null; // UUID برگشتی از upload
+  image?: string | null;
 }
+
+/* =========================
+   Image Upload
+========================= */
 
 const UUID_PATTERN =
   /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
@@ -36,7 +62,11 @@ const UUID_PATTERN =
 const extractImageId = (value: unknown): string | null => {
   if (typeof value === "string") {
     const trimmed = value.trim();
-    if (!trimmed) return null;
+
+    if (!trimmed) {
+      return null;
+    }
+
     return trimmed.match(UUID_PATTERN)?.[0] ?? null;
   }
 
@@ -45,11 +75,23 @@ const extractImageId = (value: unknown): string | null => {
   }
 
   const record = value as Record<string, unknown>;
-  const keys = ["id", "uuid", "file", "image", "url", "data", "result"];
+
+  const keys = [
+    "id",
+    "uuid",
+    "file",
+    "image",
+    "url",
+    "data",
+    "result",
+  ];
 
   for (const key of keys) {
     const found = extractImageId(record[key]);
-    if (found) return found;
+
+    if (found) {
+      return found;
+    }
   }
 
   try {
@@ -59,21 +101,30 @@ const extractImageId = (value: unknown): string | null => {
   }
 };
 
-
 export const uploadImage = async (file: File): Promise<string> => {
   const formData = new FormData();
+
   formData.append("file", file);
 
-  const response = await api.post<unknown>("/api/upload", formData);
+  const response = await api.post<unknown>(
+    "/api/upload",
+    formData,
+  );
+
   const imageId = extractImageId(response);
 
   if (!imageId) {
-    throw new Error("Could not upload photo. Please try again.");
+    throw new Error(
+      "Could not upload photo. Please try again.",
+    );
   }
 
   return imageId;
 };
 
+/* =========================
+   Get User
+========================= */
 
 export const getUserById = async (
   id: string,
@@ -88,6 +139,10 @@ export const getUserById = async (
 
   return response as User;
 };
+
+/* =========================
+   Update Profile
+========================= */
 
 export const updateUserProfile = async (
   userId: string,
@@ -105,6 +160,10 @@ export const updateUserProfile = async (
   return getUserById(userId);
 };
 
+/* =========================
+   Recommended Users
+========================= */
+
 export const getRecommendedUsers = async (): Promise<User[]> => {
   const response = await api.get<
     RecommendedUsersResponse | User[]
@@ -117,11 +176,35 @@ export const getRecommendedUsers = async (): Promise<User[]> => {
   return response.data ?? [];
 };
 
-export interface FollowResponse {
-  message: string;
-  success: boolean;
-  data?: unknown;
-}
+/* =========================
+   User Search
+========================= */
+
+export const searchUsers = async (
+  query: string,
+): Promise<User[]> => {
+  const trimmedQuery = query.trim();
+
+  if (!trimmedQuery) {
+    return [];
+  }
+
+  const response = await api.get<
+    SearchUsersResponse | User[]
+  >(
+    `/api/users/search?q=${encodeURIComponent(trimmedQuery)}`,
+  );
+
+  if (Array.isArray(response)) {
+    return response;
+  }
+
+  return response.data ?? [];
+};
+
+/* =========================
+   Follow / Unfollow
+========================= */
 
 export const toggleFollowUser = async (
   userId: string,
