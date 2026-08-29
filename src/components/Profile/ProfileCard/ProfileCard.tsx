@@ -83,38 +83,26 @@ const ProfileCard = ({
     }
 
     if (diffMinutes < 60) {
-      return `${diffMinutes} ${
-        diffMinutes === 1 ? "minute" : "minutes"
-      } ago`;
+      return `${diffMinutes} ${diffMinutes === 1 ? "minute" : "minutes"} ago`;
     }
 
     if (diffHours < 24) {
-      return `${diffHours} ${
-        diffHours === 1 ? "hour" : "hours"
-      } ago`;
+      return `${diffHours} ${diffHours === 1 ? "hour" : "hours"} ago`;
     }
 
     if (diffDays < 7) {
-      return `${diffDays} ${
-        diffDays === 1 ? "day" : "days"
-      } ago`;
+      return `${diffDays} ${diffDays === 1 ? "day" : "days"} ago`;
     }
 
     if (diffDays < 30) {
-      return `${diffWeeks} ${
-        diffWeeks === 1 ? "week" : "weeks"
-      } ago`;
+      return `${diffWeeks} ${diffWeeks === 1 ? "week" : "weeks"} ago`;
     }
 
     if (diffDays < 365) {
-      return `${diffMonths} ${
-        diffMonths === 1 ? "month" : "months"
-      } ago`;
+      return `${diffMonths} ${diffMonths === 1 ? "month" : "months"} ago`;
     }
 
-    return `${diffYears} ${
-      diffYears === 1 ? "year" : "years"
-    } ago`;
+    return `${diffYears} ${diffYears === 1 ? "year" : "years"} ago`;
   };
 
   const closeCropper = () => {
@@ -334,14 +322,9 @@ const ProfileCard = ({
             onClick={() => setIsEditProfileOpen(true)}
             variant="primary"
             className="w-full"
+            icon={<Icon name="Edit" size={20} reverseTheme />}
           >
-            <Icon
-              name="Edit"
-              size={20}
-              className="mr-2 text-(--color-card)"
-            />
-
-            <span>Edit Profile</span>
+            Edit Profile
           </Button>
         </div>
 
@@ -381,9 +364,7 @@ const ProfileCard = ({
               </div>
 
               {avatarError && (
-                <p className="mt-3 text-[13px] text-red-500">
-                  {avatarError}
-                </p>
+                <p className="mt-3 text-[13px] text-red-500">{avatarError}</p>
               )}
 
               <div className="mt-5 flex justify-end gap-3">
@@ -402,9 +383,7 @@ const ProfileCard = ({
                   onClick={handleSaveCrop}
                   disabled={isUploadingAvatar}
                 >
-                  {isUploadingAvatar
-                    ? "Saving..."
-                    : "Save photo"}
+                  {isUploadingAvatar ? "Saving..." : "Save photo"}
                 </Button>
               </div>
             </div>
@@ -417,9 +396,7 @@ const ProfileCard = ({
             title="Delete photo?"
             message="Your profile photo will be removed."
             confirmLabel="Yes, delete"
-            onCancel={() =>
-              setIsDeletePhotoOpen(false)
-            }
+            onCancel={() => setIsDeletePhotoOpen(false)}
             onConfirm={handleDeletePhoto}
           />
         )}
@@ -428,27 +405,21 @@ const ProfileCard = ({
         <div className="flex items-center gap-2 pt-6 text-(--color-content-secondary)">
           <Icon name="Location" size={20} />
 
-          <span className="text-[14px]">
-            {user.location || "No location"}
-          </span>
+          <span className="text-[14px]">{user.location || "No location"}</span>
         </div>
 
         {/* Website */}
         <div className="mt-3 flex items-center gap-2 text-(--color-content-secondary)">
           <Icon name="Link" size={20} />
 
-          <span className="text-[14px]">
-            {user.website || "No website"}
-          </span>
+          <span className="text-[14px]">{user.website || "No website"}</span>
         </div>
 
         {/* Joined */}
         <div className="mt-3 flex items-center gap-2 text-(--color-content-secondary)">
           <Icon name="Calendar" size={20} />
 
-          <span className="text-[14px]">
-            {getJoinedTime(user.createdAt)}
-          </span>
+          <span className="text-[14px]">{getJoinedTime(user.createdAt)}</span>
         </div>
       </div>
     </div>
