@@ -18,11 +18,7 @@ const TOKEN_KEY = "rivo_token";
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-export const AuthProvider = ({
-  children,
-}: {
-  children: ReactNode;
-}) => {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(() => {
     const savedUser = localStorage.getItem(USER_KEY);
 
@@ -51,15 +47,12 @@ export const AuthProvider = ({
 
         setUser(sessionUser);
 
-        localStorage.setItem(
-          USER_KEY,
-          JSON.stringify(sessionUser),
-        );
+        localStorage.setItem(USER_KEY, JSON.stringify(sessionUser));
 
         const sessionToken =
-          response &&
-          "data" in response &&
-          response.data?.session?.token;
+          "data" in response && response.data && "session" in response.data
+            ? response.data.session?.token
+            : undefined;
 
         if (sessionToken) {
           localStorage.setItem(TOKEN_KEY, sessionToken);

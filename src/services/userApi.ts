@@ -1,7 +1,5 @@
 import { api } from "./api";
-
 import type { Post } from "./postApi";
-
 import type { User } from "../types/user";
 
 export type { User };
@@ -53,7 +51,7 @@ export interface UpdateProfilePayload {
 }
 
 /* =========================
-   Image Upload
+   Helpers / Image Upload
 ========================= */
 
 const UUID_PATTERN =
@@ -141,21 +139,17 @@ export const getUserById = async (
 };
 
 /* =========================
-   Update Profile
+   Update User Profile
 ========================= */
 
 export const updateUserProfile = async (
   userId: string,
   data: UpdateProfilePayload,
 ): Promise<User> => {
-  const response = await api.put<UserResponse | User>(
+  await api.put<UserResponse | User>(
     `/api/users/${userId}`,
     data,
   );
-
-  if ("data" in response && response.data) {
-    return response.data;
-  }
 
   return getUserById(userId);
 };
@@ -209,9 +203,13 @@ export const searchUsers = async (
 export const toggleFollowUser = async (
   userId: string,
 ): Promise<FollowResponse> => {
-  return api.patch<FollowResponse>(
+  const response = await api.patch<FollowResponse>(
     `/api/users/${userId}`,
   );
+
+  window.dispatchEvent(new Event("profile:changed"));
+
+  return response;
 };
 
 /* =========================

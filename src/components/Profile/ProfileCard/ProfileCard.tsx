@@ -2,13 +2,12 @@ import { useEffect, useRef, useState } from "react";
 
 import Cropper, { type ReactCropperElement } from "react-cropper";
 import "cropperjs/dist/cropper.css";
-
+import { getUserCounts } from "../../../utils/getUserCounts";
 import Icon from "../../common/Icon/Icon";
 import Button from "../../common/Button/Button";
 import ConfirmModal from "../../common/Modal/ConfirmModal";
 import EditProfileModal from "../EditProfileModal/EditProfileModal";
 import ProfilePhoto from "../ProfilePhoto/ProfilePhoto";
-
 import type { User } from "../../../types/user";
 import { uploadImage } from "../../../services/userApi";
 import type { UpdateProfilePayload } from "../../../services/userApi";
@@ -17,6 +16,7 @@ import { getUsernameFromEmail } from "../../../utils/getUsernameFromEmail";
 
 interface ProfileCardProps {
   user: User;
+  postsCount: number;
   onSaveProfile: (data: UpdateProfilePayload) => Promise<void>;
   isSaving: boolean;
   saveError: string | null;
@@ -36,6 +36,7 @@ const toImageUuid = (image: string | null | undefined) => {
 
 const ProfileCard = ({
   user,
+  postsCount,
   onSaveProfile,
   isSaving,
   saveError,
@@ -51,10 +52,8 @@ const ProfileCard = ({
 
   const username = getUsernameFromEmail(user.email);
 
-  const followersCount = user._count?.followers ?? 0;
-  const followingCount = user._count?.following ?? 0;
-  const postsCount = user._count?.posts ?? 0;
-
+  const { followers: followersCount, following: followingCount } =
+    getUserCounts(user);
   useEffect(() => {
     return () => {
       if (selectedImage?.startsWith("blob:")) {
@@ -227,7 +226,14 @@ const ProfileCard = ({
   }) => {
     const image = toImageUuid(user.image);
 
-    await onSaveProfile(image ? { ...data, image } : data);
+    await onSaveProfile(
+      image
+        ? {
+            ...data,
+            image,
+          }
+        : data,
+    );
 
     setIsEditProfileOpen(false);
   };
@@ -242,15 +248,11 @@ const ProfileCard = ({
           }
         `}
       </style>
-
       <div className="w-full">
+        {/* Profile */}
         <div className="flex flex-col items-center">
           {/* Profile photo is display-only inside the card */}
-          <ProfilePhoto
-            image={user.image}
-            name={user.name}
-            editable={false}
-          />
+          <ProfilePhoto image={user.image} name={user.name} editable={false} />
 
           <h2 className="mt-3 text-[20px] font-semibold text-(--color-content-primary)">
             {user.name}
@@ -272,12 +274,13 @@ const ProfileCard = ({
             </p>
           )}
         </div>
-
+        {/* Stats */}
         <div className="mt-8 flex items-center justify-between text-center">
           <div>
             <p className="text-[18px] font-medium text-(--color-content-primary)">
               {followingCount}
             </p>
+
             <span className="text-[14px] text-(--color-content-secondary)">
               Followings
             </span>
@@ -287,6 +290,7 @@ const ProfileCard = ({
             <p className="text-[18px] font-medium text-(--color-content-primary)">
               {followersCount}
             </p>
+
             <span className="text-[14px] text-(--color-content-secondary)">
               Followers
             </span>
@@ -296,34 +300,34 @@ const ProfileCard = ({
             <p className="text-[18px] font-medium text-(--color-content-primary)">
               {postsCount}
             </p>
+
             <span className="text-[14px] text-(--color-content-secondary)">
               Posts
             </span>
           </div>
         </div>
-
-        <div className="mb-12 mt-4 w-full">
+        {/* Edit Profile */}
+        <div className="mb-1 mt-2 w-full">
           <Button
             type="button"
             onClick={() => setIsEditProfileOpen(true)}
             variant="primary"
             className="w-full"
+            icon={<Icon name="Edit" size={20} reverseTheme />}
           >
-            <Icon name="Edit" size={20} className="mr-2" />
-            <span>Edit Profile</span>
+            Edit Profile
           </Button>
         </div>
-
         <EditProfileModal
-  isOpen={isEditProfileOpen}
-  user={user}
-  isSaving={isSaving}
-  error={saveError}
-  onClose={() => setIsEditProfileOpen(false)}
-  onSave={handleSaveProfile}
-  onChangeAvatar={handleFileSelect}
-/>
-
+          isOpen={isEditProfileOpen}
+          user={user}
+          isSaving={isSaving}
+          error={saveError}
+          onClose={() => setIsEditProfileOpen(false)}
+          onSave={handleSaveProfile}
+          onChangeAvatar={handleFileSelect}
+        />
+        {/* Crop Modal */}
         {isCropOpen && selectedImage && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
             <div className="w-full max-w-md rounded-2xl border border-(--color-border) bg-(--color-card) p-5">
@@ -341,7 +345,7 @@ const ProfileCard = ({
                   background={false}
                   guides={false}
                   autoCropArea={1}
-                  responsive={true}
+                  responsive
                   checkOrientation={false}
                   minCropBoxWidth={200}
                   minCropBoxHeight={200}
@@ -350,9 +354,7 @@ const ProfileCard = ({
               </div>
 
               {avatarError && (
-                <p className="mt-3 text-[13px] text-red-500">
-                  {avatarError}
-                </p>
+                <p className="mt-3 text-[13px] text-red-500">{avatarError}</p>
               )}
 
               <div className="mt-5 flex justify-end gap-3">
@@ -377,7 +379,7 @@ const ProfileCard = ({
             </div>
           </div>
         )}
-
+        {/* Delete Photo */}{" "}
         {isDeletePhotoOpen && (
           <ConfirmModal
             title="Delete photo?"
@@ -386,31 +388,36 @@ const ProfileCard = ({
             onCancel={() => setIsDeletePhotoOpen(false)}
             onConfirm={handleDeletePhoto}
           />
-        )}
-
+        )}{" "}
+        {/* Location */}{" "}
         <div className="flex items-center gap-2 pt-6 text-(--color-content-secondary)">
-          <Icon name="Location" size={20} />
+          {" "}
+          <Icon name="Location" size={20} />{" "}
           <span className="text-[14px]">
-            {user.location || "No location"}
-          </span>
-        </div>
-
+            {" "}
+            {user.location || "No location"}{" "}
+          </span>{" "}
+        </div>{" "}
+        {/* Website */}{" "}
         <div className="mt-3 flex items-center gap-2 text-(--color-content-secondary)">
-          <Icon name="Link" size={20} />
+          {" "}
+          <Icon name="Link" size={20} />{" "}
           <span className="text-[14px]">
-            {user.website || "No website"}
-          </span>
-        </div>
-
+            {" "}
+            {user.website || "No website"}{" "}
+          </span>{" "}
+        </div>{" "}
+        {/* Joined */}{" "}
         <div className="mt-3 flex items-center gap-2 text-(--color-content-secondary)">
-          <Icon name="Calendar" size={20} />
+          {" "}
+          <Icon name="Calendar" size={20} />{" "}
           <span className="text-[14px]">
-            {getJoinedTime(user.createdAt)}
-          </span>
-        </div>
-      </div>
+            {" "}
+            {getJoinedTime(user.createdAt)}{" "}
+          </span>{" "}
+        </div>{" "}
+      </div>{" "}
     </div>
   );
 };
-
 export default ProfileCard;

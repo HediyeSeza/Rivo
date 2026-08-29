@@ -165,7 +165,7 @@ const ProfilePhoto = ({
         type="button"
         onClick={handleAvatarClick}
         aria-label={hasPhoto ? "View profile photo" : "Add profile photo"}
-        className="group relative h-24 w-24 overflow-hidden rounded-full ring-2 ring-(--color-border) transition-transform duration-200 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-content-primary) sm:h-28 sm:w-28"
+        className="group relative h-16 w-16 overflow-hidden rounded-full ring-2 ring-(--color-border) transition-transform duration-200 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-content-primary)"
       >
         {hasPhoto ? (
           <img

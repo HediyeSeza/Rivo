@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 
 import PostCard from "../../Home/PostCard/PostCard";
-
-import ConfirmModal from "../../common/Modal/ConfirmModal";
 import SuccessModal from "../../common/Modal/SuccessModal";
+import ConfirmModal from "../../common/Modal/ConfirmModal";
 
 import { deletePost } from "../../../services/postApi";
 
@@ -21,6 +20,7 @@ interface ProfilePostsProps {
   userId: string;
   isOwnProfile: boolean;
   profileImage?: string | null;
+  onPostsCountChange?: (count: number) => void;
 }
 
 type ProfilePostWithRelations = ProfilePost & {
@@ -50,13 +50,20 @@ const ProfilePosts = ({
   userId,
   isOwnProfile = false,
   profileImage,
+  onPostsCountChange,
 }: ProfilePostsProps) => {
   const [activeTab, setActiveTab] = useState<ProfileTab>("posts");
+
   const [posts, setPosts] = useState<ProfilePost[]>([]);
+
   const [likedPosts, setLikedPosts] = useState<ProfilePost[]>([]);
+
   const [isLoading, setIsLoading] = useState(true);
+
   const [error, setError] = useState<string | null>(null);
+
   const [postToDelete, setPostToDelete] = useState<ProfilePost | null>(null);
+
   const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
@@ -71,9 +78,12 @@ const ProfilePosts = ({
         setError(null);
 
         const userPosts = await getUserPosts(userId);
+
         setPosts(userPosts);
+        onPostsCountChange?.(userPosts.length);
 
         const liked = await getUserLikedPosts(userId);
+
         setLikedPosts(liked);
       } catch (error) {
         console.error("Failed to load profile posts:", error);
@@ -100,8 +110,20 @@ const ProfilePosts = ({
 
     try {
       await deletePost(postToDelete.id);
+      
+      window.dispatchEvent(new Event("posts:changed"));
 
-      setPosts((currentPosts) =>
+      setPosts((currentPosts) => {
+        const updatedPosts = currentPosts.filter(
+          (post) => post.id !== postToDelete.id,
+        );
+
+        onPostsCountChange?.(updatedPosts.length);
+
+        return updatedPosts;
+      });
+
+      setLikedPosts((currentPosts) =>
         currentPosts.filter((post) => post.id !== postToDelete.id),
       );
 
@@ -113,18 +135,21 @@ const ProfilePosts = ({
       }, 5000);
     } catch (error) {
       console.error("Failed to delete post:", error);
+
       setPostToDelete(null);
     }
   };
 
   const getPostAuthorName = (post: ProfilePost) => {
     const currentPost = post as ProfilePostWithRelations;
-    return currentPost.author?.name || "User";
+
+    return currentPost.author?.name || currentPost.post?.author?.name || "User";
   };
 
   const getPostUsername = (post: ProfilePost) => {
     const currentPost = post as ProfilePostWithRelations;
-    const email = currentPost.author?.email;
+
+    const email = currentPost.author?.email || currentPost.post?.author?.email;
 
     if (email) {
       return getUsernameFromEmail(email);
@@ -167,9 +192,7 @@ const ProfilePosts = ({
     const authorId = currentPost.author?.id || currentPost.post?.author?.id;
 
     const snapshotImage =
-      currentPost.author?.image ||
-      currentPost.post?.author?.image ||
-      undefined;
+      currentPost.author?.image || currentPost.post?.author?.image || undefined;
 
     const isProfileAuthor =
       authorId === userId || (isOwnProfile && activeTab === "posts");
@@ -181,9 +204,31 @@ const ProfilePosts = ({
     return snapshotImage;
   };
 
+  const getPostLikesData = (post: ProfilePost) => {
+    const currentPost = post as ProfilePostWithRelations;
+
+    return currentPost.likes ?? [];
+  };
+
+  const getPostCommentsData = (post: ProfilePost) => {
+    const currentPost = post as ProfilePostWithRelations;
+
+    return currentPost.comments ?? [];
+  };
+
   if (isLoading) {
     return (
-      <div className="flex min-h-[180px] w-full items-center justify-center text-[14px] text-(--color-content-secondary)">
+      <div
+        className="
+          flex
+          min-h-[180px]
+          w-full
+          items-center
+          justify-center
+          text-[14px]
+          text-(--color-content-secondary)
+        "
+      >
         Loading posts...
       </div>
     );
@@ -191,7 +236,23 @@ const ProfilePosts = ({
 
   if (error) {
     return (
-      <div className="flex min-h-[180px] w-full items-center justify-center rounded-xl border border-(--color-border) bg-(--color-card) px-5 text-center text-[14px] text-red-500">
+      <div
+        className="
+          flex
+          min-h-[180px]
+          w-full
+          items-center
+          justify-center
+          rounded-xl
+          border
+          border-(--color-border)
+          bg-(--color-card)
+          px-5
+          text-center
+          text-[14px]
+          text-red-500
+        "
+      >
         {error}
       </div>
     );
@@ -208,12 +269,34 @@ const ProfilePosts = ({
         />
       )}
 
-      <div className="flex w-full items-center rounded-xl bg-(--color-tab-bg) p-1">
+      {/* Profile Tabs */}
+      <div
+        className="
+          flex
+          w-full
+          items-center
+          rounded-xl
+          bg-(--color-tab-bg)
+          p-1
+        "
+      >
         <button
           type="button"
           onClick={() => setActiveTab("posts")}
           className={`
-            flex min-h-[36px] flex-1 items-center justify-center rounded-lg border px-4 text-[16px] font-medium transition-all duration-200
+            flex
+            min-h-[36px]
+            flex-1
+            items-center
+            justify-center
+            rounded-lg
+            border
+            px-4
+            text-[16px]
+            font-medium
+            transition-all
+            duration-200
+
             ${
               activeTab === "posts"
                 ? "border-(--color-tab-active-border) bg-(--color-tab-active-bg) text-(--color-content-primary) shadow-sm"
@@ -228,7 +311,19 @@ const ProfilePosts = ({
           type="button"
           onClick={() => setActiveTab("likes")}
           className={`
-            flex min-h-[36px] flex-1 items-center justify-center rounded-lg border px-4 text-[16px] font-medium transition-all duration-200
+            flex
+            min-h-[36px]
+            flex-1
+            items-center
+            justify-center
+            rounded-lg
+            border
+            px-4
+            text-[16px]
+            font-medium
+            transition-all
+            duration-200
+
             ${
               activeTab === "likes"
                 ? "border-(--color-tab-active-border) bg-(--color-tab-active-bg) text-(--color-content-primary) shadow-sm"
@@ -240,11 +335,21 @@ const ProfilePosts = ({
         </button>
       </div>
 
-      <div className="mt-5 flex w-full flex-col gap-4">
+      {/* Posts */}
+      <div
+        className="
+          mt-5
+          flex
+          w-full
+          flex-col
+          gap-4
+        "
+      >
         {displayedPosts.length > 0 ? (
           displayedPosts.map((post) => (
             <PostCard
               key={post.id}
+              postId={post.id}
               name={getPostAuthorName(post)}
               username={getPostUsername(post)}
               avatar={getPostAvatar(post)}
@@ -252,14 +357,30 @@ const ProfilePosts = ({
               content={post.content}
               likes={getPostLikes(post)}
               comments={getPostComments(post)}
+              likesData={getPostLikesData(post)}
+              commentsData={getPostCommentsData(post)}
               showDelete={activeTab === "posts" && isOwnProfile}
               onDelete={() => setPostToDelete(post)}
-              isLiked={activeTab === "likes"}
-              showUnlike={false}
             />
           ))
         ) : (
-          <div className="flex min-h-[180px] w-full items-center justify-center rounded-xl border border-(--color-border) bg-(--color-card) px-5 text-center text-[14px] text-(--color-content-secondary)">
+          <div
+            className="
+              flex
+              min-h-[180px]
+              w-full
+              items-center
+              justify-center
+              rounded-xl
+              border
+              border-(--color-border)
+              bg-(--color-card)
+              px-5
+              text-center
+              text-[14px]
+              text-(--color-content-secondary)
+            "
+          >
             {activeTab === "posts" ? "No posts yet." : "No liked posts yet."}
           </div>
         )}

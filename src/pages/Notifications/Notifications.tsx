@@ -3,13 +3,18 @@ import { useEffect, useState } from "react";
 import ProfileSidebar from "../../components/ProfileSidebar/ProfileSidebar";
 import NotificationsList from "../../components/Notifications/NotificationsList/NotificationsList";
 
+import { useAuth } from "../../context/AuthContext";
+
 import type { Notification } from "../../types/notification";
+
 import {
   getNotifications,
   markNotificationsAsRead,
 } from "../../services/notificationApi";
 
 const Notifications = () => {
+  const { user } = useAuth();
+
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,13 +31,14 @@ const Notifications = () => {
         setNotifications(data);
       } catch (error) {
         console.error("Failed to fetch notifications:", error);
+
         setError("Failed to load notifications.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchNotifications();
+    void fetchNotifications();
   }, []);
 
   const unreadNotifications = notifications.filter(
@@ -49,11 +55,12 @@ const Notifications = () => {
     try {
       setMarkingAsRead(true);
 
-      const ids = unreadNotifications.map((notification) => notification.id);
+      const ids = unreadNotifications.map(
+        (notification) => notification.id,
+      );
 
       await markNotificationsAsRead(ids);
 
-      // Update UI immediately
       setNotifications((currentNotifications) =>
         currentNotifications.map((notification) => ({
           ...notification,
@@ -61,7 +68,10 @@ const Notifications = () => {
         })),
       );
     } catch (error) {
-      console.error("Failed to mark notifications as read:", error);
+      console.error(
+        "Failed to mark notifications as read:",
+        error,
+      );
     } finally {
       setMarkingAsRead(false);
     }
@@ -83,7 +93,7 @@ const Notifications = () => {
     >
       {/* Left Sidebar */}
       <aside className="hidden min-w-0 md:block">
-        <ProfileSidebar />
+        <ProfileSidebar user={user} />
       </aside>
 
       {/* Notifications */}
@@ -109,7 +119,9 @@ const Notifications = () => {
       >
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-[16px] font-bold">Notifications</h1>
+          <h1 className="text-[16px] font-bold">
+            Notifications
+          </h1>
 
           <div className="flex items-center gap-5">
             <span
@@ -137,7 +149,9 @@ const Notifications = () => {
                 disabled:opacity-40
               "
             >
-              {markingAsRead ? "Marking..." : "Mark as read"}
+              {markingAsRead
+                ? "Marking..."
+                : "Mark as read"}
             </button>
           </div>
         </div>
