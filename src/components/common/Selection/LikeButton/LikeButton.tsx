@@ -8,13 +8,10 @@ import { useAuth } from "../../../../context/AuthContext";
 
 interface LikeButtonProps {
   postId: string;
-
-  likes: {
+  likes?: {
     userId: string;
   }[];
-
-  likesCount: number;
-
+  likesCount?: number;
   onMessage?: (message: string) => void;
 }
 
@@ -22,7 +19,9 @@ const LIKED_POSTS_KEY = "rivo_liked_posts";
 
 const getLikedPosts = (userId: string): string[] => {
   try {
-    const stored = localStorage.getItem(`${LIKED_POSTS_KEY}_${userId}`);
+    const stored = localStorage.getItem(
+      `${LIKED_POSTS_KEY}_${userId}`,
+    );
 
     if (!stored) {
       return [];
@@ -36,46 +35,47 @@ const getLikedPosts = (userId: string): string[] => {
   }
 };
 
-const saveLikedPosts = (userId: string, postIds: string[]) => {
-  localStorage.setItem(`${LIKED_POSTS_KEY}_${userId}`, JSON.stringify(postIds));
+const saveLikedPosts = (
+  userId: string,
+  postIds: string[],
+) => {
+  localStorage.setItem(
+    `${LIKED_POSTS_KEY}_${userId}`,
+    JSON.stringify(postIds),
+  );
 };
 
 const LikeButton = ({
   postId,
-  likes,
-  likesCount,
+  likes = [],
+  likesCount = 0,
   onMessage,
 }: LikeButtonProps) => {
   const { user } = useAuth();
 
   const [isLiked, setIsLiked] = useState(false);
-
   const [count, setCount] = useState(likesCount);
-
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (!user) {
       setIsLiked(false);
+      setCount(likesCount);
       return;
     }
 
-    /*
-     * First check localStorage.
-     * This keeps the UI state after refresh.
-     */
+    // First check localStorage.
+    // This keeps the UI state after refresh.
     const likedPosts = getLikedPosts(user.id);
-
     const isStoredLiked = likedPosts.includes(postId);
 
-    /*
-     * If backend provides the user's like,
-     * use that information as well.
-     */
-    const isBackendLiked = likes.some((like) => like.userId === user.id);
+    // If backend provides the user's like,
+    // use that information as well.
+    const isBackendLiked = likes.some(
+      (like) => like.userId === user.id,
+    );
 
     setIsLiked(isStoredLiked || isBackendLiked);
-
     setCount(likesCount);
   }, [postId, user, likes, likesCount]);
 
@@ -95,14 +95,13 @@ const LikeButton = ({
         return;
       }
 
-      const liked = response.message === "Post liked successfully";
+      const liked =
+        response.message === "Post liked successfully";
 
       const likedPosts = getLikedPosts(user.id);
 
       if (liked) {
-        /*
-         * Save this post as liked.
-         */
+        // Save this post as liked.
         if (!likedPosts.includes(postId)) {
           likedPosts.push(postId);
         }
@@ -110,25 +109,30 @@ const LikeButton = ({
         saveLikedPosts(user.id, likedPosts);
 
         setIsLiked(true);
-
         setCount((currentCount) => currentCount + 1);
       } else {
-        /*
-         * Remove this post from liked posts.
-         */
-        const updatedLikedPosts = likedPosts.filter((id) => id !== postId);
+        // Remove this post from liked posts.
+        const updatedLikedPosts = likedPosts.filter(
+          (id) => id !== postId,
+        );
 
         saveLikedPosts(user.id, updatedLikedPosts);
 
         setIsLiked(false);
-
-        setCount((currentCount) => Math.max(0, currentCount - 1));
+        setCount((currentCount) =>
+          Math.max(0, currentCount - 1),
+        );
       }
     } catch (error) {
-      console.error("Failed to like/unlike post:", error);
+      console.error(
+        "Failed to like/unlike post:",
+        error,
+      );
 
       onMessage?.(
-        error instanceof Error ? error.message : "Something went wrong",
+        error instanceof Error
+          ? error.message
+          : "Something went wrong",
       );
     } finally {
       setIsLoading(false);
@@ -158,9 +162,14 @@ const LikeButton = ({
         dark:hover:bg-white/5
       "
     >
-      <Icon name={isLiked ? "HeartFill" : "Heart"} size={18} />
+      <Icon
+        name={isLiked ? "HeartFill" : "Heart"}
+        size={18}
+      />
 
-      <span className="text-[14px]">{count}</span>
+      <span className="text-[14px]">
+        {count}
+      </span>
     </button>
   );
 };
