@@ -1,44 +1,26 @@
 import { useState } from "react";
 
 import Avatar from "../../../common/Avatar/Avatar";
-import { createComment, type PostComment } from "../../../../services/postApi";
+
+import {
+  createComment,
+  type PostComment,
+} from "../../../../services/postApi";
+
 import { useAuth } from "../../../../context/AuthContext";
 
 import avatarImage from "../../../../assets/Avatar/a.png";
 
+import CommentItem from "./CommentItem";
+
 interface CommentsProps {
   postId: string;
   comments: PostComment[];
-  onCommentAdded: (postId: string) => void | Promise<void>;
+  onCommentAdded: (
+    postId: string,
+  ) => void | Promise<void>;
   onMessage?: (message: string) => void;
 }
-
-const formatCommentTime = (createdAt: string) => {
-  const date = new Date(createdAt);
-  const now = new Date();
-
-  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-  if (diffInSeconds < 60) {
-    return "just now";
-  }
-
-  const diffInMinutes = Math.floor(diffInSeconds / 60);
-
-  if (diffInMinutes < 60) {
-    return `${diffInMinutes} ${diffInMinutes === 1 ? "minute" : "minutes"} ago`;
-  }
-
-  const diffInHours = Math.floor(diffInMinutes / 60);
-
-  if (diffInHours < 24) {
-    return `${diffInHours} ${diffInHours === 1 ? "hour" : "hours"} ago`;
-  }
-
-  const diffInDays = Math.floor(diffInHours / 24);
-
-  return `${diffInDays} ${diffInDays === 1 ? "day" : "days"} ago`;
-};
 
 const Comments = ({
   postId,
@@ -49,13 +31,20 @@ const Comments = ({
   const { user } = useAuth();
 
   const [content, setContent] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] =
+    useState(false);
+  const [error, setError] = useState<
+    string | null
+  >(null);
 
   const handleSubmit = async () => {
     const trimmedContent = content.trim();
 
-    if (!trimmedContent || isSubmitting || !user) {
+    if (
+      !trimmedContent ||
+      isSubmitting ||
+      !user
+    ) {
       return;
     }
 
@@ -63,7 +52,10 @@ const Comments = ({
       setIsSubmitting(true);
       setError(null);
 
-      const response = await createComment(postId, trimmedContent);
+      const response = await createComment(
+        postId,
+        trimmedContent,
+      );
 
       onMessage?.(response.message);
 
@@ -76,10 +68,15 @@ const Comments = ({
 
       await onCommentAdded(postId);
     } catch (error) {
-      console.error("Failed to create comment:", error);
+      console.error(
+        "Failed to create comment:",
+        error,
+      );
 
       const message =
-        error instanceof Error ? error.message : "Failed to add comment.";
+        error instanceof Error
+          ? error.message
+          : "Failed to add comment.";
 
       onMessage?.(message);
       setError(message);
@@ -94,42 +91,10 @@ const Comments = ({
       {comments.length > 0 && (
         <div className="flex flex-col gap-4">
           {comments.map((comment) => (
-            <div key={comment.id} className="flex items-start gap-3">
-              <Avatar
-                src={comment.author.image || avatarImage}
-                alt={`${comment.author.name} avatar`}
-                size={36}
-              />
-
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-[14px] font-semibold">
-                    {comment.author.name}
-                  </span>
-
-                  <span
-                    className="
-                      text-[12px]
-                      text-[var(--color-content-muted)]
-                    "
-                  >
-                    {formatCommentTime(comment.createdAt)}
-                  </span>
-                </div>
-
-                <p
-                  className="
-                    mt-1
-                    break-words
-                    text-[14px]
-                    leading-5
-                    text-[var(--color-content-primary)]
-                  "
-                >
-                  {comment.content}
-                </p>
-              </div>
-            </div>
+            <CommentItem
+              key={comment.id}
+              comment={comment}
+            />
           ))}
         </div>
       )}
@@ -143,12 +108,18 @@ const Comments = ({
           ${comments.length > 0 ? "mt-5" : ""}
         `}
       >
-        <Avatar src={user?.image || avatarImage} alt="Your avatar" size={36} />
+        <Avatar
+          src={user?.image || avatarImage}
+          alt="Your avatar"
+          size={36}
+        />
 
         <div className="min-w-0 flex-1">
           <textarea
             value={content}
-            onChange={(event) => setContent(event.target.value)}
+            onChange={(event) =>
+              setContent(event.target.value)
+            }
             placeholder="Write a comment..."
             rows={3}
             disabled={!user || isSubmitting}
@@ -173,13 +144,21 @@ const Comments = ({
             "
           />
 
-          {error && <p className="mt-2 text-[12px] text-red-500">{error}</p>}
+          {error && (
+            <p className="mt-2 text-[12px] text-red-500">
+              {error}
+            </p>
+          )}
 
           <div className="mt-2 flex justify-end">
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={!content.trim() || !user || isSubmitting}
+              disabled={
+                !content.trim() ||
+                !user ||
+                isSubmitting
+              }
               className="
                 rounded-lg
                 bg-[var(--color-content-primary)]
@@ -195,7 +174,9 @@ const Comments = ({
                 disabled:opacity-50
               "
             >
-              {isSubmitting ? "Commenting..." : "Comment"}
+              {isSubmitting
+                ? "Commenting..."
+                : "Comment"}
             </button>
           </div>
         </div>
