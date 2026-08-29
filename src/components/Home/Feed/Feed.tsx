@@ -14,8 +14,9 @@ import {
   deletePost,
   getPosts,
   type Post,
-  type PostComment,
 } from "../../../services/postApi";
+
+import { getUserById } from "../../../services/userApi";
 
 import { getUsernameFromEmail } from "../../../utils/getUsernameFromEmail";
 
@@ -54,7 +55,43 @@ const Feed = () => {
 
       const postsData = await getPosts();
 
-      setPosts(postsData as PostWithAuthor[]);
+      const uniqueAuthorIds = [
+        ...new Set(postsData.map((post) => post.authorId)),
+      ];
+
+      const users = await Promise.all(
+        uniqueAuthorIds.map((id) => getUserById(id)),
+      );
+
+      const usersMap = new Map(
+        users.map((user) => [user.id, user]),
+      );
+
+      const postsWithAuthors: PostWithAuthor[] = postsData.flatMap(
+  (post) => {
+    const author = usersMap.get(post.authorId);
+
+    if (!author) {
+      return [];
+    }
+
+    return [
+      {
+        ...post,
+        author: {
+          id: author.id,
+          name: author.name,
+          email: author.email,
+          image: author.image ?? null,
+          avatar: author.avatar ?? null,
+        },
+      },
+    ];
+  },
+);
+
+setPosts(postsWithAuthors);
+
     } catch (error) {
       console.error("Failed to load posts:", error);
 

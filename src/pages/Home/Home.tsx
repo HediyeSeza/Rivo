@@ -1,3 +1,6 @@
+import { useEffect } from "react";
+import { getUserById } from "../../services/userApi";
+
 import Feed from "../../components/Home/Feed/Feed";
 
 import WelcomeSection from "../../components/WelcomeSection/WelcomeSection";
@@ -12,7 +15,27 @@ const Home = () => {
   const {
     user,
     isAuthenticated,
+    updateUser
   } = useAuth();
+  useEffect(() => {
+  if (!user?.id) {
+    return;
+  }
+
+  let cancelled = false;
+
+  getUserById(user.id)
+    .then((freshUser) => {
+      if (!cancelled) {
+        updateUser(freshUser);
+      }
+    })
+    .catch(() => {});
+
+  return () => {
+    cancelled = true;
+  };
+}, [user?.id]);
 
   return (
     <div className="min-h-screen w-full pt-24">

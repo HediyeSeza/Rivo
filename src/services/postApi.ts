@@ -59,7 +59,9 @@ export const getPosts = async (): Promise<Post[]> => {
 export const toggleLikePost = async (
   postId: string,
 ): Promise<ToggleLikeResponse> => {
-  const response = await api.patch<ToggleLikeResponse>(`/api/posts/${postId}`);
+  const response = await api.patch<ToggleLikeResponse>(
+    `/api/posts/${postId}`,
+  );
 
   return response;
 };
@@ -74,13 +76,20 @@ export interface CreatePostPayload {
   content: string;
 }
 
-export const createPost = async (data: CreatePostPayload): Promise<Post> => {
-  const response = await api.post<CreatePostResponse>("/api/posts", data);
+export const createPost = async (
+  data: CreatePostPayload,
+): Promise<Post> => {
+  const response = await api.post<CreatePostResponse>(
+    "/api/posts",
+    data,
+  );
 
-  return response.data.data;
+  return response.data;
 };
 
-export const deletePost = async (postId: string): Promise<void> => {
+export const deletePost = async (
+  postId: string,
+): Promise<void> => {
   await api.delete(`/api/posts/${postId}`);
 };
 
@@ -93,12 +102,13 @@ export const createComment = async (
   postId: string,
   content: string,
 ): Promise<CreateCommentResponse> => {
-  const response = await api.post<CreateCommentResponse>(
-    `/api/posts/${postId}/comment`,
-    {
-      content,
-    },
-  );
+  const response =
+    await api.post<CreateCommentResponse>(
+      `/api/posts/${postId}/comment`,
+      {
+        content,
+      },
+    );
 
   return response;
 };
