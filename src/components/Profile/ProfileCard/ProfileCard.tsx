@@ -328,7 +328,7 @@ const ProfileCard = ({
         </div>
 
         {/* Edit Profile */}
-        <div className="mb-12 mt-4 w-full">
+        <div className="mb-1 mt-2 w-full">
           <Button
             type="button"
             onClick={() => setIsEditProfileOpen(true)}
