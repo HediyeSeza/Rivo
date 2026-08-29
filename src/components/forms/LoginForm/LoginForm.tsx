@@ -70,13 +70,30 @@ const LoginForm = () => {
       try {
         const result = await login(formData);
         signIn(result.user, result.token);
-        navigate("/");
+        // Give a moment for state to update before navigating
+        setTimeout(() => navigate("/"), 100);
       } catch (error) {
-        setServerError(
-          error instanceof ApiError && [401, 404].includes(error.status)
-            ? "This account does not exist or the password is incorrect."
-            : "Unable to log in. Please try again.",
-        );
+        console.error("Login error:", error);
+        
+        if (error instanceof ApiError) {
+          if ([401, 404].includes(error.status)) {
+            setServerError("This account does not exist or the password is incorrect.");
+          } else if (error.status === 429) {
+            setServerError("Too many login attempts. Please try again later.");
+          } else if (error.status >= 500) {
+            setServerError("Server error. Please try again later.");
+          } else {
+            setServerError(error.message || "Unable to log in. Please try again.");
+          }
+        } else if (error instanceof TypeError) {
+          setServerError("Network error. Please check your connection and try again.");
+        } else {
+          setServerError(
+            error instanceof Error
+              ? error.message
+              : "Unable to log in. Please try again.",
+          );
+        }
       } finally {
         setIsSubmitting(false);
       }

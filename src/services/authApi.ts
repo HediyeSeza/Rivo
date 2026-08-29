@@ -1,37 +1,23 @@
 import { api } from "./api";
 
-import type {
-  AuthResponse,
-  User,
-} from "../types/user";
+import type { AuthResponse, User } from "../types/user";
 
 export interface LoginPayload {
   email: string;
   password: string;
 }
 
-export interface RegisterPayload
-  extends LoginPayload {
+export interface RegisterPayload extends LoginPayload {
   name: string;
 }
 
-export const getUser = (
-  response: AuthResponse | User,
-): User => {
-  if (
-    typeof response !== "object" ||
-    response === null
-  ) {
-    throw new Error(
-      "Invalid authentication response",
-    );
+export const getUser = (response: AuthResponse | User): User => {
+  if (typeof response !== "object" || response === null) {
+    throw new Error("Invalid authentication response");
   }
 
   if ("data" in response && response.data) {
-    if (
-      "user" in response.data &&
-      response.data.user
-    ) {
+    if ("user" in response.data && response.data.user) {
       return response.data.user;
     }
   }
@@ -43,52 +29,54 @@ export const getUser = (
   return response as User;
 };
 
-export const login = async (
-  payload: LoginPayload,
-) => {
-  const response =
-    await api.post<AuthResponse | User>(
-      "/api/authentication/login",
-      payload,
-    );
+export const login = async (payload: LoginPayload) => {
+  const response = await api.post<AuthResponse | User>(
+    "/api/authentication/login",
+    payload,
+    {
+      maxRetries: 1,
+      retryDelay: 1000,
+      retryOn: [408, 429, 500, 502, 503, 504],
+    },
+  );
 
   return {
     user: getUser(response),
 
     token:
-      "token" in response
-        ? response.token ||
-          response.accessToken
-        : undefined,
+      "token" in response ? response.token || response.accessToken : undefined,
   };
 };
 
-export const register = async (
-  payload: RegisterPayload,
-) => {
-  const response =
-    await api.post<AuthResponse | User>(
-      "/api/authentication/register",
-      payload,
-    );
+export const register = async (payload: RegisterPayload) => {
+  const response = await api.post<AuthResponse | User>(
+    "/api/authentication/register",
+    payload,
+    {
+      maxRetries: 1,
+      retryDelay: 1000,
+      retryOn: [408, 429, 500, 502, 503, 504],
+    },
+  );
 
   return {
     user: getUser(response),
 
     token:
-      "token" in response
-        ? response.token ||
-          response.accessToken
-        : undefined,
+      "token" in response ? response.token || response.accessToken : undefined,
   };
 };
 
 export const getSession = () =>
-  api.get<AuthResponse | User>(
-    "/api/authentication/session",
-  );
+  api.get<AuthResponse | User>("/api/authentication/session", {
+    maxRetries: 1,
+    retryDelay: 800,
+    retryOn: [408, 429, 500, 502, 503, 504],
+  });
 
 export const logout = () =>
-  api.post<void>(
-    "/api/authentication/logout",
-  );
+  api.post<void>("/api/authentication/logout", undefined, {
+    maxRetries: 1,
+    retryDelay: 800,
+    retryOn: [408, 429, 500, 502, 503, 504],
+  });

@@ -78,17 +78,30 @@ const RegisterForm = () => {
       try {
         const result = await register(formData);
         signIn(result.user, result.token);
-        navigate("/");
+        // Give a moment for state to update before navigating
+        setTimeout(() => navigate("/"), 100);
       } catch (error) {
-        setServerError(
-          error instanceof ApiError
-            ? error.status === 409
-              ? "An account with this email already exists."
-              : error.message
-            : error instanceof Error
+        console.error("Register error:", error);
+
+        if (error instanceof ApiError) {
+          if (error.status === 409) {
+            setServerError("An account with this email already exists. Please try logging in or use a different email.");
+          } else if (error.status === 429) {
+            setServerError("Too many registration attempts. Please try again later.");
+          } else if (error.status >= 500) {
+            setServerError("Server error. Please try again later.");
+          } else {
+            setServerError(error.message || "Unable to create your account. Please try again.");
+          }
+        } else if (error instanceof TypeError) {
+          setServerError("Network error. Please check your connection and try again.");
+        } else {
+          setServerError(
+            error instanceof Error
               ? error.message
               : "Unable to create your account. Please try again.",
-        );
+          );
+        }
       } finally {
         setIsSubmitting(false);
       }

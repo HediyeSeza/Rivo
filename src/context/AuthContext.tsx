@@ -1,13 +1,21 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 
 import type { ReactNode } from "react";
 import type { User } from "../types/user";
 
 import { getSession, getUser, logout } from "../services/authApi";
+import { ApiError } from "../services/api";
 
 interface AuthContextValue {
   user: User | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
   signIn: (user: User, token?: string) => void;
   updateUser: (user: User) => void;
   signOut: () => Promise<void>;
@@ -34,82 +42,79 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   });
 
-  useEffect(() => {
-    let isActive = true;
+  const [isLoading, setIsLoading] = useState(true);
 
-    getSession()
-      .then((response) => {
-        if (!isActive) {
-          return;
-        }
+  const validateSession = useCallback(async () => {
+    try {
+      const response = await getSession();
+      const sessionUser = getUser(response);
 
-        const sessionUser = getUser(response);
+      setUser(sessionUser);
+      localStorage.setItem(USER_KEY, JSON.stringify(sessionUser));
 
-        setUser(sessionUser);
-
-        localStorage.setItem(USER_KEY, JSON.stringify(sessionUser));
-
-        const sessionToken =
-          "data" in response && response.data && "session" in response.data
-            ? response.data.session?.token
+      const sessionToken =
+        "data" in response && response.data && "session" in response.data
+          ? response.data.session?.token
+          : "token" in response
+            ? response.token
             : undefined;
 
-        if (sessionToken) {
-          localStorage.setItem(TOKEN_KEY, sessionToken);
-        }
-      })
-      .catch((error) => {
-        console.error("Failed to get session:", error);
-
-        if (!isActive) {
-          return;
-        }
-
+      if (sessionToken) {
+        localStorage.setItem(TOKEN_KEY, sessionToken);
+      }
+    } catch (error) {
+      // If session fails (401, 403, etc.), clear auth
+      if (error instanceof ApiError && [401, 403, 404].includes(error.status)) {
+        console.debug("Session validation failed, clearing auth", error.status);
         setUser(null);
-
         localStorage.removeItem(USER_KEY);
         localStorage.removeItem(TOKEN_KEY);
-      });
-
-    return () => {
-      isActive = false;
-    };
+      } else {
+        console.error("Session validation error:", error);
+        // For network errors, don't clear auth - keep existing user if available
+      }
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const signIn = (nextUser: User, token?: string) => {
-    setUser(nextUser);
+  // Validate session on mount
+  useEffect(() => {
+    validateSession();
+  }, [validateSession]);
 
+  const signIn = useCallback((nextUser: User, token?: string) => {
+    setUser(nextUser);
     localStorage.setItem(USER_KEY, JSON.stringify(nextUser));
 
     if (token) {
       localStorage.setItem(TOKEN_KEY, token);
     }
-  };
+  }, []);
 
-  const updateUser = (nextUser: User) => {
+  const updateUser = useCallback((nextUser: User) => {
     setUser(nextUser);
-
     localStorage.setItem(USER_KEY, JSON.stringify(nextUser));
-  };
+  }, []);
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     try {
       await logout();
     } catch {
       // Clear local session even if server request fails.
     } finally {
       setUser(null);
-
       localStorage.removeItem(USER_KEY);
       localStorage.removeItem(TOKEN_KEY);
     }
-  };
+  }, []);
 
   return (
     <AuthContext.Provider
       value={{
         user,
         isAuthenticated: Boolean(user),
+        isLoading,
         signIn,
         updateUser,
         signOut,
