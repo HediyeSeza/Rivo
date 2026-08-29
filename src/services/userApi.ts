@@ -4,6 +4,10 @@ import type { User } from "../types/user";
 
 export type { User };
 
+/* =========================
+   Response Types
+========================= */
+
 interface UserResponse {
   message: string;
   success: boolean;
@@ -22,6 +26,22 @@ interface PostsResponse {
   data?: Post[];
 }
 
+export interface SearchUsersResponse {
+  message: string;
+  success: boolean;
+  data?: User[];
+}
+
+export interface FollowResponse {
+  message: string;
+  success: boolean;
+  data?: unknown;
+}
+
+/* =========================
+   Profile
+========================= */
+
 export interface UpdateProfilePayload {
   name: string;
   bio: string;
@@ -31,7 +51,7 @@ export interface UpdateProfilePayload {
 }
 
 /* =========================
-   Helpers
+   Helpers / Image Upload
 ========================= */
 
 const UUID_PATTERN =
@@ -79,10 +99,6 @@ const extractImageId = (value: unknown): string | null => {
   }
 };
 
-/* =========================
-   Upload Image
-========================= */
-
 export const uploadImage = async (file: File): Promise<string> => {
   const formData = new FormData();
 
@@ -115,10 +131,7 @@ export const getUserById = async (
     `/api/users/${id}`,
   );
 
-  if (
-    "data" in response &&
-    response.data
-  ) {
+  if ("data" in response && response.data) {
     return response.data;
   }
 
@@ -137,7 +150,7 @@ export const updateUserProfile = async (
     `/api/users/${userId}`,
     data,
   );
-  
+
   return getUserById(userId);
 };
 
@@ -158,14 +171,34 @@ export const getRecommendedUsers = async (): Promise<User[]> => {
 };
 
 /* =========================
-   Follow
+   User Search
 ========================= */
 
-export interface FollowResponse {
-  message: string;
-  success: boolean;
-  data?: unknown;
-}
+export const searchUsers = async (
+  query: string,
+): Promise<User[]> => {
+  const trimmedQuery = query.trim();
+
+  if (!trimmedQuery) {
+    return [];
+  }
+
+  const response = await api.get<
+    SearchUsersResponse | User[]
+  >(
+    `/api/users/search?q=${encodeURIComponent(trimmedQuery)}`,
+  );
+
+  if (Array.isArray(response)) {
+    return response;
+  }
+
+  return response.data ?? [];
+};
+
+/* =========================
+   Follow / Unfollow
+========================= */
 
 export const toggleFollowUser = async (
   userId: string,
