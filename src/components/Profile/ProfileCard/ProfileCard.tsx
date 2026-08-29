@@ -83,26 +83,38 @@ const ProfileCard = ({
     }
 
     if (diffMinutes < 60) {
-      return `${diffMinutes} ${diffMinutes === 1 ? "minute" : "minutes"} ago`;
+      return `${diffMinutes} ${
+        diffMinutes === 1 ? "minute" : "minutes"
+      } ago`;
     }
 
     if (diffHours < 24) {
-      return `${diffHours} ${diffHours === 1 ? "hour" : "hours"} ago`;
+      return `${diffHours} ${
+        diffHours === 1 ? "hour" : "hours"
+      } ago`;
     }
 
     if (diffDays < 7) {
-      return `${diffDays} ${diffDays === 1 ? "day" : "days"} ago`;
+      return `${diffDays} ${
+        diffDays === 1 ? "day" : "days"
+      } ago`;
     }
 
     if (diffDays < 30) {
-      return `${diffWeeks} ${diffWeeks === 1 ? "week" : "weeks"} ago`;
+      return `${diffWeeks} ${
+        diffWeeks === 1 ? "week" : "weeks"
+      } ago`;
     }
 
     if (diffDays < 365) {
-      return `${diffMonths} ${diffMonths === 1 ? "month" : "months"} ago`;
+      return `${diffMonths} ${
+        diffMonths === 1 ? "month" : "months"
+      } ago`;
     }
 
-    return `${diffYears} ${diffYears === 1 ? "year" : "years"} ago`;
+    return `${diffYears} ${
+      diffYears === 1 ? "year" : "years"
+    } ago`;
   };
 
   const closeCropper = () => {
@@ -184,6 +196,7 @@ const ProfileCard = ({
       closeCropper();
     } catch (error) {
       console.error("Avatar save failed:", error);
+
       setAvatarError(
         error instanceof Error
           ? error.message
@@ -209,6 +222,7 @@ const ProfileCard = ({
       setIsDeletePhotoOpen(false);
     } catch (error) {
       console.error("Avatar delete failed:", error);
+
       setAvatarError(
         error instanceof Error
           ? error.message
@@ -225,7 +239,14 @@ const ProfileCard = ({
   }) => {
     const image = toImageUuid(user.image);
 
-    await onSaveProfile(image ? { ...data, image } : data);
+    await onSaveProfile(
+      image
+        ? {
+            ...data,
+            image,
+          }
+        : data,
+    );
 
     setIsEditProfileOpen(false);
   };
@@ -242,6 +263,7 @@ const ProfileCard = ({
       </style>
 
       <div className="w-full">
+        {/* Profile */}
         <div className="flex flex-col items-center">
           <ProfilePhoto
             image={user.image}
@@ -272,11 +294,13 @@ const ProfileCard = ({
           )}
         </div>
 
+        {/* Stats */}
         <div className="mt-8 flex items-center justify-between text-center">
           <div>
             <p className="text-[18px] font-medium text-(--color-content-primary)">
               {followingCount}
             </p>
+
             <span className="text-[14px] text-(--color-content-secondary)">
               Followings
             </span>
@@ -286,6 +310,7 @@ const ProfileCard = ({
             <p className="text-[18px] font-medium text-(--color-content-primary)">
               {followersCount}
             </p>
+
             <span className="text-[14px] text-(--color-content-secondary)">
               Followers
             </span>
@@ -295,12 +320,14 @@ const ProfileCard = ({
             <p className="text-[18px] font-medium text-(--color-content-primary)">
               {postsCount}
             </p>
+
             <span className="text-[14px] text-(--color-content-secondary)">
               Posts
             </span>
           </div>
         </div>
 
+        {/* Edit Profile */}
         <div className="mb-12 mt-4 w-full">
           <Button
             type="button"
@@ -308,7 +335,12 @@ const ProfileCard = ({
             variant="primary"
             className="w-full"
           >
-            <Icon name="Edit" size={20} className="mr-2" />
+            <Icon
+              name="Edit"
+              size={20}
+              className="mr-2 text-(--color-card)"
+            />
+
             <span>Edit Profile</span>
           </Button>
         </div>
@@ -322,6 +354,7 @@ const ProfileCard = ({
           onSave={handleSaveProfile}
         />
 
+        {/* Crop Modal */}
         {isCropOpen && selectedImage && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
             <div className="w-full max-w-md rounded-2xl border border-(--color-border) bg-(--color-card) p-5">
@@ -339,7 +372,7 @@ const ProfileCard = ({
                   background={false}
                   guides={false}
                   autoCropArea={1}
-                  responsive={true}
+                  responsive
                   checkOrientation={false}
                   minCropBoxWidth={200}
                   minCropBoxHeight={200}
@@ -348,7 +381,9 @@ const ProfileCard = ({
               </div>
 
               {avatarError && (
-                <p className="mt-3 text-[13px] text-red-500">{avatarError}</p>
+                <p className="mt-3 text-[13px] text-red-500">
+                  {avatarError}
+                </p>
               )}
 
               <div className="mt-5 flex justify-end gap-3">
@@ -367,36 +402,53 @@ const ProfileCard = ({
                   onClick={handleSaveCrop}
                   disabled={isUploadingAvatar}
                 >
-                  {isUploadingAvatar ? "Saving..." : "Save photo"}
+                  {isUploadingAvatar
+                    ? "Saving..."
+                    : "Save photo"}
                 </Button>
               </div>
             </div>
           </div>
         )}
 
+        {/* Delete Photo */}
         {isDeletePhotoOpen && (
           <ConfirmModal
             title="Delete photo?"
             message="Your profile photo will be removed."
             confirmLabel="Yes, delete"
-            onCancel={() => setIsDeletePhotoOpen(false)}
+            onCancel={() =>
+              setIsDeletePhotoOpen(false)
+            }
             onConfirm={handleDeletePhoto}
           />
         )}
 
+        {/* Location */}
         <div className="flex items-center gap-2 pt-6 text-(--color-content-secondary)">
           <Icon name="Location" size={20} />
-          <span className="text-[14px]">{user.location || "No location"}</span>
+
+          <span className="text-[14px]">
+            {user.location || "No location"}
+          </span>
         </div>
 
+        {/* Website */}
         <div className="mt-3 flex items-center gap-2 text-(--color-content-secondary)">
           <Icon name="Link" size={20} />
-          <span className="text-[14px]">{user.website || "No website"}</span>
+
+          <span className="text-[14px]">
+            {user.website || "No website"}
+          </span>
         </div>
 
+        {/* Joined */}
         <div className="mt-3 flex items-center gap-2 text-(--color-content-secondary)">
           <Icon name="Calendar" size={20} />
-          <span className="text-[14px]">{getJoinedTime(user.createdAt)}</span>
+
+          <span className="text-[14px]">
+            {getJoinedTime(user.createdAt)}
+          </span>
         </div>
       </div>
     </div>
