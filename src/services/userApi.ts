@@ -27,8 +27,12 @@ export interface UpdateProfilePayload {
   bio: string;
   location: string;
   website: string;
-  image?: string | null; // UUID برگشتی از upload
+  image?: string | null;
 }
+
+/* =========================
+   Helpers
+========================= */
 
 const UUID_PATTERN =
   /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
@@ -36,7 +40,11 @@ const UUID_PATTERN =
 const extractImageId = (value: unknown): string | null => {
   if (typeof value === "string") {
     const trimmed = value.trim();
-    if (!trimmed) return null;
+
+    if (!trimmed) {
+      return null;
+    }
+
     return trimmed.match(UUID_PATTERN)?.[0] ?? null;
   }
 
@@ -45,11 +53,23 @@ const extractImageId = (value: unknown): string | null => {
   }
 
   const record = value as Record<string, unknown>;
-  const keys = ["id", "uuid", "file", "image", "url", "data", "result"];
+
+  const keys = [
+    "id",
+    "uuid",
+    "file",
+    "image",
+    "url",
+    "data",
+    "result",
+  ];
 
   for (const key of keys) {
     const found = extractImageId(record[key]);
-    if (found) return found;
+
+    if (found) {
+      return found;
+    }
   }
 
   try {
@@ -59,21 +79,34 @@ const extractImageId = (value: unknown): string | null => {
   }
 };
 
+/* =========================
+   Upload Image
+========================= */
 
 export const uploadImage = async (file: File): Promise<string> => {
   const formData = new FormData();
+
   formData.append("file", file);
 
-  const response = await api.post<unknown>("/api/upload", formData);
+  const response = await api.post<unknown>(
+    "/api/upload",
+    formData,
+  );
+
   const imageId = extractImageId(response);
 
   if (!imageId) {
-    throw new Error("Could not upload photo. Please try again.");
+    throw new Error(
+      "Could not upload photo. Please try again.",
+    );
   }
 
   return imageId;
 };
 
+/* =========================
+   Get User
+========================= */
 
 export const getUserById = async (
   id: string,
@@ -82,28 +115,35 @@ export const getUserById = async (
     `/api/users/${id}`,
   );
 
-  if ("data" in response && response.data) {
+  if (
+    "data" in response &&
+    response.data
+  ) {
     return response.data;
   }
 
   return response as User;
 };
 
+/* =========================
+   Update User Profile
+========================= */
+
 export const updateUserProfile = async (
   userId: string,
   data: UpdateProfilePayload,
 ): Promise<User> => {
-  const response = await api.put<UserResponse | User>(
+  await api.put<UserResponse | User>(
     `/api/users/${userId}`,
     data,
   );
-
-  if ("data" in response && response.data) {
-    return response.data;
-  }
-
+  
   return getUserById(userId);
 };
+
+/* =========================
+   Recommended Users
+========================= */
 
 export const getRecommendedUsers = async (): Promise<User[]> => {
   const response = await api.get<
@@ -117,6 +157,10 @@ export const getRecommendedUsers = async (): Promise<User[]> => {
   return response.data ?? [];
 };
 
+/* =========================
+   Follow
+========================= */
+
 export interface FollowResponse {
   message: string;
   success: boolean;
@@ -126,9 +170,13 @@ export interface FollowResponse {
 export const toggleFollowUser = async (
   userId: string,
 ): Promise<FollowResponse> => {
-  return api.patch<FollowResponse>(
+  const response = await api.patch<FollowResponse>(
     `/api/users/${userId}`,
   );
+
+  window.dispatchEvent(new Event("profile:changed"));
+
+  return response;
 };
 
 /* =========================

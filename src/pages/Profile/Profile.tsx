@@ -3,10 +3,8 @@ import { useEffect, useState } from "react";
 import ProfileCard from "../../components/Profile/ProfileCard/ProfileCard";
 import ProfilePosts from "../../components/Profile/ProfilePosts/ProfilePosts";
 import ProfileSidebar from "../../components/ProfileSidebar/ProfileSidebar";
-
-import { useAuth } from "../../context/AuthContext";
-
 import { getUserById, updateUserProfile } from "../../services/userApi";
+import { useAuth } from "../../context/AuthContext";
 
 import type { UpdateProfilePayload, User } from "../../services/userApi";
 
@@ -23,29 +21,50 @@ function Profile() {
 
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadProfile = async () => {
-      if (!authUser?.id) {
-        setIsLoading(false);
-        return;
-      }
+  const [postsCount, setPostsCount] = useState(0);
 
-      try {
+  const loadProfile = async (showLoading = false) => {
+    if (!authUser?.id) {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      if (showLoading) {
         setIsLoading(true);
-        setError(null);
-        const profileUser = await getUserById(authUser.id);
-        setUser(profileUser);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to load profile.",
-        );
-      } finally {
+      }
+
+      setError(null);
+
+      const profileUser = await getUserById(authUser.id);
+
+      setUser(profileUser);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load profile.");
+    } finally {
+      if (showLoading) {
         setIsLoading(false);
       }
-    };
+    }
+  };
 
-    void loadProfile();
+  useEffect(() => {
+    void loadProfile(true);
   }, [authUser?.id]);
+
+  useEffect(() => {
+  const handleProfileChanged = () => {
+    void loadProfile(false);
+  };
+
+  window.addEventListener("posts:changed", handleProfileChanged);
+  window.addEventListener("profile:changed", handleProfileChanged);
+
+  return () => {
+    window.removeEventListener("posts:changed", handleProfileChanged);
+    window.removeEventListener("profile:changed", handleProfileChanged);
+  };
+}, [authUser?.id]);
 
   const handleSaveProfile = async (data: UpdateProfilePayload) => {
     if (!user) {
@@ -120,6 +139,7 @@ function Profile() {
             <div className="w-full max-w-[550px]">
               <ProfileCard
                 user={user}
+                postsCount={postsCount}
                 onSaveProfile={handleSaveProfile}
                 isSaving={isSaving}
                 saveError={saveError}
@@ -132,6 +152,7 @@ function Profile() {
               userId={user.id}
               isOwnProfile={true}
               profileImage={user.image}
+              onPostsCountChange={setPostsCount}
             />
           </div>
         </section>
