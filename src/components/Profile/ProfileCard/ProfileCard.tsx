@@ -420,15 +420,7 @@ const ProfileCard = ({
             {user.website || "No website"}{" "}
           </span>{" "}
         </div>{" "}
-        {/* Joined */}{" "}
-        <div className="mt-3 flex items-center gap-2 text-(--color-content-secondary)">
-          {" "}
-          <Icon name="Calendar" size={20} />{" "}
-          <span className="text-[14px]">
-            {" "}
-            {getJoinedTime(user.createdAt)}{" "}
-          </span>{" "}
-        </div>{" "}
+        {/* Joined */}
         <div className="mt-3 flex items-center gap-2 text-(--color-content-secondary)">
           <Icon name="Calendar" size={20} />
 
@@ -440,8 +432,9 @@ const ProfileCard = ({
           initialTab={followListTab ?? "followers"}
           onClose={() => setFollowListTab(null)}
         />
-      </div>{" "}
+      </div>
     </div>
   );
 };
+
 export default ProfileCard;
