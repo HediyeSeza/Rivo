@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import PostCard from "../../Home/PostCard/PostCard";
 import SuccessModal from "../../common/Modal/SuccessModal";
 import ConfirmModal from "../../common/Modal/ConfirmModal";
+import EmptyState from "../../common/EmptyState/EmptyState";
+import Loading from "../../loading/Loading";
 
 import { deletePost } from "../../../services/postApi";
 
@@ -21,6 +23,7 @@ interface ProfilePostsProps {
   isOwnProfile: boolean;
   profileImage?: string | null;
   onPostsCountChange?: (count: number) => void;
+  onLoadingChange?: (loading: boolean) => void;
 }
 
 type ProfilePostWithRelations = ProfilePost & {
@@ -30,6 +33,7 @@ type ProfilePostWithRelations = ProfilePost & {
     email?: string;
     image?: string | null;
   };
+
   post?: {
     author?: {
       id?: string;
@@ -38,10 +42,12 @@ type ProfilePostWithRelations = ProfilePost & {
       image?: string | null;
     };
   };
+
   _count?: {
     likes?: number;
     comments?: number;
   };
+
   likes?: unknown[];
   comments?: unknown[];
 };
@@ -51,42 +57,59 @@ const ProfilePosts = ({
   isOwnProfile = false,
   profileImage,
   onPostsCountChange,
+  onLoadingChange,
 }: ProfilePostsProps) => {
-  const [activeTab, setActiveTab] = useState<ProfileTab>("posts");
+  const [activeTab, setActiveTab] =
+    useState<ProfileTab>("posts");
 
   const [posts, setPosts] = useState<ProfilePost[]>([]);
 
-  const [likedPosts, setLikedPosts] = useState<ProfilePost[]>([]);
+  const [likedPosts, setLikedPosts] =
+    useState<ProfilePost[]>([]);
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] =
+    useState(true);
 
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] =
+    useState<string | null>(null);
 
-  const [postToDelete, setPostToDelete] = useState<ProfilePost | null>(null);
+  const [postToDelete, setPostToDelete] =
+    useState<ProfilePost | null>(null);
 
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [showSuccess, setShowSuccess] =
+    useState(false);
 
   useEffect(() => {
     const loadProfilePosts = async () => {
       if (!userId) {
         setIsLoading(false);
+        onLoadingChange?.(false);
         return;
       }
 
       try {
         setIsLoading(true);
+        onLoadingChange?.(true);
         setError(null);
 
-        const userPosts = await getUserPosts(userId);
+        const userPosts =
+          await getUserPosts(userId);
 
         setPosts(userPosts);
-        onPostsCountChange?.(userPosts.length);
 
-        const liked = await getUserLikedPosts(userId);
+        onPostsCountChange?.(
+          userPosts.length,
+        );
+
+        const liked =
+          await getUserLikedPosts(userId);
 
         setLikedPosts(liked);
       } catch (error) {
-        console.error("Failed to load profile posts:", error);
+        console.error(
+          "Failed to load profile posts:",
+          error,
+        );
 
         setError(
           error instanceof Error
@@ -95,36 +118,52 @@ const ProfilePosts = ({
         );
       } finally {
         setIsLoading(false);
+        onLoadingChange?.(false);
       }
     };
 
     void loadProfilePosts();
   }, [userId]);
 
-  const displayedPosts = activeTab === "posts" ? posts : likedPosts;
+  const displayedPosts =
+    activeTab === "posts"
+      ? posts
+      : likedPosts;
 
   const handleDeletePost = async () => {
-    if (!postToDelete || !isOwnProfile) {
+    if (
+      !postToDelete ||
+      !isOwnProfile
+    ) {
       return;
     }
 
     try {
       await deletePost(postToDelete.id);
 
-      window.dispatchEvent(new Event("posts:changed"));
+      window.dispatchEvent(
+        new Event("posts:changed"),
+      );
 
       setPosts((currentPosts) => {
-        const updatedPosts = currentPosts.filter(
-          (post) => post.id !== postToDelete.id,
-        );
+        const updatedPosts =
+          currentPosts.filter(
+            (post) =>
+              post.id !== postToDelete.id,
+          );
 
-        onPostsCountChange?.(updatedPosts.length);
+        onPostsCountChange?.(
+          updatedPosts.length,
+        );
 
         return updatedPosts;
       });
 
       setLikedPosts((currentPosts) =>
-        currentPosts.filter((post) => post.id !== postToDelete.id),
+        currentPosts.filter(
+          (post) =>
+            post.id !== postToDelete.id,
+        ),
       );
 
       setPostToDelete(null);
@@ -134,22 +173,37 @@ const ProfilePosts = ({
         setShowSuccess(false);
       }, 5000);
     } catch (error) {
-      console.error("Failed to delete post:", error);
+      console.error(
+        "Failed to delete post:",
+        error,
+      );
 
       setPostToDelete(null);
     }
   };
 
-  const getPostAuthorName = (post: ProfilePost) => {
-    const currentPost = post as ProfilePostWithRelations;
+  const getPostAuthorName = (
+    post: ProfilePost,
+  ) => {
+    const currentPost =
+      post as ProfilePostWithRelations;
 
-    return currentPost.author?.name || currentPost.post?.author?.name || "User";
+    return (
+      currentPost.author?.name ||
+      currentPost.post?.author?.name ||
+      "User"
+    );
   };
 
-  const getPostUsername = (post: ProfilePost) => {
-    const currentPost = post as ProfilePostWithRelations;
+  const getPostUsername = (
+    post: ProfilePost,
+  ) => {
+    const currentPost =
+      post as ProfilePostWithRelations;
 
-    const email = currentPost.author?.email || currentPost.post?.author?.email;
+    const email =
+      currentPost.author?.email ||
+      currentPost.post?.author?.email;
 
     if (email) {
       return getUsernameFromEmail(email);
@@ -158,67 +212,107 @@ const ProfilePosts = ({
     return "user";
   };
 
-  const getPostLikes = (post: ProfilePost) => {
-    const currentPost = post as ProfilePostWithRelations;
+  const getPostLikes = (
+    post: ProfilePost,
+  ) => {
+    const currentPost =
+      post as ProfilePostWithRelations;
 
-    if (typeof currentPost._count?.likes === "number") {
+    if (
+      typeof currentPost._count?.likes ===
+      "number"
+    ) {
       return currentPost._count.likes;
     }
 
-    if (Array.isArray(currentPost.likes)) {
+    if (
+      Array.isArray(currentPost.likes)
+    ) {
       return currentPost.likes.length;
     }
 
     return 0;
   };
 
-  const getPostComments = (post: ProfilePost) => {
-    const currentPost = post as ProfilePostWithRelations;
+  const getPostComments = (
+    post: ProfilePost,
+  ) => {
+    const currentPost =
+      post as ProfilePostWithRelations;
 
-    if (typeof currentPost._count?.comments === "number") {
+    if (
+      typeof currentPost._count?.comments ===
+      "number"
+    ) {
       return currentPost._count.comments;
     }
 
-    if (Array.isArray(currentPost.comments)) {
+    if (
+      Array.isArray(currentPost.comments)
+    ) {
       return currentPost.comments.length;
     }
 
     return 0;
   };
 
-  const getPostAvatar = (post: ProfilePost) => {
-    const currentPost = post as ProfilePostWithRelations;
+  const getPostAvatar = (
+    post: ProfilePost,
+  ) => {
+    const currentPost =
+      post as ProfilePostWithRelations;
 
-    const authorId = currentPost.author?.id || currentPost.post?.author?.id;
+    const authorId =
+      currentPost.author?.id ||
+      currentPost.post?.author?.id;
 
     const snapshotImage =
-      currentPost.author?.image || currentPost.post?.author?.image || undefined;
+      currentPost.author?.image ||
+      currentPost.post?.author?.image ||
+      undefined;
 
     const isProfileAuthor =
-      authorId === userId || (isOwnProfile && activeTab === "posts");
+      authorId === userId ||
+      (isOwnProfile &&
+        activeTab === "posts");
 
-    if (isProfileAuthor && profileImage !== undefined) {
-      return profileImage || undefined;
+    if (
+      isProfileAuthor &&
+      profileImage !== undefined
+    ) {
+      return (
+        profileImage || undefined
+      );
     }
 
     return snapshotImage;
   };
 
-  const getPostLikesData = (post: ProfilePost) => {
-    const currentPost = post as ProfilePostWithRelations;
+  const getPostLikesData = (
+    post: ProfilePost,
+  ) => {
+    const currentPost =
+      post as ProfilePostWithRelations;
 
     return currentPost.likes ?? [];
   };
 
-  const getPostCommentsData = (post: ProfilePost) => {
-    const currentPost = post as ProfilePostWithRelations;
+  const getPostCommentsData = (
+    post: ProfilePost,
+  ) => {
+    const currentPost =
+      post as ProfilePostWithRelations;
 
     return currentPost.comments ?? [];
   };
-  const getActualPost = (post: ProfilePost) => {
-    const currentPost = post as ProfilePostWithRelations & {
-      post?: ProfilePost;
-    };
+
+  const getActualPost = (
+    post: ProfilePost,
+  ) => {
+    const currentPost =
+      post as ProfilePostWithRelations & {
+        post?: ProfilePost;
+      };
 
     return currentPost.post ?? post;
   };
@@ -232,11 +326,9 @@ const ProfilePosts = ({
           w-full
           items-center
           justify-center
-          text-[14px]
-          text-(--color-content-secondary)
         "
       >
-        Loading posts...
+        <Loading />
       </div>
     );
   }
@@ -267,11 +359,17 @@ const ProfilePosts = ({
 
   return (
     <section className="w-full">
-      {showSuccess && <SuccessModal message="Post deleted successfully" />}
+      {showSuccess && (
+        <SuccessModal
+          message="Post deleted successfully"
+        />
+      )}
 
       {postToDelete && (
         <ConfirmModal
-          onCancel={() => setPostToDelete(null)}
+          onCancel={() =>
+            setPostToDelete(null)
+          }
           onConfirm={handleDeletePost}
         />
       )}
@@ -289,7 +387,9 @@ const ProfilePosts = ({
       >
         <button
           type="button"
-          onClick={() => setActiveTab("posts")}
+          onClick={() =>
+            setActiveTab("posts")
+          }
           className={`
             flex
             min-h-[36px]
@@ -316,7 +416,9 @@ const ProfilePosts = ({
 
         <button
           type="button"
-          onClick={() => setActiveTab("likes")}
+          onClick={() =>
+            setActiveTab("likes")
+          }
           className={`
             flex
             min-h-[36px]
@@ -354,29 +456,55 @@ const ProfilePosts = ({
       >
         {displayedPosts.length > 0 ? (
           displayedPosts.map((item) => {
-            const post = getActualPost(item);
+            const post =
+              getActualPost(item);
 
             return (
               <PostCard
                 key={post.id}
                 postId={post.id}
-                name={getPostAuthorName(item)}
-                username={getPostUsername(item)}
-                avatar={getPostAvatar(item)}
-                createdAt={post.createdAt}
+                name={getPostAuthorName(
+                  item,
+                )}
+                username={getPostUsername(
+                  item,
+                )}
+                avatar={getPostAvatar(
+                  item,
+                )}
+                createdAt={
+                  post.createdAt
+                }
                 content={post.content}
                 likes={getPostLikes(item)}
-                comments={getPostComments(item)}
-                likesData={getPostLikesData(item)}
-                commentsData={getPostCommentsData(item)}
-                showDelete={activeTab === "posts" && isOwnProfile}
-                onDelete={() => setPostToDelete(item)}
-                onLikeChange={(changedPostId, isLiked) => {
+                comments={getPostComments(
+                  item,
+                )}
+                likesData={getPostLikesData(
+                  item,
+                )}
+                commentsData={getPostCommentsData(
+                  item,
+                )}
+                showDelete={
+                  activeTab === "posts" &&
+                  isOwnProfile
+                }
+                onDelete={() =>
+                  setPostToDelete(item)
+                }
+                onLikeChange={(
+                  changedPostId,
+                  isLiked,
+                ) => {
                   if (!isLiked) {
-                    setLikedPosts((currentPosts) =>
-                      currentPosts.filter(
-                        (likedPost) => likedPost.id !== changedPostId,
-                      ),
+                    setLikedPosts(
+                      (currentPosts) =>
+                        currentPosts.filter(
+                          (likedPost) =>
+                            likedPost.id !==
+                            changedPostId,
+                        ),
                     );
                   }
                 }}
@@ -384,25 +512,23 @@ const ProfilePosts = ({
             );
           })
         ) : (
-          <div
-            className="
-              flex
-              min-h-[180px]
-              w-full
-              items-center
-              justify-center
-              rounded-xl
-              border
-              border-(--color-border)
-              bg-(--color-card)
-              px-5
-              text-center
-              text-[14px]
-              text-(--color-content-secondary)
-            "
-          >
-            {activeTab === "posts" ? "No posts yet." : "No liked posts yet."}
-          </div>
+          <EmptyState
+            variant={
+              activeTab === "posts"
+                ? "posts"
+                : "likes"
+            }
+            title={
+              activeTab === "posts"
+                ? "No posts yet"
+                : "No liked posts yet"
+            }
+            description={
+              activeTab === "posts"
+                ? "Looks like you haven't shared anything yet. When you post, it will appear here."
+                : "Posts you like will appear here."
+            }
+          />
         )}
       </div>
     </section>

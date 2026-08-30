@@ -3,23 +3,28 @@ import { useEffect, useState } from "react";
 import ProfileCard from "../../components/Profile/ProfileCard/ProfileCard";
 import ProfilePosts from "../../components/Profile/ProfilePosts/ProfilePosts";
 import ProfileSidebar from "../../components/ProfileSidebar/ProfileSidebar";
-import { getUserById, updateUserProfile } from "../../services/userApi";
+import Loading from "../../components/loading/Loading";
+
+import {
+  getUserById,
+  updateUserProfile,
+} from "../../services/userApi";
+
 import { useAuth } from "../../context/AuthContext";
-import type { UpdateProfilePayload, User } from "../../services/userApi";
+
+import type {
+  UpdateProfilePayload,
+  User,
+} from "../../services/userApi";
 
 function Profile() {
   const { user: authUser, updateUser } = useAuth();
 
   const [user, setUser] = useState<User | null>(null);
-
   const [isLoading, setIsLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
-
   const [isSaving, setIsSaving] = useState(false);
-
   const [saveError, setSaveError] = useState<string | null>(null);
-
   const [postsCount, setPostsCount] = useState(0);
 
   const loadProfile = async (showLoading = false) => {
@@ -35,11 +40,22 @@ function Profile() {
 
       setError(null);
 
-      const profileUser = await getUserById(authUser.id);
+      const minimumLoadingTime = new Promise((resolve) => {
+        window.setTimeout(resolve, 800);
+      });
+
+      const [profileUser] = await Promise.all([
+        getUserById(authUser.id),
+        minimumLoadingTime,
+      ]);
 
       setUser(profileUser);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load profile.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to load profile.",
+      );
     } finally {
       if (showLoading) {
         setIsLoading(false);
@@ -52,20 +68,36 @@ function Profile() {
   }, [authUser?.id]);
 
   useEffect(() => {
-  const handleProfileChanged = () => {
-    void loadProfile(false);
-  };
+    const handleProfileChanged = () => {
+      void loadProfile(false);
+    };
 
-  window.addEventListener("posts:changed", handleProfileChanged);
-  window.addEventListener("profile:changed", handleProfileChanged);
+    window.addEventListener(
+      "posts:changed",
+      handleProfileChanged,
+    );
 
-  return () => {
-    window.removeEventListener("posts:changed", handleProfileChanged);
-    window.removeEventListener("profile:changed", handleProfileChanged);
-  };
-}, [authUser?.id]);
+    window.addEventListener(
+      "profile:changed",
+      handleProfileChanged,
+    );
 
-  const handleSaveProfile = async (data: UpdateProfilePayload) => {
+    return () => {
+      window.removeEventListener(
+        "posts:changed",
+        handleProfileChanged,
+      );
+
+      window.removeEventListener(
+        "profile:changed",
+        handleProfileChanged,
+      );
+    };
+  }, [authUser?.id]);
+
+  const handleSaveProfile = async (
+    data: UpdateProfilePayload,
+  ) => {
     if (!user) {
       return;
     }
@@ -74,15 +106,23 @@ function Profile() {
       setIsSaving(true);
       setSaveError(null);
 
-      const updatedUser = await updateUserProfile(user.id, data);
+      const updatedUser = await updateUserProfile(
+        user.id,
+        data,
+      );
 
       setUser(updatedUser);
       updateUser(updatedUser);
     } catch (error) {
-      console.error("Failed to update profile:", error);
+      console.error(
+        "Failed to update profile:",
+        error,
+      );
 
       setSaveError(
-        error instanceof Error ? error.message : "Failed to update profile.",
+        error instanceof Error
+          ? error.message
+          : "Failed to update profile.",
       );
 
       throw error;
@@ -92,19 +132,15 @@ function Profile() {
   };
 
   if (isLoading) {
-    return (
-      <main className="flex min-h-screen items-center justify-center">
-        <span className="text-[14px] text-(--color-content-secondary)">
-          Loading profile...
-        </span>
-      </main>
-    );
+    return <Loading />;
   }
 
   if (error) {
     return (
       <main className="flex min-h-screen items-center justify-center px-6">
-        <span className="text-[14px] text-red-500">{error}</span>
+        <span className="text-[14px] text-red-500">
+          {error}
+        </span>
       </main>
     );
   }
@@ -126,7 +162,18 @@ function Profile() {
         xl:px-12
       "
     >
-      <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-[230px_minmax(0,1fr)] xl:grid-cols-[294px_minmax(0,1fr)] 2xl:grid-cols-[358px_minmax(0,1fr)] 2xl:gap-8">
+      <div
+        className="
+          grid
+          w-full
+          grid-cols-1
+          gap-6
+          lg:grid-cols-[230px_minmax(0,1fr)]
+          xl:grid-cols-[294px_minmax(0,1fr)]
+          2xl:grid-cols-[358px_minmax(0,1fr)]
+          2xl:gap-8
+        "
+      >
         {/* Left Sidebar */}
         <aside className="sticky top-24 hidden min-w-0 lg:block">
           <ProfileSidebar user={user} />
