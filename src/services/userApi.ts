@@ -40,6 +40,24 @@ export interface FollowResponse {
   data?: unknown;
 }
 
+interface FollowersResponse {
+  message: string;
+  success: boolean;
+  data?: {
+    createdAt: string;
+    follower: User;
+  }[];
+}
+
+interface FollowingsResponse {
+  message: string;
+  success: boolean;
+  data?: {
+    createdAt: string;
+    following: User;
+  }[];
+}
+
 /* =========================
    Profile
 ========================= */
@@ -213,6 +231,39 @@ export const toggleFollowUser = async (
 
   return response;
 };
+
+/* =========================
+   Followers
+========================= */
+
+export const getUserFollowers = async (
+  userId: string,
+): Promise<User[]> => {
+  const response = await api.get<FollowersResponse>(
+    `/api/users/${userId}/followers`,
+  );
+
+  return (response.data ?? []).map(
+    (item) => item.follower,
+  );
+};
+
+/* =========================
+   Following
+========================= */
+
+export const getUserFollowings = async (
+  userId: string,
+): Promise<User[]> => {
+  const response = await api.get<FollowingsResponse>(
+    `/api/users/${userId}/followings`,
+  );
+
+  return (response.data ?? []).map(
+    (item) => item.following,
+  );
+};
+
 
 /* =========================
    Profile Posts
