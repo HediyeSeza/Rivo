@@ -5,7 +5,6 @@ import ProfilePosts from "../../components/Profile/ProfilePosts/ProfilePosts";
 import ProfileSidebar from "../../components/ProfileSidebar/ProfileSidebar";
 import { getUserById, updateUserProfile } from "../../services/userApi";
 import { useAuth } from "../../context/AuthContext";
-
 import type { UpdateProfilePayload, User } from "../../services/userApi";
 
 function Profile() {

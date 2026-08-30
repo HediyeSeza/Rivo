@@ -11,7 +11,7 @@ import ProfilePhoto from "../ProfilePhoto/ProfilePhoto";
 import type { User } from "../../../types/user";
 import { uploadImage } from "../../../services/userApi";
 import type { UpdateProfilePayload } from "../../../services/userApi";
-
+import FollowListModal from "../../common/Modal/FollowListModal/FollowListModal";
 import { getUsernameFromEmail } from "../../../utils/getUsernameFromEmail";
 
 interface ProfileCardProps {
@@ -44,6 +44,11 @@ const ProfileCard = ({
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [isCropOpen, setIsCropOpen] = useState(false);
   const [isDeletePhotoOpen, setIsDeletePhotoOpen] = useState(false);
+
+  const [followListTab, setFollowListTab] = useState<
+    "followers" | "following" | null
+  >(null);
+
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [avatarError, setAvatarError] = useState<string | null>(null);
@@ -276,7 +281,11 @@ const ProfileCard = ({
         </div>
         {/* Stats */}
         <div className="mt-8 flex items-center justify-between text-center">
-          <div>
+          <button
+            type="button"
+            onClick={() => setFollowListTab("following")}
+            className="cursor-pointer"
+          >
             <p className="text-[18px] font-medium text-(--color-content-primary)">
               {followingCount}
             </p>
@@ -284,9 +293,13 @@ const ProfileCard = ({
             <span className="text-[14px] text-(--color-content-secondary)">
               Followings
             </span>
-          </div>
+          </button>
 
-          <div>
+          <button
+            type="button"
+            onClick={() => setFollowListTab("followers")}
+            className="cursor-pointer"
+          >
             <p className="text-[18px] font-medium text-(--color-content-primary)">
               {followersCount}
             </p>
@@ -294,7 +307,7 @@ const ProfileCard = ({
             <span className="text-[14px] text-(--color-content-secondary)">
               Followers
             </span>
-          </div>
+          </button>
 
           <div>
             <p className="text-[18px] font-medium text-(--color-content-primary)">
@@ -416,6 +429,17 @@ const ProfileCard = ({
             {getJoinedTime(user.createdAt)}{" "}
           </span>{" "}
         </div>{" "}
+        <div className="mt-3 flex items-center gap-2 text-(--color-content-secondary)">
+          <Icon name="Calendar" size={20} />
+
+          <span className="text-[14px]">{getJoinedTime(user.createdAt)}</span>
+        </div>
+        <FollowListModal
+          isOpen={followListTab !== null}
+          userId={user.id}
+          initialTab={followListTab ?? "followers"}
+          onClose={() => setFollowListTab(null)}
+        />
       </div>{" "}
     </div>
   );
