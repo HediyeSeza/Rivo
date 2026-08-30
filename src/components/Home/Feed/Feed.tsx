@@ -2,18 +2,18 @@ import { useEffect, useState } from "react";
 
 import PostCard from "../PostCard/PostCard";
 import CreatePost from "../CreatePost/CreatePost";
-
 import Loading from "../../loading/Loading";
-
-import SuccessModal from "../../common/Modal/SuccessModal";
-import ConfirmModal from "../../common/Modal/ConfirmModal";
+import ActionModal from "../../common/Modal/ActionModal/ActionModal";
 
 import { useAuth } from "../../../context/AuthContext";
 
-import { deletePost, getPosts, type Post } from "../../../services/postApi";
+import {
+  deletePost,
+  getPosts,
+  type Post,
+} from "../../../services/postApi";
 
 import { getUserById } from "../../../services/userApi";
-
 import { getUsernameFromEmail } from "../../../utils/getUsernameFromEmail";
 
 import Toast from "../../Toast/Toast";
@@ -37,16 +37,16 @@ const Feed = () => {
 
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+
   const [likeToast, setLikeToast] = useState<{
     id: number;
     message: string;
   } | null>(null);
+
   const [commentToast, setCommentToast] = useState<{
     id: number;
     message: string;
   } | null>(null);
-
-  const [postToDelete, setPostToDelete] = useState<PostWithAuthor | null>(null);
 
   const fetchPosts = async (showLoading = true) => {
     try {
@@ -66,35 +66,40 @@ const Feed = () => {
         uniqueAuthorIds.map((id) => getUserById(id)),
       );
 
-      const usersMap = new Map(users.map((user) => [user.id, user]));
+      const usersMap = new Map(
+        users.map((user) => [user.id, user]),
+      );
 
-      const postsWithAuthors: PostWithAuthor[] = postsData.flatMap((post) => {
-        const author = usersMap.get(post.authorId);
+      const postsWithAuthors: PostWithAuthor[] =
+        postsData.flatMap((post) => {
+          const author = usersMap.get(post.authorId);
 
-        if (!author) {
-          return [];
-        }
+          if (!author) {
+            return [];
+          }
 
-        return [
-          {
-            ...post,
-            author: {
-              id: author.id,
-              name: author.name,
-              email: author.email,
-              image: author.image ?? null,
-              avatar: author.avatar ?? null,
+          return [
+            {
+              ...post,
+              author: {
+                id: author.id,
+                name: author.name,
+                email: author.email,
+                image: author.image ?? null,
+                avatar: author.avatar ?? null,
+              },
             },
-          },
-        ];
-      });
+          ];
+        });
 
       setPosts(postsWithAuthors);
     } catch (error) {
       console.error("Failed to load posts:", error);
 
       setError(
-        error instanceof Error ? error.message : "Failed to load posts.",
+        error instanceof Error
+          ? error.message
+          : "Failed to load posts.",
       );
     } finally {
       if (showLoading) {
@@ -107,67 +112,98 @@ const Feed = () => {
     void fetchPosts();
   }, []);
 
+  // -----------------------------------------
+  // Post created
+  // -----------------------------------------
+
   const handlePostCreated = async () => {
     setSuccessMessage("Post created successfully");
     setShowSuccess(true);
 
-    window.setTimeout(() => {
-      setShowSuccess(false);
-    }, 5000);
-
     await fetchPosts(false);
   };
+
+  // -----------------------------------------
+  // Close success modal
+  // -----------------------------------------
+
+  const handleCloseSuccess = () => {
+    setShowSuccess(false);
+  };
+
+  // -----------------------------------------
+  // Comment added
+  // -----------------------------------------
 
   const handleCommentAdded = async (postId: string) => {
     try {
       await fetchPosts(false);
     } catch (error) {
-      console.error(`Failed to refresh post ${postId}:`, error);
+      console.error(
+        `Failed to refresh post ${postId}:`,
+        error,
+      );
     }
   };
+
+  // -----------------------------------------
+  // Like message
+  // -----------------------------------------
 
   const handleLikeMessage = (message: string) => {
-    setLikeToast({ id: Date.now(), message });
+    setLikeToast({
+      id: Date.now(),
+      message,
+    });
   };
+
+  // -----------------------------------------
+  // Comment message
+  // -----------------------------------------
 
   const handleCommentMessage = (message: string) => {
-    setCommentToast({ id: Date.now(), message });
+    setCommentToast({
+      id: Date.now(),
+      message,
+    });
   };
 
-  const handleDeletePost = async () => {
-    if (!postToDelete) {
-      return;
-    }
+  // -----------------------------------------
+  // Delete post
+  // -----------------------------------------
 
+  const handleDeletePost = async (postId: string) => {
     try {
-      await deletePost(postToDelete.id);
+      await deletePost(postId);
 
       setPosts((currentPosts) =>
-        currentPosts.filter((post) => post.id !== postToDelete.id),
+        currentPosts.filter((post) => post.id !== postId),
       );
-
-      setPostToDelete(null);
 
       setSuccessMessage("Post deleted successfully");
       setShowSuccess(true);
-
-      window.setTimeout(() => {
-        setShowSuccess(false);
-      }, 5000);
     } catch (error) {
       console.error("Failed to delete post:", error);
 
       setError(
-        error instanceof Error ? error.message : "Failed to delete post.",
+        error instanceof Error
+          ? error.message
+          : "Failed to delete post.",
       );
-
-      setPostToDelete(null);
     }
   };
+
+  // -----------------------------------------
+  // Loading
+  // -----------------------------------------
 
   if (isLoading) {
     return <Loading />;
   }
+
+  // -----------------------------------------
+  // Error
+  // -----------------------------------------
 
   if (error) {
     return (
@@ -189,6 +225,7 @@ const Feed = () => {
 
   return (
     <section className="w-full">
+
       {/* Toast */}
       {likeToast && (
         <Toast
@@ -207,16 +244,24 @@ const Feed = () => {
       )}
 
       <div className="mx-auto w-full">
-        {/* Success message */}
-        {showSuccess && <SuccessModal message={successMessage} />}
 
-        {/* Delete confirmation */}
-        {postToDelete && (
-          <ConfirmModal
-            onCancel={() => setPostToDelete(null)}
-            onConfirm={handleDeletePost}
-          />
-        )}
+<ActionModal
+  isOpen={showSuccess}
+  variant={
+    successMessage === "Post deleted successfully"
+      ? "danger"
+      : "success"
+  }
+  title={successMessage}
+  description={
+    successMessage === "Post created successfully"
+      ? "Your post has been published and is now visible to others."
+      : "Your post has been deleted successfully."
+  }
+  buttonText="Awesome!"
+  onAction={handleCloseSuccess}
+  onClose={handleCloseSuccess}
+/>
 
         {/* Create Post */}
         <CreatePost onPostCreated={handlePostCreated} />
@@ -239,7 +284,9 @@ const Feed = () => {
                 key={post.id}
                 postId={post.id}
                 name={post.author?.name ?? "User"}
-                username={getUsernameFromEmail(post.author?.email ?? "")}
+                username={getUsernameFromEmail(
+                  post.author?.email ?? "",
+                )}
                 createdAt={post.createdAt}
                 content={post.content}
                 likes={post._count?.likes ?? 0}
@@ -248,7 +295,9 @@ const Feed = () => {
                 likesData={post.likes ?? []}
                 commentsData={post.comments ?? []}
                 showDelete={post.author?.id === user?.id}
-                onDelete={() => setPostToDelete(post)}
+                onDelete={() => {
+                  void handleDeletePost(post.id);
+                }}
                 onLikeMessage={handleLikeMessage}
                 onCommentAdded={handleCommentAdded}
                 onCommentMessage={handleCommentMessage}
