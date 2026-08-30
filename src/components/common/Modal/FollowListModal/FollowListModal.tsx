@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
+
 import { useAuth } from "../../../../context/AuthContext";
+
 import Avatar from "../../Avatar/Avatar";
+
 import FollowUserButton from "../../../Profile/ProfileConnections/FollowUserButton";
+
+import EmptyState from "../../EmptyState/EmptyState";
+
+import Loading from "../../../loading/Loading";
 
 import {
   getUserFollowers,
@@ -26,11 +33,12 @@ const FollowListModal = ({
   onClose,
 }: FollowListModalProps) => {
   const { user: authUser } = useAuth();
-  const [activeTab, setActiveTab] = useState<FollowTab>(initialTab);
 
+  const [activeTab, setActiveTab] = useState<FollowTab>(initialTab);
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
   const [followedUserIds, setFollowedUserIds] = useState<Set<string>>(
     new Set(),
   );
@@ -52,9 +60,14 @@ const FollowListModal = ({
       try {
         const followingUsers = await getUserFollowings(authUser.id);
 
-        setFollowedUserIds(new Set(followingUsers.map((user) => user.id)));
+        setFollowedUserIds(
+          new Set(followingUsers.map((user) => user.id)),
+        );
       } catch (error) {
-        console.error("Failed to load current user followings:", error);
+        console.error(
+          "Failed to load current user followings:",
+          error,
+        );
       }
     };
 
@@ -66,32 +79,69 @@ const FollowListModal = ({
       return;
     }
 
+    let isCancelled = false;
+
     const loadUsers = async () => {
       try {
         setIsLoading(true);
         setError(null);
+        setUsers([]);
+
+        const startTime = Date.now();
 
         const data =
           activeTab === "followers"
             ? await getUserFollowers(userId)
             : await getUserFollowings(userId);
 
+        /*
+         * حتی اگر API سریع جواب بدهد،
+         * Loading حداقل 700ms نمایش داده می‌شود.
+         */
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(700 - elapsedTime, 0);
+
+        if (remainingTime > 0) {
+          await new Promise((resolve) => {
+            window.setTimeout(resolve, remainingTime);
+          });
+        }
+
+        if (isCancelled) {
+          return;
+        }
+
         setUsers(data);
       } catch (error) {
+        if (isCancelled) {
+          return;
+        }
+
         console.error("Failed to load follow list:", error);
 
         setError(
-          error instanceof Error ? error.message : "Failed to load users.",
+          error instanceof Error
+            ? error.message
+            : "Failed to load users.",
         );
       } finally {
-        setIsLoading(false);
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
       }
     };
 
     void loadUsers();
+
+    return () => {
+      isCancelled = true;
+    };
   }, [isOpen, activeTab, userId]);
 
-  const handleFollowChange = (changedUserId: string, isFollowing: boolean) => {
+  const handleFollowChange = (
+    changedUserId: string,
+    isFollowing: boolean,
+  ) => {
     setFollowedUserIds((currentIds) => {
       const nextIds = new Set(currentIds);
 
@@ -213,6 +263,7 @@ const FollowListModal = ({
             `}
           >
             Followers
+
             {activeTab === "followers" && (
               <span
                 className="
@@ -247,6 +298,7 @@ const FollowListModal = ({
             `}
           >
             Following
+
             {activeTab === "following" && (
               <span
                 className="
@@ -265,28 +317,30 @@ const FollowListModal = ({
         </div>
 
         {/* Content */}
-        <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="min-h-0 flex-1">
+          {/* Loading */}
           {isLoading && (
             <div
               className="
                 flex
                 h-full
+                min-h-[300px]
                 items-center
                 justify-center
                 px-5
-                text-[14px]
-                text-[var(--color-content-secondary)]
               "
             >
-              Loading...
+              <Loading />
             </div>
           )}
 
+          {/* Error */}
           {!isLoading && error && (
             <div
               className="
                 flex
                 h-full
+                min-h-[300px]
                 items-center
                 justify-center
                 px-5
@@ -299,40 +353,43 @@ const FollowListModal = ({
             </div>
           )}
 
+          {/* Empty */}
           {!isLoading && !error && users.length === 0 && (
-            <div
-              className="
-                  flex
-                  h-full
-                  items-center
-                  justify-center
-                  px-5
-                  text-center
-                  text-[14px]
-                  text-[var(--color-content-secondary)]
-                "
-            >
-              {activeTab === "followers"
-                ? "No followers yet."
-                : "Not following anyone yet."}
-            </div>
+            <EmptyState
+              variant={
+                activeTab === "followers"
+                  ? "followers"
+                  : "following"
+              }
+              title={
+                activeTab === "followers"
+                  ? "No followers yet"
+                  : "Not following anyone yet"
+              }
+              description={
+                activeTab === "followers"
+                  ? "When people follow you, they’ll appear here."
+                  : "People you follow will appear here."
+              }
+            />
           )}
 
+          {/* Users */}
           {!isLoading && !error && users.length > 0 && (
             <div className="flex flex-col">
               {users.map((user) => (
                 <div
                   key={user.id}
                   className="
-                      flex
-                      items-center
-                      gap-3
-                      border-b
-                      border-[var(--color-border)]
-                      px-5
-                      py-3
-                      last:border-b-0
-                    "
+                    flex
+                    items-center
+                    gap-3
+                    border-b
+                    border-[var(--color-border)]
+                    px-5
+                    py-3
+                    last:border-b-0
+                  "
                 >
                   <Avatar
                     src={user.image ?? undefined}
@@ -343,21 +400,21 @@ const FollowListModal = ({
                   <div className="min-w-0 flex-1">
                     <p
                       className="
-                          truncate
-                          text-[14px]
-                          font-semibold
-                          text-[var(--color-content-primary)]
-                        "
+                        truncate
+                        text-[14px]
+                        font-semibold
+                        text-[var(--color-content-primary)]
+                      "
                     >
                       {user.name}
                     </p>
 
                     <p
                       className="
-                          truncate
-                          text-[12px]
-                          text-[var(--color-content-secondary)]
-                        "
+                        truncate
+                        text-[12px]
+                        text-[var(--color-content-secondary)]
+                      "
                     >
                       @{user.username ?? user.email.split("@")[0]}
                     </p>

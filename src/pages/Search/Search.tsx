@@ -1,30 +1,29 @@
 import { useEffect, useState } from "react";
 
-import {
-  useNavigate,
-  useSearchParams,
-} from "react-router-dom";
-
-
+import { useSearchParams } from "react-router-dom";
 
 import SearchResults from "../../components/Search/SearchResults/SearchResults";
+
+import EmptyState from "../../components/common/EmptyState/EmptyState";
+
+import Loading from "../../components/loading/Loading";
 
 import { searchUsers } from "../../services/userApi";
 
 import type { User } from "../../types/user";
 
 const Search = () => {
-  const navigate = useNavigate();
 
-  const [searchParams, setSearchParams] =
-    useSearchParams();
+const [searchParams] = useSearchParams();
 
   // Query همیشه مستقیماً از URL خوانده می‌شود
   const query = searchParams.get("q") ?? "";
 
   const [users, setUsers] = useState<User[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] =
+    useState(false);
+  const [error, setError] =
+    useState<string | null>(null);
 
   useEffect(() => {
     const trimmedQuery = query.trim();
@@ -39,38 +38,45 @@ const Search = () => {
 
     let isCancelled = false;
 
-    const timeoutId = window.setTimeout(async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
+    const timeoutId = window.setTimeout(
+      async () => {
+        try {
+          setIsLoading(true);
+          setError(null);
 
-        const results = await searchUsers(trimmedQuery);
+          const results =
+            await searchUsers(trimmedQuery);
 
-        if (isCancelled) {
-          return;
+          if (isCancelled) {
+            return;
+          }
+
+          setUsers(results);
+        } catch (error) {
+          if (isCancelled) {
+            return;
+          }
+
+          console.error(
+            "Failed to search users:",
+            error,
+          );
+
+          setUsers([]);
+
+          setError(
+            error instanceof Error
+              ? error.message
+              : "Something went wrong while searching.",
+          );
+        } finally {
+          if (!isCancelled) {
+            setIsLoading(false);
+          }
         }
-
-        setUsers(results);
-      } catch (error) {
-        if (isCancelled) {
-          return;
-        }
-
-        console.error("Failed to search users:", error);
-
-        setUsers([]);
-
-        setError(
-          error instanceof Error
-            ? error.message
-            : "Something went wrong while searching.",
-        );
-      } finally {
-        if (!isCancelled) {
-          setIsLoading(false);
-        }
-      }
-    }, 400);
+      },
+      400,
+    );
 
     return () => {
       isCancelled = true;
@@ -78,48 +84,20 @@ const Search = () => {
     };
   }, [query]);
 
-  const handleSearchChange = (value: string) => {
-    const trimmedValue = value.trimStart();
-
-    // اگر سرچ کاملاً پاک شد، برگرد به Home
-    if (!trimmedValue.trim()) {
-      setUsers([]);
-      setError(null);
-      setIsLoading(false);
-      setSearchParams({});
-      navigate("/");
-      return;
-    }
-
-    setSearchParams({
-      q: trimmedValue,
-    });
-  };
-
-  const handleClear = () => {
-    setUsers([]);
-    setError(null);
-    setIsLoading(false);
-    setSearchParams({});
-    navigate("/");
-  };
-
   return (
     <main
       className="
         min-h-screen
-    bg-[var(--color-background-primary)]
-    px-4
-    pt-24
-    pb-6
-    text-[var(--color-content-primary)]
-    sm:px-6
-    lg:px-8
+        bg-[var(--color-background-primary)]
+        px-4
+        pt-24
+        pb-6
+        text-[var(--color-content-primary)]
+        sm:px-6
+        lg:px-8
       "
     >
       <div className="mx-auto w-full max-w-[900px]">
-        
-
         {/* Search Results */}
         {query.trim() && (
           <section>
@@ -145,12 +123,62 @@ const Search = () => {
               </p>
             </div>
 
-            <SearchResults
-              users={users}
-              query={query}
-              isLoading={isLoading}
-              error={error}
-            />
+            {/* Loading */}
+            {isLoading && (
+              <div
+                className="
+                  flex
+                  min-h-[280px]
+                  w-full
+                  items-center
+                  justify-center
+                "
+              >
+                <Loading />
+              </div>
+            )}
+
+            {/* Error */}
+            {!isLoading && error && (
+              <div
+                className="
+                  flex
+                  min-h-[280px]
+                  w-full
+                  items-center
+                  justify-center
+                  px-6
+                  text-center
+                  text-[14px]
+                  text-red-500
+                "
+              >
+                {error}
+              </div>
+            )}
+
+            {/* Empty Search */}
+            {!isLoading &&
+              !error &&
+              users.length === 0 && (
+                <EmptyState
+                  variant="search"
+                  title="No users found"
+                  description={`We couldn't find any users matching "${query}".`}
+                />
+              )}
+
+            {/* Results */}
+            {!isLoading &&
+              !error &&
+              users.length > 0 && (
+                <SearchResults
+                  users={users}
+                  query={query}
+                  isLoading={false}
+                  error={null}
+                />
+              )}
           </section>
         )}
       </div>
