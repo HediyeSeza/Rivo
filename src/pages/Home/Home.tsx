@@ -12,30 +12,26 @@ import ProfileSidebar from "../../components/ProfileSidebar/ProfileSidebar";
 import { useAuth } from "../../context/AuthContext";
 
 const Home = () => {
-  const {
-    user,
-    isAuthenticated,
-    updateUser
-  } = useAuth();
+  const { user, isAuthenticated, updateUser } = useAuth();
   useEffect(() => {
-  if (!user?.id) {
-    return;
-  }
+    if (!user?.id) {
+      return;
+    }
 
-  let cancelled = false;
+    let cancelled = false;
 
-  getUserById(user.id)
-    .then((freshUser) => {
-      if (!cancelled) {
-        updateUser(freshUser);
-      }
-    })
-    .catch(() => {});
+    getUserById(user.id)
+      .then((freshUser) => {
+        if (!cancelled) {
+          updateUser(freshUser);
+        }
+      })
+      .catch(() => {});
 
-  return () => {
-    cancelled = true;
-  };
-}, [user?.id]);
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
 
   return (
     <div className="min-h-screen w-full pt-24">
@@ -88,22 +84,21 @@ const Home = () => {
         </main>
 
         {/* Right Sidebar */}
-        {isAuthenticated && (
-          <aside
-            className="
-              sticky
-              top-24
-              hidden
-              w-[230px]
-              shrink-0
-              lg:block
-              xl:w-[294px]
-              2xl:w-[358px]
-            "
-          >
-            <RecommendedUsers />
-          </aside>
-        )}
+        <aside
+          className={`
+            sticky
+            top-24
+            hidden
+            w-[230px]
+            shrink-0
+            lg:block
+            xl:w-[294px]
+            2xl:w-[358px]
+            ${!isAuthenticated ? "invisible" : ""}
+          `}
+        >
+          <RecommendedUsers />
+        </aside>
       </div>
     </div>
   );
