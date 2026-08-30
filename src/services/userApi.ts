@@ -238,16 +238,30 @@ export const getUserPosts = async (
    Profile Likes
 ========================= */
 
+interface LikedPostResponse {
+  id: string;
+  userId: string;
+  postId: string;
+  createdAt: string;
+  post: Post;
+}
+
+interface LikedPostsResponse {
+  message?: string;
+  success?: boolean;
+  data?: LikedPostResponse[];
+}
+
 export const getUserLikedPosts = async (
   userId: string,
 ): Promise<ProfilePost[]> => {
   const response = await api.get<
-    PostsResponse | ProfilePost[]
+    LikedPostsResponse | LikedPostResponse[]
   >(`/api/users/${userId}/likes`);
 
-  if (Array.isArray(response)) {
-    return response;
-  }
+  const likedPosts = Array.isArray(response)
+    ? response
+    : response.data ?? [];
 
-  return response.data ?? [];
+  return likedPosts.map((like) => like.post);
 };

@@ -13,6 +13,7 @@ interface LikeButtonProps {
   }[];
   likesCount?: number;
   onMessage?: (message: string) => void;
+  onLikeChange?: (postId: string, isLiked: boolean) => void;
 }
 
 const LIKED_POSTS_KEY = "rivo_liked_posts";
@@ -50,7 +51,9 @@ const LikeButton = ({
   likes = [],
   likesCount = 0,
   onMessage,
+  onLikeChange,
 }: LikeButtonProps) => {
+
   const { user } = useAuth();
 
   const [isLiked, setIsLiked] = useState(false);
@@ -109,6 +112,7 @@ const LikeButton = ({
         saveLikedPosts(user.id, likedPosts);
 
         setIsLiked(true);
+        onLikeChange?.(postId, true);
         setCount((currentCount) => currentCount + 1);
       } else {
         // Remove this post from liked posts.
@@ -119,6 +123,7 @@ const LikeButton = ({
         saveLikedPosts(user.id, updatedLikedPosts);
 
         setIsLiked(false);
+        onLikeChange?.(postId, false);
         setCount((currentCount) =>
           Math.max(0, currentCount - 1),
         );
