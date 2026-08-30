@@ -7,22 +7,19 @@ import { toggleFollowUser } from "../../../services/userApi";
 interface FollowUserButtonProps {
   userId: string;
   initialFollowing?: boolean;
-  onFollowChange?: (
-    userId: string,
-    isFollowing: boolean,
-  ) => void;
+  isFollower?: boolean;
+  onFollowChange?: (userId: string, isFollowing: boolean) => void;
 }
 
 const FollowUserButton = ({
   userId,
   initialFollowing = false,
+  isFollower = false,
   onFollowChange,
 }: FollowUserButtonProps) => {
-  const [isFollowing, setIsFollowing] =
-    useState(initialFollowing);
+  const [isFollowing, setIsFollowing] = useState(initialFollowing);
 
-  const [isLoading, setIsLoading] =
-    useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleToggleFollow = async () => {
     if (isLoading) {
@@ -32,8 +29,7 @@ const FollowUserButton = ({
     try {
       setIsLoading(true);
 
-      const response =
-        await toggleFollowUser(userId);
+      const response = await toggleFollowUser(userId);
 
       if (!response.success) {
         return;
@@ -43,15 +39,9 @@ const FollowUserButton = ({
 
       setIsFollowing(nextFollowing);
 
-      onFollowChange?.(
-        userId,
-        nextFollowing,
-      );
+      onFollowChange?.(userId, nextFollowing);
     } catch (error) {
-      console.error(
-        "Failed to toggle follow:",
-        error,
-      );
+      console.error("Failed to toggle follow:", error);
     } finally {
       setIsLoading(false);
     }
@@ -60,11 +50,7 @@ const FollowUserButton = ({
   return (
     <Button
       type="button"
-      variant={
-        isFollowing
-          ? "secondary"
-          : "primary"
-      }
+      variant={isFollowing ? "secondary" : "primary"}
       onClick={handleToggleFollow}
       disabled={isLoading}
       className="
@@ -77,7 +63,9 @@ const FollowUserButton = ({
           ? "..."
           : isFollowing
             ? "Following"
-            : "Follow"}
+            : isFollower
+              ? "Follow back"
+              : "Follow"}
       </span>
     </Button>
   );
