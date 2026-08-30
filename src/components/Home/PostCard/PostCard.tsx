@@ -31,6 +31,7 @@ interface PostCardProps {
   commentsData: PostComment[];
 
   onLikeMessage?: (message: string) => void;
+  onLikeChange?: (postId: string, isLiked: boolean) => void;
 
   onCommentAdded?: (postId: string) => void | Promise<void>;
   onCommentMessage?: (message: string) => void;
@@ -88,6 +89,7 @@ const PostCard = ({
   likesData,
   commentsData,
   onLikeMessage,
+  onLikeChange,
   onCommentAdded,
   onCommentMessage,
   showDelete = false,
@@ -205,6 +207,7 @@ const PostCard = ({
           likes={likesData}
           likesCount={likes}
           onMessage={onLikeMessage}
+          onLikeChange={onLikeChange}
         />
 
         {/* Comment */}
