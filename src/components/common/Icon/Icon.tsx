@@ -51,6 +51,24 @@ import sendLight from "../../../assets/icons/Light/Send.svg";
 import tashDark from "../../../assets/icons/Dark/Tash.svg";
 import tashLight from "../../../assets/icons/Light/Tash.svg";
 
+import heartFillDark from "../../../assets/icons/Dark/heart-fill.svg";
+import heartFillLight from "../../../assets/icons/Light/heart-fill.svg";
+
+import replyDark from "../../../assets/icons/Dark/arrow-Reply.svg";
+import replyLight from "../../../assets/icons/Light/arrow-Reply.svg";
+
+import cameraDark from "../../../assets/icons/Dark/camera.svg";
+import cameraLight from "../../../assets/icons/Light/camera.svg";
+
+import closeDark from "../../../assets/icons/Dark/Close.svg";
+import closeLight from "../../../assets/icons/Light/Close.svg";
+
+import searchDark from "../../../assets/icons/Dark/search.svg";
+import searchLight from "../../../assets/icons/Light/search.svg";
+
+import chatFillDark from "../../../assets/icons/Dark/fill-chat.svg";
+import chatFillLight from "../../../assets/icons/Light/fill-chat.svg";
+
 const icons = {
   Chat: {
     dark: chatDark,
@@ -62,10 +80,31 @@ const icons = {
     light: editLight,
   },
 
-  Heart: {
-    dark: heartDark,
-    light: heartLight,
+  Search: {
+    dark: searchDark,
+    light: searchLight,
   },
+  Reply: {
+    dark: replyDark,
+    light: replyLight,
+  },
+  ChatFill: {
+    dark: chatFillDark,
+    light: chatFillLight,
+  },
+
+  Close: {
+    dark: closeDark,
+    light: closeLight,
+  },
+
+  Camera: {
+    dark: cameraDark,
+    light: cameraLight,
+  },
+
+  Heart: { dark: heartDark, light: heartLight },
+  HeartFill: { dark: heartFillDark, light: heartFillLight },
 
   Home: {
     dark: homeDark,

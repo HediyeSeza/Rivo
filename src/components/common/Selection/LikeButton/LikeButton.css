@@ -1,0 +1,4 @@
+.like-button__liked img {
+  filter: brightness(0) saturate(100%) invert(18%) sepia(96%) saturate(4375%)
+    hue-rotate(349deg) brightness(93%) contrast(115%);
+}

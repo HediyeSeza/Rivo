@@ -61,7 +61,7 @@ const NotificationCard = ({
         ${
           read
             ? "bg-white dark:bg-[var(--color-card)]"
-            : "bg-gray-100 dark:bg-[#2a2a2a]"
+            : "bg-[#f0f0f0] dark:bg-[#252525]"
         }
       `}
     >

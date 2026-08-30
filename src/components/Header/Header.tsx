@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import Logo from "../common/Logo/Logo";
 
@@ -9,6 +9,8 @@ import Icon from "../common/Icon/Icon";
 import Button from "../common/Button/Button";
 
 import MobileMenu from "./MobileMenu/MobileMenu";
+
+import SearchBar from "../Search/SearchBar/SearchBar";
 
 import { useTheme } from "../../context/ThemeContext";
 
@@ -23,6 +25,56 @@ function Header() {
 
   const navigate = useNavigate();
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const searchQuery = searchParams.get("q") ?? "";
+
+  const handleSearchChange = (value: string) => {
+    const trimmedValue = value.trimStart();
+
+    /*
+     * Empty search
+     *
+     * اگر کاربر تمام متن سرچ را پاک کرد،
+     * query از URL حذف می‌شود و به Home برمی‌گردیم.
+     */
+    if (!trimmedValue.trim()) {
+      setSearchParams({});
+      navigate("/");
+      return;
+    }
+
+    /*
+     * If we are already on the search page,
+     * only update the query parameter.
+     */
+    if (window.location.pathname === "/search") {
+      setSearchParams({
+        q: trimmedValue,
+      });
+      return;
+    }
+
+    /*
+     * If we are on another page,
+     * navigate to search and pass the query
+     * in the same navigation.
+     */
+    navigate({
+      pathname: "/search",
+      search: `?q=${encodeURIComponent(trimmedValue)}`,
+    });
+  };
+
+  const handleSearchClear = () => {
+    /*
+     * Clear search query from URL
+     * and return to Home.
+     */
+    setSearchParams({});
+    navigate("/");
+  };
+
   const handleSignOut = async () => {
     await signOut();
     navigate("/login");
@@ -31,44 +83,137 @@ function Header() {
   return (
     <header
       className="
-        fixed left-0 right-0 top-0 z-40
-        flex h-16 w-full items-center justify-between
-        border-b border-white/30
-        bg-white/20
-        backdrop-blur-lg
+        fixed
+        left-0
+        right-0
+        top-0
+        z-40
+        flex
+        h-16
+        w-full
+        items-center
+        gap-4
+        
+        px-4
         shadow-sm
-        transition-colors duration-300
+        backdrop-blur-lg
+        transition-all
+        duration-300
         dark:border-white/10
         dark:bg-[#0A0A0A99]
+        sm:px-5
+        lg:px-6
       "
     >
       {/* Logo */}
       <button
         type="button"
         onClick={() => navigate("/")}
-        className="flex cursor-pointer items-center pl-2"
+        className="
+          flex
+          shrink-0
+          cursor-pointer
+          items-center
+          gap-1
+        "
         aria-label="Go to home"
       >
         <Logo />
 
-        <h1 className="text-xl font-bold text-black dark:text-white">
+        <h1
+          className="
+            text-xl
+            font-bold
+            text-[var(--color-content-primary)]
+          "
+        >
           Rivo
         </h1>
       </button>
 
-      <nav className="relative mr-2 flex items-center gap-4">
+      {/* Desktop Search */}
+      <div
+        className="
+          mx-auto
+          hidden
+          min-w-0
+          flex-1
+          md:block
+          md:max-w-[420px]
+          lg:max-w-[580px]
+          xl:max-w-[620px]
+          2xl:max-w-[680px]
+        "
+      >
+        <SearchBar
+          value={searchQuery}
+          onChange={handleSearchChange}
+          onClear={handleSearchClear}
+        />
+      </div>
+
+      {/* Navigation */}
+      <nav
+        className="
+          ml-auto
+          flex
+          shrink-0
+          items-center
+          gap-1
+          sm:gap-2
+          lg:gap-3
+        "
+      >
+        {/* Mobile Search */}
+        <button
+          type="button"
+          onClick={() => navigate("/search")}
+          aria-label="Search"
+          className="
+            flex
+            h-10
+            w-10
+            shrink-0
+            items-center
+            justify-center
+            rounded-xl
+            text-[var(--color-content-primary)]
+            transition
+            duration-200
+            hover:bg-black/5
+            dark:hover:bg-white/5
+            md:hidden
+          "
+        >
+          <Icon name="Search" size={20} />
+        </button>
+
         {/* Theme Toggle */}
-        <div className="rounded-xl border-2 border-[#E5E5E5] dark:border-[#333333]">
+        <div
+          className="
+            shrink-0
+            rounded-xl
+            border
+            border-[var(--color-border)]
+          "
+        >
           <button
             type="button"
             onClick={toggleTheme}
+            aria-label="Toggle theme"
             className="
-              flex h-10 w-10 cursor-pointer items-center justify-center
+              flex
+              h-10
+              w-10
+              shrink-0
+              cursor-pointer
+              items-center
+              justify-center
               rounded-xl
-              bg-[#fefefe]
-              transition-all duration-200
+              bg-[var(--color-background-secondary)]
+              transition-all
+              duration-200
               hover:bg-black/5
-              dark:bg-[#212121]
               dark:hover:bg-white/5
             "
           >

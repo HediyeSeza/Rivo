@@ -3,6 +3,7 @@ import { useState } from "react";
 import Avatar from "../../common/Avatar/Avatar";
 import Button from "../../common/Button/Button";
 import { useTheme } from "../../../context/ThemeContext";
+import { useAuth } from "../../../context/AuthContext";
 
 import avatarImage from "../../../assets/Avatar/a.png";
 
@@ -17,10 +18,13 @@ interface CreatePostProps {
 
 const CreatePost = ({ onPostCreated }: CreatePostProps) => {
   const { theme } = useTheme();
+  const { user } = useAuth();
 
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const userAvatar = user?.image || avatarImage;
 
   const handleCreatePost = async () => {
     const trimmedContent = content.trim();
@@ -29,7 +33,6 @@ const CreatePost = ({ onPostCreated }: CreatePostProps) => {
       return;
     }
 
-    // Validation
     if (trimmedContent.length < 5) {
       setError("Content is too short, minimum 5 characters");
       return;
@@ -43,14 +46,14 @@ const CreatePost = ({ onPostCreated }: CreatePostProps) => {
         content: trimmedContent,
       });
 
-      setContent("");      
-      
+      setContent("");
 
-      // Refresh Feed from backend
+      window.dispatchEvent(new Event("posts:changed"));
+
       await onPostCreated();
+      
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create post.");
-      
     } finally {
       setIsSubmitting(false);
     }
@@ -58,7 +61,6 @@ const CreatePost = ({ onPostCreated }: CreatePostProps) => {
 
   return (
     <>
-
       <section
         className="
           mb-6
@@ -75,9 +77,12 @@ const CreatePost = ({ onPostCreated }: CreatePostProps) => {
           dark:shadow-[0_2px_8px_rgba(0,0,0,0.25)]
         "
       >
-        {/* Top */}
         <div className="flex items-center gap-3">
-          <Avatar src={avatarImage} alt="User avatar" size={40} />
+          <Avatar
+            src={userAvatar}
+            alt={user?.name || "User avatar"}
+            size={40}
+          />
 
           <textarea
             placeholder="What's on your mind?"
@@ -106,33 +111,30 @@ const CreatePost = ({ onPostCreated }: CreatePostProps) => {
           />
         </div>
 
-        {/* Error */}
         <div className="relative mt-20">
           {error ? (
             <p
               className="
-        absolute
-        bottom-2
-        left-0
-        font-normal
-        text-[12px]
-        text-red-500
-      "
+                absolute
+                bottom-2
+                left-0
+                font-normal
+                text-[12px]
+                text-red-500
+              "
             >
               {error}
             </p>
           ) : null}
 
-          {/* Divider */}
           <div
             className="
-      border-t
-      border-[var(--color-border)]
-    "
+              border-t
+              border-[var(--color-border)]
+            "
           />
         </div>
 
-        {/* Post Button */}
         <div className="mt-4 flex justify-end">
           <Button
             type="button"

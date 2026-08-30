@@ -1,25 +1,43 @@
 import { api } from "./api";
 
-import type { AuthResponse, User } from "../types/user";
+import type {
+  AuthResponse,
+  User,
+} from "../types/user";
 
 export interface LoginPayload {
   email: string;
   password: string;
 }
 
-export interface RegisterPayload extends LoginPayload {
+export interface RegisterPayload
+  extends LoginPayload {
   name: string;
 }
 
 export const getUser = (
   response: AuthResponse | User,
 ): User => {
-  if ("user" in response && response.user) {
-    return response.user;
+  if (
+    typeof response !== "object" ||
+    response === null
+  ) {
+    throw new Error(
+      "Invalid authentication response",
+    );
   }
 
   if ("data" in response && response.data) {
-    return response.data;
+    if (
+      "user" in response.data &&
+      response.data.user
+    ) {
+      return response.data.user;
+    }
+  }
+
+  if ("user" in response && response.user) {
+    return response.user;
   }
 
   return response as User;
@@ -28,20 +46,19 @@ export const getUser = (
 export const login = async (
   payload: LoginPayload,
 ) => {
-  const response = await api.post<
-    AuthResponse | User
-  >(
-    "/api/authentication/login",
-    payload,
-  );
-
-  const data = response.data;
+  const response =
+    await api.post<AuthResponse | User>(
+      "/api/authentication/login",
+      payload,
+    );
 
   return {
-    user: getUser(data),
+    user: getUser(response),
+
     token:
-      "token" in data
-        ? data.token || data.accessToken
+      "token" in response
+        ? response.token ||
+          response.accessToken
         : undefined,
   };
 };
@@ -49,31 +66,27 @@ export const login = async (
 export const register = async (
   payload: RegisterPayload,
 ) => {
-  const response = await api.post<
-    AuthResponse | User
-  >(
-    "/api/authentication/register",
-    payload,
-  );
-
-  const data = response.data;
+  const response =
+    await api.post<AuthResponse | User>(
+      "/api/authentication/register",
+      payload,
+    );
 
   return {
-    user: getUser(data),
+    user: getUser(response),
+
     token:
-      "token" in data
-        ? data.token || data.accessToken
+      "token" in response
+        ? response.token ||
+          response.accessToken
         : undefined,
   };
 };
 
-export const getSession = async () => {
-  const response = await api.get<
-    AuthResponse | User
-  >("/api/authentication/session");
-
-  return response.data;
-};
+export const getSession = () =>
+  api.get<AuthResponse | User>(
+    "/api/authentication/session",
+  );
 
 export const logout = () =>
   api.post<void>(

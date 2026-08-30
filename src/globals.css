@@ -63,30 +63,32 @@ ol {
   min-height: 100vh;
 }
 
-.api-error-banner {
-  position: fixed;
-  z-index: 1000;
-  top: 1rem;
-  left: 50%;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  max-width: calc(100% - 2rem);
-  padding: 0.75rem 1rem;
-  border: 1px solid rgb(239 68 68 / 35%);
-  border-radius: var(--radius-sm);
-  background: var(--color-card);
-  color: var(--color-content-primary);
-  box-shadow: 0 8px 24px rgb(0 0 0 / 12%);
-  transform: translateX(-50%);
+@keyframes toast-slide-in {
+  from {
+    transform: translate(-50%, -20px);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
 }
 
-.api-error-banner button {
-  flex: 0 0 auto;
-  padding: 0 0.25rem;
-  background: transparent;
-  color: var(--color-content-secondary);
-  cursor: pointer;
-  font-size: 1.25rem;
-  line-height: 1;
+@keyframes toast-slide-out {
+  from {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+  to {
+    transform: translate(-50%, -20px);
+    opacity: 0;
+  }
+}
+
+.toast-enter {
+  animation: toast-slide-in 250ms ease-out forwards;
+}
+
+.toast-exit {
+  animation: toast-slide-out 250ms ease-in forwards;
 }

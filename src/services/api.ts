@@ -11,7 +11,6 @@ export class ApiError extends Error {
 
   constructor(message: string, status: number) {
     super(message);
-
     this.name = "ApiError";
     this.status = status;
   }
@@ -22,28 +21,24 @@ const request = async <T>(
   options: RequestInit = {},
 ): Promise<T> => {
   const token = localStorage.getItem("rivo_token");
+  const isFormData = options.body instanceof FormData;
+  const headers = new Headers(options.headers);
 
-  let response: Response;
-
-  try {
-    response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      ...options,
-      headers: {
-        "Content-Type": "application/json",
-
-        ...(token
-          ? {
-              Authorization: `Bearer ${token}`,
-            }
-          : {}),
-
-        ...options.headers,
-      },
-    });
-  } catch (error) {
-    notifyApiError();
-    throw error;
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
   }
+
+  if (isFormData) {
+    headers.delete("Content-Type");
+  } else if (!headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
+
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    ...options,
+    credentials: "include",
+    headers,
+  });
 
   if (!response.ok) {
     notifyApiError();
@@ -69,7 +64,23 @@ const request = async <T>(
     return undefined as T;
   }
 
-  return response.json();
+  const raw = await response.text();
+
+  if (!raw) {
+    return undefined as T;
+  }
+
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    return raw as T;
+  }
+};
+
+const serializeBody = (body?: unknown): BodyInit | undefined => {
+  if (body === undefined) return undefined;
+  if (body instanceof FormData) return body;
+  return JSON.stringify(body);
 };
 
 export const api = {
@@ -81,13 +92,19 @@ export const api = {
   post: <T>(endpoint: string, body?: unknown) =>
     request<T>(endpoint, {
       method: "POST",
-      body: body ? JSON.stringify(body) : undefined,
+      body: serializeBody(body),
+    }),
+
+  put: <T>(endpoint: string, body?: unknown) =>
+    request<T>(endpoint, {
+      method: "PUT",
+      body: serializeBody(body),
     }),
 
   patch: <T>(endpoint: string, body?: unknown) =>
     request<T>(endpoint, {
       method: "PATCH",
-      body: body ? JSON.stringify(body) : undefined,
+      body: serializeBody(body),
     }),
 
   delete: <T>(endpoint: string) =>

@@ -1,3 +1,6 @@
+import { useEffect } from "react";
+import { getUserById } from "../../services/userApi";
+
 import Feed from "../../components/Home/Feed/Feed";
 
 import WelcomeSection from "../../components/WelcomeSection/WelcomeSection";
@@ -9,10 +12,26 @@ import ProfileSidebar from "../../components/ProfileSidebar/ProfileSidebar";
 import { useAuth } from "../../context/AuthContext";
 
 const Home = () => {
-  const {
-    user,
-    isAuthenticated,
-  } = useAuth();
+  const { user, isAuthenticated, updateUser } = useAuth();
+  useEffect(() => {
+    if (!user?.id) {
+      return;
+    }
+
+    let cancelled = false;
+
+    getUserById(user.id)
+      .then((freshUser) => {
+        if (!cancelled) {
+          updateUser(freshUser);
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
 
   return (
     <div className="min-h-screen w-full pt-24">
@@ -66,7 +85,7 @@ const Home = () => {
 
         {/* Right Sidebar */}
         <aside
-          className="
+          className={`
             sticky
             top-24
             hidden
@@ -75,7 +94,8 @@ const Home = () => {
             lg:block
             xl:w-[294px]
             2xl:w-[358px]
-          "
+            ${!isAuthenticated ? "invisible" : ""}
+          `}
         >
           <RecommendedUsers />
         </aside>
