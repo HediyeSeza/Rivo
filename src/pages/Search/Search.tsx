@@ -5,7 +5,7 @@ import {
   useSearchParams,
 } from "react-router-dom";
 
-import SearchBar from "../../components/Search/SearchBar/SearchBar";
+
 
 import SearchResults from "../../components/Search/SearchResults/SearchResults";
 
@@ -108,23 +108,17 @@ const Search = () => {
     <main
       className="
         min-h-screen
-        bg-[var(--color-background-primary)]
-        px-4
-        py-6
-        text-[var(--color-content-primary)]
-        sm:px-6
-        lg:px-8
+    bg-[var(--color-background-primary)]
+    px-4
+    pt-24
+    pb-6
+    text-[var(--color-content-primary)]
+    sm:px-6
+    lg:px-8
       "
     >
       <div className="mx-auto w-full max-w-[900px]">
-        {/* Search Bar */}
-        <div className="mb-6">
-          <SearchBar
-            value={query}
-            onChange={handleSearchChange}
-            onClear={handleClear}
-          />
-        </div>
+        
 
         {/* Search Results */}
         {query.trim() && (
