@@ -3,12 +3,17 @@ import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 import Logo from "../common/Logo/Logo";
+
 import Icon from "../common/Icon/Icon";
+
 import Button from "../common/Button/Button";
+
 import MobileMenu from "./MobileMenu/MobileMenu";
+
 import SearchBar from "../Search/SearchBar/SearchBar";
 
 import { useTheme } from "../../context/ThemeContext";
+
 import { useAuth } from "../../context/AuthContext";
 
 function Header() {
@@ -29,9 +34,13 @@ function Header() {
 
     /*
      * Empty search
+     *
+     * اگر کاربر تمام متن سرچ را پاک کرد،
+     * query از URL حذف می‌شود و به Home برمی‌گردیم.
      */
-    if (!trimmedValue) {
+    if (!trimmedValue.trim()) {
       setSearchParams({});
+      navigate("/");
       return;
     }
 
@@ -43,7 +52,6 @@ function Header() {
       setSearchParams({
         q: trimmedValue,
       });
-
       return;
     }
 
@@ -59,12 +67,16 @@ function Header() {
   };
 
   const handleSearchClear = () => {
+    /*
+     * Clear search query from URL
+     * and return to Home.
+     */
     setSearchParams({});
+    navigate("/");
   };
 
   const handleSignOut = async () => {
     await signOut();
-
     navigate("/login");
   };
 
@@ -81,9 +93,7 @@ function Header() {
         w-full
         items-center
         gap-4
-        border-b
-        border-white/30
-        bg-white/20
+        
         px-4
         shadow-sm
         backdrop-blur-lg

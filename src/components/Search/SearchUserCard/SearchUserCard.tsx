@@ -11,6 +11,7 @@ interface SearchUserCardProps {
 const SearchUserCard = ({ user }: SearchUserCardProps) => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   const handleFollow = async () => {
     if (isLoading) {
@@ -34,6 +35,8 @@ const SearchUserCard = ({ user }: SearchUserCardProps) => {
     }
   };
 
+  const showImage = Boolean(user.image) && !imageError;
+
   return (
     <article
       className="
@@ -53,10 +56,11 @@ const SearchUserCard = ({ user }: SearchUserCardProps) => {
     >
       {/* Avatar */}
       <div className="shrink-0">
-        {user.image ? (
+        {showImage ? (
           <img
             src={user.image}
             alt={user.name}
+            onError={() => setImageError(true)}
             className="
               h-14
               w-14
@@ -127,7 +131,6 @@ const SearchUserCard = ({ user }: SearchUserCardProps) => {
           duration-200
           disabled:cursor-not-allowed
           disabled:opacity-60
-
           ${
             isFollowing
               ? `
@@ -139,9 +142,12 @@ const SearchUserCard = ({ user }: SearchUserCardProps) => {
                 dark:hover:bg-white/5
               `
               : `
-                bg-[#4F46FF]
+                bg-black
                 text-white
-                hover:bg-[#4338CA]
+                hover:bg-black/80
+                dark:bg-white
+                dark:text-black
+                dark:hover:bg-white/80
               `
           }
         `}
