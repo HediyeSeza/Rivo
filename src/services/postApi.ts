@@ -59,9 +59,7 @@ export const getPosts = async (): Promise<Post[]> => {
 export const toggleLikePost = async (
   postId: string,
 ): Promise<ToggleLikeResponse> => {
-  const response = await api.patch<ToggleLikeResponse>(
-    `/api/posts/${postId}`,
-  );
+  const response = await api.patch<ToggleLikeResponse>(`/api/posts/${postId}`);
 
   return response;
 };
@@ -76,20 +74,13 @@ export interface CreatePostPayload {
   content: string;
 }
 
-export const createPost = async (
-  data: CreatePostPayload,
-): Promise<Post> => {
-  const response = await api.post<CreatePostResponse>(
-    "/api/posts",
-    data,
-  );
+export const createPost = async (data: CreatePostPayload): Promise<Post> => {
+  const response = await api.post<CreatePostResponse>("/api/posts", data);
 
   return response.data;
 };
 
-export const deletePost = async (
-  postId: string,
-): Promise<void> => {
+export const deletePost = async (postId: string): Promise<void> => {
   await api.delete(`/api/posts/${postId}`);
 };
 
@@ -102,13 +93,47 @@ export const createComment = async (
   postId: string,
   content: string,
 ): Promise<CreateCommentResponse> => {
-  const response =
-    await api.post<CreateCommentResponse>(
-      `/api/posts/${postId}/comment`,
-      {
-        content,
-      },
-    );
+  const response = await api.post<CreateCommentResponse>(
+    `/api/posts/${postId}/comment`,
+    {
+      content,
+    },
+  );
+
+  return response;
+};
+
+export interface UpdateCommentResponse {
+  message: string;
+  success: boolean;
+  data: PostComment;
+}
+
+export const updateComment = async (
+  postId: string,
+  commentId: string,
+  content: string,
+): Promise<UpdateCommentResponse> => {
+  const response = await api.put<UpdateCommentResponse>(
+    `/api/posts/${postId}/comment/${commentId}`,
+    { content },
+  );
+
+  return response;
+};
+
+export interface DeleteCommentResponse {
+  message: string;
+  success: boolean;
+}
+
+export const deleteComment = async (
+  postId: string,
+  commentId: string,
+): Promise<DeleteCommentResponse> => {
+  const response = await api.delete<DeleteCommentResponse>(
+    `/api/posts/${postId}/comment/${commentId}`,
+  );
 
   return response;
 };
