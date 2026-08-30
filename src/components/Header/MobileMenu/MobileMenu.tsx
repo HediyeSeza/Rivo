@@ -11,7 +11,7 @@ interface MobileMenuProps {
 
 const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { signOut, isAuthenticated } = useAuth();
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -66,39 +66,54 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
             <span className="text-[16px] font-normal">Home</span>
           </Button>
 
-          {/* Notifications */}
-          <Button
-            type="button"
-            className="w-full"
-            variant="secondary"
-            icon={<Icon name="notif" size={18} />}
-            onClick={() => handleNavigate("/notifications")}
-          >
-            <span className="text-[16px] font-normal">Notifications</span>
-          </Button>
+          {isAuthenticated && (
+            <>
+              {/* Notifications */}
+              <Button
+                type="button"
+                className="w-full"
+                variant="secondary"
+                icon={<Icon name="notif" size={18} />}
+                onClick={() => handleNavigate("/notifications")}
+              >
+                <span className="text-[16px] font-normal">Notifications</span>
+              </Button>
 
-          {/* Profile */}
-          <Button
-            type="button"
-            className="w-full"
-            variant="secondary"
-            icon={<Icon name="Person" size={18} />}
-            onClick={() => handleNavigate("/profile")}
-          >
-            <span className="text-[16px] font-normal">Profile</span>
-          </Button>
+              {/* Profile */}
+              <Button
+                type="button"
+                className="w-full"
+                variant="secondary"
+                icon={<Icon name="Person" size={18} />}
+                onClick={() => handleNavigate("/profile")}
+              >
+                <span className="text-[16px] font-normal">Profile</span>
+              </Button>
+            </>
+          )}
 
-          {/* Logout */}
-          <Button
-            type="button"
-            className="w-full"
-            variant="secondary"
-            icon={<Icon name="Tash" size={18} />}
-            onClick={handleSignOut}
-            aria-label="Log out"
-          >
-            <span />
-          </Button>
+          {isAuthenticated ? (
+            /* Logout */
+            <Button
+              type="button"
+              className="w-full"
+              variant="secondary"
+              icon={<Icon name="Tash" size={18} />}
+              onClick={handleSignOut}
+              aria-label="Log out"
+            >
+              <span />
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              className="w-full"
+              variant="primary"
+              onClick={() => handleNavigate("/login")}
+            >
+              Sign in
+            </Button>
+          )}
         </div>
       </div>
     </div>

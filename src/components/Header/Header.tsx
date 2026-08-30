@@ -21,7 +21,7 @@ function Header() {
 
   const { theme, toggleTheme } = useTheme();
 
-  const { signOut } = useAuth();
+  const { signOut, isAuthenticated } = useAuth();
 
   const navigate = useNavigate();
 
@@ -217,10 +217,7 @@ function Header() {
               dark:hover:bg-white/5
             "
           >
-            <Icon
-              name={theme === "dark" ? "Moon" : "Light"}
-              size={18}
-            />
+            <Icon name={theme === "dark" ? "Moon" : "Light"} size={18} />
           </button>
         </div>
 
@@ -234,10 +231,7 @@ function Header() {
           <span />
         </Button>
 
-        <MobileMenu
-          isOpen={isMenuOpen}
-          onClose={() => setIsMenuOpen(false)}
-        />
+        <MobileMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
 
         {/* Home */}
         <Button
@@ -247,48 +241,57 @@ function Header() {
           icon={<Icon name="Home" size={18} />}
           onClick={() => navigate("/")}
         >
-          <span className="text-[14px] font-normal">
-            Home
-          </span>
+          <span className="text-[14px] font-normal">Home</span>
         </Button>
 
-        {/* Notifications */}
-        <Button
-          type="button"
-          className="!hidden md:!flex"
-          variant="pure"
-          icon={<Icon name="notif" size={18} />}
-          onClick={() => navigate("/notifications")}
-        >
-          <span className="text-[14px] font-normal">
-            Notifications
-          </span>
-        </Button>
+        {isAuthenticated && (
+          <>
+            {/* Notifications */}
+            <Button
+              type="button"
+              className="!hidden md:!flex"
+              variant="pure"
+              icon={<Icon name="notif" size={18} />}
+              onClick={() => navigate("/notifications")}
+            >
+              <span className="text-[14px] font-normal">Notifications</span>
+            </Button>
 
-        {/* Profile */}
-        <Button
-          type="button"
-          className="!hidden md:!flex"
-          variant="pure"
-          icon={<Icon name="Person" size={18} />}
-          onClick={() => navigate("/profile")}
-        >
-          <span className="text-[14px] font-normal">
-            Profile
-          </span>
-        </Button>
+            {/* Profile */}
+            <Button
+              type="button"
+              className="!hidden md:!flex"
+              variant="pure"
+              icon={<Icon name="Person" size={18} />}
+              onClick={() => navigate("/profile")}
+            >
+              <span className="text-[14px] font-normal">Profile</span>
+            </Button>
+          </>
+        )}
 
-        {/* Logout */}
-        <Button
-          type="button"
-          className="!hidden md:!flex"
-          variant="pure"
-          icon={<Icon name="Logout" size={18} />}
-          onClick={handleSignOut}
-          aria-label="Log out"
-        >
-          <span />
-        </Button>
+        {isAuthenticated ? (
+          /* Logout */
+          <Button
+            type="button"
+            className="!hidden md:!flex"
+            variant="pure"
+            icon={<Icon name="Logout" size={18} />}
+            onClick={handleSignOut}
+            aria-label="Log out"
+          >
+            <span />
+          </Button>
+        ) : (
+          <Button
+            type="button"
+            className="!hidden md:!flex"
+            variant="primary"
+            onClick={() => navigate("/login")}
+          >
+            Sign in
+          </Button>
+        )}
       </nav>
     </header>
   );
