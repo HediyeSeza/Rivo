@@ -110,7 +110,7 @@ const ProfilePosts = ({
 
     try {
       await deletePost(postToDelete.id);
-      
+
       window.dispatchEvent(new Event("posts:changed"));
 
       setPosts((currentPosts) => {
@@ -214,6 +214,13 @@ const ProfilePosts = ({
     const currentPost = post as ProfilePostWithRelations;
 
     return currentPost.comments ?? [];
+  };
+  const getActualPost = (post: ProfilePost) => {
+    const currentPost = post as ProfilePostWithRelations & {
+      post?: ProfilePost;
+    };
+
+    return currentPost.post ?? post;
   };
 
   if (isLoading) {
@@ -346,23 +353,36 @@ const ProfilePosts = ({
         "
       >
         {displayedPosts.length > 0 ? (
-          displayedPosts.map((post) => (
-            <PostCard
-              key={post.id}
-              postId={post.id}
-              name={getPostAuthorName(post)}
-              username={getPostUsername(post)}
-              avatar={getPostAvatar(post)}
-              createdAt={post.createdAt}
-              content={post.content}
-              likes={getPostLikes(post)}
-              comments={getPostComments(post)}
-              likesData={getPostLikesData(post)}
-              commentsData={getPostCommentsData(post)}
-              showDelete={activeTab === "posts" && isOwnProfile}
-              onDelete={() => setPostToDelete(post)}
-            />
-          ))
+          displayedPosts.map((item) => {
+            const post = getActualPost(item);
+
+            return (
+              <PostCard
+                key={post.id}
+                postId={post.id}
+                name={getPostAuthorName(item)}
+                username={getPostUsername(item)}
+                avatar={getPostAvatar(item)}
+                createdAt={post.createdAt}
+                content={post.content}
+                likes={getPostLikes(item)}
+                comments={getPostComments(item)}
+                likesData={getPostLikesData(item)}
+                commentsData={getPostCommentsData(item)}
+                showDelete={activeTab === "posts" && isOwnProfile}
+                onDelete={() => setPostToDelete(item)}
+                onLikeChange={(changedPostId, isLiked) => {
+                  if (!isLiked) {
+                    setLikedPosts((currentPosts) =>
+                      currentPosts.filter(
+                        (likedPost) => likedPost.id !== changedPostId,
+                      ),
+                    );
+                  }
+                }}
+              />
+            );
+          })
         ) : (
           <div
             className="

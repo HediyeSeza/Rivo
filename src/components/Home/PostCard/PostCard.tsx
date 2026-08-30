@@ -31,6 +31,7 @@ interface PostCardProps {
   commentsData: PostComment[];
 
   onLikeMessage?: (message: string) => void;
+  onLikeChange?: (postId: string, isLiked: boolean) => void;
 
   onCommentAdded?: (postId: string) => void | Promise<void>;
   onCommentMessage?: (message: string) => void;
@@ -88,6 +89,7 @@ const PostCard = ({
   likesData,
   commentsData,
   onLikeMessage,
+  onLikeChange,
   onCommentAdded,
   onCommentMessage,
   showDelete = false,
@@ -108,8 +110,6 @@ const PostCard = ({
         dark:border-[#313131]
         dark:bg-[#191919]
         text-[var(--color-content-primary)]
-        transition-colors
-        duration-200
       "
     >
       {/* Post Header */}
@@ -205,6 +205,7 @@ const PostCard = ({
           likes={likesData}
           likesCount={likes}
           onMessage={onLikeMessage}
+          onLikeChange={onLikeChange}
         />
 
         {/* Comment */}
@@ -228,7 +229,7 @@ const PostCard = ({
             ${showComments ? "bg-black/5 dark:bg-white/5" : ""}
           `}
         >
-          <Icon name="Chat" size={18} />
+          <Icon name={showComments ? "ChatFill" : "Chat"} size={18} />
 
           <span className="text-[14px]">{comments}</span>
         </button>

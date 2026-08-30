@@ -10,15 +10,13 @@ import ConfirmModal from "../../common/Modal/ConfirmModal";
 
 import { useAuth } from "../../../context/AuthContext";
 
-import {
-  deletePost,
-  getPosts,
-  type Post,
-} from "../../../services/postApi";
+import { deletePost, getPosts, type Post } from "../../../services/postApi";
 
 import { getUserById } from "../../../services/userApi";
 
 import { getUsernameFromEmail } from "../../../utils/getUsernameFromEmail";
+
+import Toast from "../../Toast/Toast";
 
 type PostWithAuthor = Post & {
   author: {
@@ -39,9 +37,14 @@ const Feed = () => {
 
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-  const [commentMessage, setCommentMessage] = useState<string | null>(null);
-
-  const [likeMessage, setLikeMessage] = useState<string | null>(null);
+  const [likeToast, setLikeToast] = useState<{
+    id: number;
+    message: string;
+  } | null>(null);
+  const [commentToast, setCommentToast] = useState<{
+    id: number;
+    message: string;
+  } | null>(null);
 
   const [postToDelete, setPostToDelete] = useState<PostWithAuthor | null>(null);
 
@@ -63,35 +66,30 @@ const Feed = () => {
         uniqueAuthorIds.map((id) => getUserById(id)),
       );
 
-      const usersMap = new Map(
-        users.map((user) => [user.id, user]),
-      );
+      const usersMap = new Map(users.map((user) => [user.id, user]));
 
-      const postsWithAuthors: PostWithAuthor[] = postsData.flatMap(
-  (post) => {
-    const author = usersMap.get(post.authorId);
+      const postsWithAuthors: PostWithAuthor[] = postsData.flatMap((post) => {
+        const author = usersMap.get(post.authorId);
 
-    if (!author) {
-      return [];
-    }
+        if (!author) {
+          return [];
+        }
 
-    return [
-      {
-        ...post,
-        author: {
-          id: author.id,
-          name: author.name,
-          email: author.email,
-          image: author.image ?? null,
-          avatar: author.avatar ?? null,
-        },
-      },
-    ];
-  },
-);
+        return [
+          {
+            ...post,
+            author: {
+              id: author.id,
+              name: author.name,
+              email: author.email,
+              image: author.image ?? null,
+              avatar: author.avatar ?? null,
+            },
+          },
+        ];
+      });
 
-setPosts(postsWithAuthors);
-
+      setPosts(postsWithAuthors);
     } catch (error) {
       console.error("Failed to load posts:", error);
 
@@ -120,14 +118,6 @@ setPosts(postsWithAuthors);
     await fetchPosts(false);
   };
 
-  const handleLikeMessage = (message: string) => {
-    setLikeMessage(message);
-
-    window.setTimeout(() => {
-      setLikeMessage(null);
-    }, 2000);
-  };
-
   const handleCommentAdded = async (postId: string) => {
     try {
       await fetchPosts(false);
@@ -136,12 +126,12 @@ setPosts(postsWithAuthors);
     }
   };
 
-  const handleCommentMessage = (message: string) => {
-    setCommentMessage(message);
+  const handleLikeMessage = (message: string) => {
+    setLikeToast({ id: Date.now(), message });
+  };
 
-    window.setTimeout(() => {
-      setCommentMessage(null);
-    }, 3000);
+  const handleCommentMessage = (message: string) => {
+    setCommentToast({ id: Date.now(), message });
   };
 
   const handleDeletePost = async () => {
@@ -199,51 +189,21 @@ setPosts(postsWithAuthors);
 
   return (
     <section className="w-full">
-      {/* Like message */}
-      {likeMessage && (
-        <div
-          className="
-            fixed
-            left-1/2
-            top-4
-            z-50
-            -translate-x-1/2
-            rounded-lg
-            border
-            border-[var(--color-border)]
-            bg-[var(--color-card)]
-            px-4
-            py-2
-            text-sm
-            text-[var(--color-content-primary)]
-            shadow-md
-          "
-        >
-          {likeMessage}
-        </div>
+      {/* Toast */}
+      {likeToast && (
+        <Toast
+          key={likeToast.id}
+          message={likeToast.message}
+          onDone={() => setLikeToast(null)}
+        />
       )}
 
-      {commentMessage && (
-        <div
-          className="
-      fixed
-      left-1/2
-      top-4
-      z-50
-      -translate-x-1/2
-      rounded-lg
-      border
-      border-[var(--color-border)]
-      bg-[var(--color-card)]
-      px-4
-      py-2
-      text-sm
-      text-[var(--color-content-primary)]
-      shadow-md
-    "
-        >
-          {commentMessage}
-        </div>
+      {commentToast && (
+        <Toast
+          key={commentToast.id}
+          message={commentToast.message}
+          onDone={() => setCommentToast(null)}
+        />
       )}
 
       <div className="mx-auto w-full">

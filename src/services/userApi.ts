@@ -1,5 +1,7 @@
 import { api } from "./api";
+
 import type { Post } from "./postApi";
+
 import type { User } from "../types/user";
 
 export type { User };
@@ -183,14 +185,14 @@ export const searchUsers = async (
     return [];
   }
 
-  const response = await api.get<
-    SearchUsersResponse | User[]
-  >(
+  const response = await api.get<SearchUsersResponse>(
     `/api/users/search?q=${encodeURIComponent(trimmedQuery)}`,
   );
 
-  if (Array.isArray(response)) {
-    return response;
+  if (!response.success) {
+    throw new Error(
+      response.message || "Failed to search users.",
+    );
   }
 
   return response.data ?? [];
@@ -236,16 +238,30 @@ export const getUserPosts = async (
    Profile Likes
 ========================= */
 
+interface LikedPostResponse {
+  id: string;
+  userId: string;
+  postId: string;
+  createdAt: string;
+  post: Post;
+}
+
+interface LikedPostsResponse {
+  message?: string;
+  success?: boolean;
+  data?: LikedPostResponse[];
+}
+
 export const getUserLikedPosts = async (
   userId: string,
 ): Promise<ProfilePost[]> => {
   const response = await api.get<
-    PostsResponse | ProfilePost[]
+    LikedPostsResponse | LikedPostResponse[]
   >(`/api/users/${userId}/likes`);
 
-  if (Array.isArray(response)) {
-    return response;
-  }
+  const likedPosts = Array.isArray(response)
+    ? response
+    : response.data ?? [];
 
-  return response.data ?? [];
+  return likedPosts.map((like) => like.post);
 };

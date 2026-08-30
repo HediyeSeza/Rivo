@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 
-import { useSearchParams } from "react-router-dom";
+import {
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 
-import SearchBar from "../../components/Search/SearchBar/SearchBar";
+
+
 import SearchResults from "../../components/Search/SearchResults/SearchResults";
 
 import { searchUsers } from "../../services/userApi";
@@ -10,66 +14,37 @@ import { searchUsers } from "../../services/userApi";
 import type { User } from "../../types/user";
 
 const Search = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
-  const [query, setQuery] = useState(
-    searchParams.get("q") ?? "",
-  );
+  const [searchParams, setSearchParams] =
+    useSearchParams();
+
+  // Query همیشه مستقیماً از URL خوانده می‌شود
+  const query = searchParams.get("q") ?? "";
 
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  /* =========================
-     Sync query with URL
-  ========================= */
-
-  useEffect(() => {
-    const urlQuery = searchParams.get("q") ?? "";
-
-    if (urlQuery !== query) {
-      setQuery(urlQuery);
-    }
-  }, [searchParams, query]);
-
-  /* =========================
-     Search Users
-  ========================= */
-
   useEffect(() => {
     const trimmedQuery = query.trim();
 
+    // وقتی سرچ خالی شد، نتایج قبلی پاک شوند
     if (!trimmedQuery) {
       setUsers([]);
       setError(null);
       setIsLoading(false);
-
       return;
     }
 
     let isCancelled = false;
 
-    const timeoutId = setTimeout(async () => {
+    const timeoutId = window.setTimeout(async () => {
       try {
         setIsLoading(true);
         setError(null);
 
-        console.log(
-          "[Rivo] Searching users:",
-          trimmedQuery,
-        );
-
         const results = await searchUsers(trimmedQuery);
-
-        console.log(
-          "[Rivo] Search results:",
-          results,
-        );
-
-        console.log(
-          "[Rivo] Users count:",
-          results.length,
-        );
 
         if (isCancelled) {
           return;
@@ -81,10 +56,7 @@ const Search = () => {
           return;
         }
 
-        console.error(
-          "[Rivo] Search failed:",
-          error,
-        );
+        console.error("Failed to search users:", error);
 
         setUsers([]);
 
@@ -102,22 +74,20 @@ const Search = () => {
 
     return () => {
       isCancelled = true;
-      clearTimeout(timeoutId);
+      window.clearTimeout(timeoutId);
     };
   }, [query]);
 
-  /* =========================
-     Search Input
-  ========================= */
-
   const handleSearchChange = (value: string) => {
-    setQuery(value);
+    const trimmedValue = value.trimStart();
 
-    const trimmedValue = value.trim();
-
-    if (!trimmedValue) {
+    // اگر سرچ کاملاً پاک شد، برگرد به Home
+    if (!trimmedValue.trim()) {
+      setUsers([]);
+      setError(null);
+      setIsLoading(false);
       setSearchParams({});
-
+      navigate("/");
       return;
     }
 
@@ -126,45 +96,33 @@ const Search = () => {
     });
   };
 
-  /* =========================
-     Clear Search
-  ========================= */
-
   const handleClear = () => {
-    setQuery("");
     setUsers([]);
     setError(null);
-
+    setIsLoading(false);
     setSearchParams({});
+    navigate("/");
   };
 
   return (
     <main
       className="
         min-h-screen
-        bg-[var(--color-background-primary)]
-        px-4
-        py-6
-        pt-20
-        text-[var(--color-content-primary)]
-        sm:px-6
-        lg:px-8
+    bg-[var(--color-background-primary)]
+    px-4
+    pt-24
+    pb-6
+    text-[var(--color-content-primary)]
+    sm:px-6
+    lg:px-8
       "
     >
       <div className="mx-auto w-full max-w-[900px]">
-        {/* Search Bar */}
-        <div className="mb-6">
-          <SearchBar
-            value={query}
-            onChange={handleSearchChange}
-            onClear={handleClear}
-          />
-        </div>
+        
 
         {/* Search Results */}
         {query.trim() && (
           <section>
-            {/* Result Header */}
             <div className="mb-5">
               <h1 className="text-[20px] font-semibold">
                 Search results for "{query}"
@@ -187,7 +145,6 @@ const Search = () => {
               </p>
             </div>
 
-            {/* Results */}
             <SearchResults
               users={users}
               query={query}
