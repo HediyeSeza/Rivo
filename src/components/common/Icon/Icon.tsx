@@ -69,6 +69,8 @@ import searchLight from "../../../assets/icons/Light/search.svg";
 import chatFillDark from "../../../assets/icons/Dark/fill-chat.svg";
 import chatFillLight from "../../../assets/icons/Light/fill-chat.svg";
 
+import editComment from "../../../assets/icons/Dark/edit-2.svg";
+
 const icons = {
   Chat: {
     dark: chatDark,
@@ -78,6 +80,11 @@ const icons = {
   Edit: {
     dark: editDark,
     light: editLight,
+  },
+
+  EditComment: {
+    dark: editComment,
+    light: editComment,
   },
 
   Search: {

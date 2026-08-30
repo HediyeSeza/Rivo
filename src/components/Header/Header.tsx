@@ -225,7 +225,7 @@ function Header() {
         <Button
           className="w-0 md:!hidden"
           variant="primary"
-          icon={<Icon name="Menu" size={18} />}
+          icon={<Icon name="Menu" size={18} reverseTheme />}
           onClick={() => setIsMenuOpen(true)}
         >
           <span />

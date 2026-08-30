@@ -36,7 +36,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
 
       {/* Menu */}
       <div
-        className={`pointer-events-auto absolute right-0 top-0 z-10 h-[100rem] w-[75%] bg-white px-5 py-6 transition-transform duration-300 ease-in-out ${
+        className={`pointer-events-auto absolute right-0 top-0 z-10 h-[100rem] w-[75%] bg-white dark:bg-black px-5 py-6 transition-transform duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -98,7 +98,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
               type="button"
               className="w-full"
               variant="secondary"
-              icon={<Icon name="Tash" size={18} />}
+              icon={<Icon name="Logout" size={18} />}
               onClick={handleSignOut}
               aria-label="Log out"
             >
