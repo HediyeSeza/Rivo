@@ -53,10 +53,7 @@ const request = async <T>(
       };
 
       message =
-        errorBody.message ||
-        errorBody.error ||
-        errorBody.detail ||
-        message;
+        errorBody.message || errorBody.error || errorBody.detail || message;
     } catch {
       // Some error responses do not contain JSON.
     }
@@ -64,7 +61,7 @@ const request = async <T>(
     throw new ApiError(message, response.status);
   }
 
-    if (response.status === 204) {
+  if (response.status === 204) {
     return undefined as T;
   }
 
@@ -80,7 +77,6 @@ const request = async <T>(
     return raw as T;
   }
 };
-
 
 const serializeBody = (body?: unknown): BodyInit | undefined => {
   if (body === undefined) return undefined;
