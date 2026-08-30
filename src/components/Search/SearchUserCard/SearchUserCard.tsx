@@ -58,7 +58,7 @@ const SearchUserCard = ({ user }: SearchUserCardProps) => {
       <div className="shrink-0">
         {showImage ? (
           <img
-            src={user.image}
+            src={user.image ?? undefined}
             alt={user.name}
             onError={() => setImageError(true)}
             className="
