@@ -1,7 +1,9 @@
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 import Header from "./components/Header/Header";
 import AppRoutes from "./routes/AppRoutes";
+import { API_ERROR_EVENT, API_ERROR_MESSAGE } from "./services/api";
 
 function AppContent() {
   const location = useLocation();
