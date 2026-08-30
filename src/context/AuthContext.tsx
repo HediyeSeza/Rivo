@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-
+import { getUserById } from "../services/userApi";
 import type { ReactNode } from "react";
 import type { User } from "../types/user";
 
@@ -38,16 +38,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let isActive = true;
 
     getSession()
-      .then((response) => {
+      .then(async (response) => {
         if (!isActive) {
           return;
         }
 
         const sessionUser = getUser(response);
 
-        setUser(sessionUser);
+        const freshUser = await getUserById(sessionUser.id);
 
-        localStorage.setItem(USER_KEY, JSON.stringify(sessionUser));
+        if (!isActive) {
+          return;
+        }
+
+        setUser(freshUser);
+
+        localStorage.setItem(USER_KEY, JSON.stringify(freshUser));
 
         const sessionToken =
           "data" in response && response.data && "session" in response.data
