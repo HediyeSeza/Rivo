@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+import { useAuth } from "../../../../context/AuthContext";
 import Avatar from "../../Avatar/Avatar";
 import FollowUserButton from "../../../Profile/ProfileConnections/FollowUserButton";
 
@@ -8,7 +8,7 @@ import {
   getUserFollowings,
 } from "../../../../services/userApi";
 
-import type { User } from "../../../../types/user"
+import type { User } from "../../../../types/user";
 
 type FollowTab = "followers" | "following";
 
@@ -25,11 +25,15 @@ const FollowListModal = ({
   initialTab,
   onClose,
 }: FollowListModalProps) => {
+  const { user: authUser } = useAuth();
   const [activeTab, setActiveTab] = useState<FollowTab>(initialTab);
 
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [followedUserIds, setFollowedUserIds] = useState<Set<string>>(
+    new Set(),
+  );
 
   useEffect(() => {
     if (!isOpen) {
@@ -38,6 +42,24 @@ const FollowListModal = ({
 
     setActiveTab(initialTab);
   }, [isOpen, initialTab]);
+
+  useEffect(() => {
+    if (!isOpen || !authUser?.id) {
+      return;
+    }
+
+    const loadCurrentUserFollowing = async () => {
+      try {
+        const followingUsers = await getUserFollowings(authUser.id);
+
+        setFollowedUserIds(new Set(followingUsers.map((user) => user.id)));
+      } catch (error) {
+        console.error("Failed to load current user followings:", error);
+      }
+    };
+
+    void loadCurrentUserFollowing();
+  }, [isOpen, authUser?.id]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -59,9 +81,7 @@ const FollowListModal = ({
         console.error("Failed to load follow list:", error);
 
         setError(
-          error instanceof Error
-            ? error.message
-            : "Failed to load users.",
+          error instanceof Error ? error.message : "Failed to load users.",
         );
       } finally {
         setIsLoading(false);
@@ -71,14 +91,18 @@ const FollowListModal = ({
     void loadUsers();
   }, [isOpen, activeTab, userId]);
 
-  const handleFollowChange = (changedUserId: string) => {
-    if (activeTab !== "following") {
-      return;
-    }
+  const handleFollowChange = (changedUserId: string, isFollowing: boolean) => {
+    setFollowedUserIds((currentIds) => {
+      const nextIds = new Set(currentIds);
 
-    setUsers((currentUsers) =>
-      currentUsers.filter((user) => user.id !== changedUserId),
-    );
+      if (isFollowing) {
+        nextIds.add(changedUserId);
+      } else {
+        nextIds.delete(changedUserId);
+      }
+
+      return nextIds;
+    });
   };
 
   if (!isOpen) {
@@ -189,7 +213,6 @@ const FollowListModal = ({
             `}
           >
             Followers
-
             {activeTab === "followers" && (
               <span
                 className="
@@ -224,7 +247,6 @@ const FollowListModal = ({
             `}
           >
             Following
-
             {activeTab === "following" && (
               <span
                 className="
@@ -277,11 +299,9 @@ const FollowListModal = ({
             </div>
           )}
 
-          {!isLoading &&
-            !error &&
-            users.length === 0 && (
-              <div
-                className="
+          {!isLoading && !error && users.length === 0 && (
+            <div
+              className="
                   flex
                   h-full
                   items-center
@@ -291,21 +311,19 @@ const FollowListModal = ({
                   text-[14px]
                   text-[var(--color-content-secondary)]
                 "
-              >
-                {activeTab === "followers"
-                  ? "No followers yet."
-                  : "Not following anyone yet."}
-              </div>
-            )}
+            >
+              {activeTab === "followers"
+                ? "No followers yet."
+                : "Not following anyone yet."}
+            </div>
+          )}
 
-          {!isLoading &&
-            !error &&
-            users.length > 0 && (
-              <div className="flex flex-col">
-                {users.map((user) => (
-                  <div
-                    key={user.id}
-                    className="
+          {!isLoading && !error && users.length > 0 && (
+            <div className="flex flex-col">
+              {users.map((user) => (
+                <div
+                  key={user.id}
+                  className="
                       flex
                       items-center
                       gap-3
@@ -315,46 +333,46 @@ const FollowListModal = ({
                       py-3
                       last:border-b-0
                     "
-                  >
-                    <Avatar
-                      src={user.image ?? undefined}
-                      alt={`${user.name} avatar`}
-                      size={44}
-                    />
+                >
+                  <Avatar
+                    src={user.image ?? undefined}
+                    alt={`${user.name} avatar`}
+                    size={44}
+                  />
 
-                    <div className="min-w-0 flex-1">
-                      <p
-                        className="
+                  <div className="min-w-0 flex-1">
+                    <p
+                      className="
                           truncate
                           text-[14px]
                           font-semibold
                           text-[var(--color-content-primary)]
                         "
-                      >
-                        {user.name}
-                      </p>
+                    >
+                      {user.name}
+                    </p>
 
-                      <p
-                        className="
+                    <p
+                      className="
                           truncate
                           text-[12px]
                           text-[var(--color-content-secondary)]
                         "
-                      >
-                        @{user.username ?? user.email.split("@")[0]}
-                      </p>
-                    </div>
-
-                    <FollowUserButton
-                      userId={user.id}
-                      onFollowChange={() =>
-                        handleFollowChange(user.id)
-                      }
-                    />
+                    >
+                      @{user.username ?? user.email.split("@")[0]}
+                    </p>
                   </div>
-                ))}
-              </div>
-            )}
+
+                  <FollowUserButton
+                    userId={user.id}
+                    initialFollowing={followedUserIds.has(user.id)}
+                    isFollower={activeTab === "followers"}
+                    onFollowChange={handleFollowChange}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
