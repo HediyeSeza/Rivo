@@ -110,8 +110,6 @@ const PostCard = ({
         dark:border-[#313131]
         dark:bg-[#191919]
         text-[var(--color-content-primary)]
-        transition-colors
-        duration-200
       "
     >
       {/* Post Header */}
