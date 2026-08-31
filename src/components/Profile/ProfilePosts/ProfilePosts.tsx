@@ -212,6 +212,19 @@ const ProfilePosts = ({
     return "user";
   };
 
+  const getPostAuthorId = (
+    post: ProfilePost,
+  ) => {
+    const currentPost =
+      post as ProfilePostWithRelations;
+
+    return (
+      currentPost.author?.id ||
+      currentPost.post?.author?.id ||
+      userId
+    );
+  };
+
   const getPostLikes = (
     post: ProfilePost,
   ) => {
@@ -463,29 +476,16 @@ const ProfilePosts = ({
               <PostCard
                 key={post.id}
                 postId={post.id}
-                name={getPostAuthorName(
-                  item,
-                )}
-                username={getPostUsername(
-                  item,
-                )}
-                avatar={getPostAvatar(
-                  item,
-                )}
-                createdAt={
-                  post.createdAt
-                }
+                authorId={getPostAuthorId(item)}
+                name={getPostAuthorName(item)}
+                username={getPostUsername(item)}
+                avatar={getPostAvatar(item)}
+                createdAt={post.createdAt}
                 content={post.content}
                 likes={getPostLikes(item)}
-                comments={getPostComments(
-                  item,
-                )}
-                likesData={getPostLikesData(
-                  item,
-                )}
-                commentsData={getPostCommentsData(
-                  item,
-                )}
+                comments={getPostComments(item)}
+                likesData={getPostLikesData(item)}
+                commentsData={getPostCommentsData(item)}
                 showDelete={
                   activeTab === "posts" &&
                   isOwnProfile

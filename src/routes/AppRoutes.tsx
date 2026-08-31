@@ -12,14 +12,24 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+
+      {/* Current user's profile */}
       <Route path="/profile" element={<Profile />} />
+
+      {/* Other user's profile */}
+      <Route path="/profile/:userId" element={<Profile />} />
+
       <Route path="/login" element={<Login />} />
+
       <Route path="/register" element={<Register />} />
+
       <Route
         path="/notifications"
         element={<Notifications />}
       />
+
       <Route path="/search" element={<Search />} />
+
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
