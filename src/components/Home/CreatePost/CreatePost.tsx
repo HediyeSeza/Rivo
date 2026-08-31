@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import Avatar from "../../common/Avatar/Avatar";
 import Button from "../../common/Button/Button";
+import Icon from "../../common/Icon/Icon";
 import { useTheme } from "../../../context/ThemeContext";
 import { useAuth } from "../../../context/AuthContext";
 
@@ -11,6 +12,7 @@ import sendDark from "../../../assets/icons/Dark/Send.svg";
 import sendLight from "../../../assets/icons/Light/Send.svg";
 
 import { createPost } from "../../../services/postApi";
+import { uploadImage } from "../../../services/userApi";
 
 interface CreatePostProps {
   onPostCreated: () => void | Promise<void>;
@@ -19,12 +21,38 @@ interface CreatePostProps {
 const CreatePost = ({ onPostCreated }: CreatePostProps) => {
   const { theme } = useTheme();
   const { user } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [content, setContent] = useState("");
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const userAvatar = user?.image || avatarImage;
+
+  const handleImagePick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      setError("Please select a valid image file.");
+      event.target.value = "";
+      return;
+    }
+
+    setSelectedImage(file);
+    setPreviewUrl(URL.createObjectURL(file));
+    setError(null);
+    event.target.value = "";
+  };
 
   const handleCreatePost = async () => {
     const trimmedContent = content.trim();
@@ -33,7 +61,12 @@ const CreatePost = ({ onPostCreated }: CreatePostProps) => {
       return;
     }
 
-    if (trimmedContent.length < 5) {
+    if (!trimmedContent && !selectedImage) {
+      setError("Please add text or choose an image.");
+      return;
+    }
+
+    if (trimmedContent && trimmedContent.length < 5 && !selectedImage) {
       setError("Content is too short, minimum 5 characters");
       return;
     }
@@ -42,16 +75,28 @@ const CreatePost = ({ onPostCreated }: CreatePostProps) => {
       setIsSubmitting(true);
       setError(null);
 
+      const uploadedImageId = selectedImage
+        ? await uploadImage(selectedImage)
+        : null;
+
       await createPost({
-        content: trimmedContent,
+        content: trimmedContent || "",
+        image: uploadedImageId,
       });
 
       setContent("");
+      setSelectedImage(null);
+      setPreviewUrl((currentUrl) => {
+        if (currentUrl) {
+          URL.revokeObjectURL(currentUrl);
+        }
+
+        return null;
+      });
 
       window.dispatchEvent(new Event("posts:changed"));
 
       await onPostCreated();
-      
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create post.");
     } finally {
@@ -111,6 +156,16 @@ const CreatePost = ({ onPostCreated }: CreatePostProps) => {
           />
         </div>
 
+        {previewUrl ? (
+          <div className="mt-4 overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-background)]">
+            <img
+              src={previewUrl}
+              alt="Selected for post"
+              className="max-h-64 w-full object-cover"
+            />
+          </div>
+        ) : null}
+
         <div className="relative mt-20">
           {error ? (
             <p
@@ -135,7 +190,39 @@ const CreatePost = ({ onPostCreated }: CreatePostProps) => {
           />
         </div>
 
-        <div className="mt-4 flex justify-end">
+        <div className="mt-4 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleImagePick}
+              aria-label="Add image to post"
+              className="
+                flex
+                h-9
+                w-9
+                items-center
+                justify-center
+                rounded-full
+                border
+                border-[var(--color-border)]
+                bg-[var(--color-background)]
+                text-[var(--color-content-primary)]
+                transition-colors
+                hover:bg-[var(--color-hover)]
+              "
+            >
+              <Icon name="Image" size={18} />
+            </button>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageChange}
+            />
+          </div>
+
           <Button
             type="button"
             variant="primary"

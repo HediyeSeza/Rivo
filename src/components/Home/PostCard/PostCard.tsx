@@ -12,6 +12,8 @@ import { type PostComment } from "../../../services/postApi";
 
 import Comments from "./Comments/Comments";
 
+const CDN_BASE = "https://79gcelddzk.ucarecd.net";
+
 interface PostCardProps {
   postId: string;
 
@@ -19,6 +21,7 @@ interface PostCardProps {
   username: string;
   createdAt: string;
   content: string;
+  image?: string | null;
 
   likes?: number;
   comments?: number;
@@ -77,12 +80,38 @@ const formatPostTime = (createdAt: string) => {
   return postDate.toLocaleDateString();
 };
 
+const resolvePostImageUrl = (image?: string | null) => {
+  if (!image) {
+    return undefined;
+  }
+
+  if (
+    image.startsWith("http://") ||
+    image.startsWith("https://") ||
+    image.startsWith("blob:") ||
+    image.startsWith("data:")
+  ) {
+    return image;
+  }
+
+  const uuid = image.match(
+    /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i,
+  )?.[0];
+
+  if (!uuid) {
+    return image;
+  }
+
+  return `${CDN_BASE}/${uuid}/`;
+};
+
 const PostCard = ({
   postId,
   name,
   username,
   createdAt,
   content,
+  image,
   likes = 0,
   comments = 0,
   avatar,
@@ -96,6 +125,7 @@ const PostCard = ({
   onDelete,
 }: PostCardProps) => {
   const [showComments, setShowComments] = useState(false);
+  const postImageUrl = resolvePostImageUrl(image);
 
   return (
     <article
@@ -195,6 +225,16 @@ const PostCard = ({
         >
           {content}
         </p>
+
+        {postImageUrl ? (
+          <div className="mt-3 overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-background)]">
+            <img
+              src={postImageUrl}
+              alt="Post image"
+              className="max-h-[420px] w-full object-cover"
+            />
+          </div>
+        ) : null}
       </div>
 
       {/* Actions */}
