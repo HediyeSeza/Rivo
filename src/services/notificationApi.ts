@@ -1,6 +1,6 @@
 import type { Notification } from "../types/notification";
 
-const BASE_URL = "https://socially-nextjs-six.vercel.app";
+const BASE_URL = "http://localhost:3000";
 
 interface NotificationsResponse {
   message: string;
