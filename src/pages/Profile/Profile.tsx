@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 import ProfileCard from "../../components/Profile/ProfileCard/ProfileCard";
 import ProfilePosts from "../../components/Profile/ProfilePosts/ProfilePosts";
@@ -18,6 +19,7 @@ import type {
 } from "../../services/userApi";
 
 function Profile() {
+  const { userId } = useParams<{ userId: string }>();
   const { user: authUser, updateUser } = useAuth();
 
   const [user, setUser] = useState<User | null>(null);
@@ -27,8 +29,19 @@ function Profile() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [postsCount, setPostsCount] = useState(0);
 
+  // -----------------------------------------
+  // Profile owner
+  // -----------------------------------------
+
+  const profileUserId = userId || authUser?.id || "";
+  const isOwnProfile = profileUserId === authUser?.id;
+
+  // -----------------------------------------
+  // Load profile
+  // -----------------------------------------
+
   const loadProfile = async (showLoading = false) => {
-    if (!authUser?.id) {
+    if (!profileUserId) {
       setIsLoading(false);
       return;
     }
@@ -45,12 +58,14 @@ function Profile() {
       });
 
       const [profileUser] = await Promise.all([
-        getUserById(authUser.id),
+        getUserById(profileUserId),
         minimumLoadingTime,
       ]);
 
       setUser(profileUser);
     } catch (err) {
+      console.error("Failed to load profile:", err);
+
       setError(
         err instanceof Error
           ? err.message
@@ -63,9 +78,17 @@ function Profile() {
     }
   };
 
+  // -----------------------------------------
+  // Initial profile load
+  // -----------------------------------------
+
   useEffect(() => {
     void loadProfile(true);
-  }, [authUser?.id]);
+  }, [profileUserId]);
+
+  // -----------------------------------------
+  // Refresh profile after changes
+  // -----------------------------------------
 
   useEffect(() => {
     const handleProfileChanged = () => {
@@ -93,12 +116,16 @@ function Profile() {
         handleProfileChanged,
       );
     };
-  }, [authUser?.id]);
+  }, [profileUserId]);
+
+  // -----------------------------------------
+  // Save profile
+  // -----------------------------------------
 
   const handleSaveProfile = async (
     data: UpdateProfilePayload,
   ) => {
-    if (!user) {
+    if (!user || !isOwnProfile) {
       return;
     }
 
@@ -131,9 +158,17 @@ function Profile() {
     }
   };
 
+  // -----------------------------------------
+  // Loading
+  // -----------------------------------------
+
   if (isLoading) {
     return <Loading />;
   }
+
+  // -----------------------------------------
+  // Error
+  // -----------------------------------------
 
   if (error) {
     return (
@@ -148,6 +183,10 @@ function Profile() {
   if (!user) {
     return null;
   }
+
+  // -----------------------------------------
+  // Render
+  // -----------------------------------------
 
   return (
     <main
@@ -184,19 +223,19 @@ function Profile() {
           <div className="flex w-full justify-center">
             <div className="w-full max-w-[550px]">
               <ProfileCard
-                user={user}
-                postsCount={postsCount}
-                onSaveProfile={handleSaveProfile}
-                isSaving={isSaving}
-                saveError={saveError}
-              />
+  user={user}
+  postsCount={postsCount}
+  onSaveProfile={handleSaveProfile}
+  isSaving={isSaving}
+  saveError={saveError}
+/>
             </div>
           </div>
 
           <div className="mt-6 w-full">
             <ProfilePosts
               userId={user.id}
-              isOwnProfile={true}
+              isOwnProfile={isOwnProfile}
               profileImage={user.image}
               onPostsCountChange={setPostsCount}
             />
