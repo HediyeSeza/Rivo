@@ -3,6 +3,9 @@ import { useState } from "react";
 import Avatar from "../../../common/Avatar/Avatar";
 import Icon from "../../../common/Icon/Icon";
 import ConfirmModal from "../../../common/Modal/ConfirmModal";
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { searchUsers } from "../../../../services/userApi";
 
 import avatarImage from "../../../../assets/Avatar/a.png";
 
@@ -68,6 +71,21 @@ const CommentItem = ({
 
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const navigate = useNavigate();
+
+  const handleAuthorClick = async () => {
+    try {
+      const results = await searchUsers(comment.author.email);
+      const matchedUser = results.find((u) => u.email === comment.author.email);
+
+      if (matchedUser) {
+        navigate(`/profile/${matchedUser.id}`);
+      }
+    } catch (error) {
+      console.error("Failed to find user profile:", error);
+    }
+  };
 
   const startEditing = () => {
     setEditContent(comment.content);
@@ -152,15 +170,13 @@ const CommentItem = ({
           {/* Comment Header */}
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2">
-              <span
-                className="
-                  text-[14px]
-                  font-semibold
-                  text-[var(--color-content-primary)]
-                "
+              <button
+                type="button"
+                onClick={handleAuthorClick}
+                className="text-[14px] font-semibold text-[var(--color-content-primary)] hover:underline cursor-pointer"
               >
                 {comment.author.name}
-              </span>
+              </button>
 
               <span
                 className="

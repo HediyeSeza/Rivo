@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Icon from "../common/Icon/Icon";
 import Avatar from "../common/Avatar/Avatar";
 import FollowButton from "../FollowButton/FollowButton";
+import { Link } from "react-router-dom";
 
 import type { User } from "../../types/user";
 import { getRecommendedUsers } from "../../services/userApi";
@@ -117,19 +118,14 @@ const RecommendedUsers = () => {
               />
 
               {/* User Info */}
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-[14px] font-bold">{user.name}</p>
-
-                <p
-                  className="
-                    truncate
-                    text-[12px]
-                    text-[var(--color-content-secondary)]
-                  "
-                >
+              <Link to={`/profile/${user.id}`} className="min-w-0 flex-1">
+                <p className="truncate text-[14px] font-bold hover:underline">
+                  {user.name}
+                </p>
+                <p className="truncate text-[12px] text-[var(--color-content-secondary)]">
                   {user._count?.followers ?? 0} followers
                 </p>
-              </div>
+              </Link>
 
               {/* Follow / Unfollow */}
               <FollowButton
