@@ -1,9 +1,11 @@
 import Icon from "../common/Icon/Icon";
 import Avatar from "../common/Avatar/Avatar";
 import avatarImage from "../../assets/Avatar/a.png";
+import { useState } from "react";
 import type { User } from "../../services/userApi";
 import { getUsernameFromEmail } from "../../utils/getUsernameFromEmail";
 import { getUserCounts } from "../../utils/getUserCounts";
+import FollowListModal from "../common/Modal/FollowListModal/FollowListModal";
 interface ProfileSidebarProps {
   user: User | null | undefined;
 }
@@ -14,6 +16,10 @@ const ProfileSidebar = ({ user }: ProfileSidebarProps) => {
   }
 
   const profileAvatar = user.image || avatarImage;
+
+  const [followListTab, setFollowListTab] = useState<
+    "followers" | "following" | null
+  >(null);
 
   const username = getUsernameFromEmail(user.email);
 
@@ -85,47 +91,65 @@ const ProfileSidebar = ({ user }: ProfileSidebarProps) => {
         />
 
         <div className="flex items-center justify-between text-center">
-          <div>
+          <button
+            type="button"
+            onClick={() => setFollowListTab("following")}
+            className="
+              cursor-pointer
+              transition-opacity
+              duration-200
+              hover:opacity-70
+            "
+          >
             <p
               className="
-                text-[16px]
-                font-medium
-                text-(--color-content-primary)
-              "
+              text-[16px]
+              font-medium
+              text-(--color-content-primary)
+            "
             >
               {followingCount}
             </p>
 
             <span
               className="
-                text-[13px]
-                text-(--color-content-secondary)
-              "
+              text-[13px]
+              text-(--color-content-secondary)
+            "
             >
               Followings
             </span>
-          </div>
+          </button>
 
-          <div>
+          <button
+            type="button"
+            onClick={() => setFollowListTab("followers")}
+            className="
+            cursor-pointer
+            transition-opacity
+            duration-200
+            hover:opacity-70
+          "
+          >
             <p
               className="
-                text-[16px]
-                font-medium
-                text-(--color-content-primary)
-              "
+              text-[16px]
+              font-medium
+              text-(--color-content-primary)
+            "
             >
               {followersCount}
             </p>
 
             <span
               className="
-                text-[13px]
-                text-(--color-content-secondary)
-              "
+              text-[13px]
+              text-(--color-content-secondary)
+            "
             >
               Followers
             </span>
-          </div>
+          </button>
         </div>
 
         <div
@@ -164,6 +188,12 @@ const ProfileSidebar = ({ user }: ProfileSidebarProps) => {
           <span className="text-[13px]">{user.website || "No website"}</span>
         </div>
       </div>
+      <FollowListModal
+        isOpen={followListTab !== null}
+        userId={user.id}
+        initialTab={followListTab ?? "followers"}
+        onClose={() => setFollowListTab(null)}
+      />
     </aside>
   );
 };
