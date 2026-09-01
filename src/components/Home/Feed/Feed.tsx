@@ -8,11 +8,7 @@ import ErrorScreen from "../../common/ErrorScreen/ErrorScreen";
 
 import { useAuth } from "../../../context/AuthContext";
 
-import {
-  deletePost,
-  getPosts,
-  type Post,
-} from "../../../services/postApi";
+import { deletePost, getPosts, type Post } from "../../../services/postApi";
 
 import { getUserById } from "../../../services/userApi";
 import { getUsernameFromEmail } from "../../../utils/getUsernameFromEmail";
@@ -47,31 +43,21 @@ const Feed = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
-  const [likeToast, setLikeToast] =
-    useState<ToastState | null>(null);
+  const [likeToast, setLikeToast] = useState<ToastState | null>(null);
 
-  const [commentToast, setCommentToast] =
-    useState<ToastState | null>(null);
+  const [commentToast, setCommentToast] = useState<ToastState | null>(null);
 
   /* -----------------------------------------
      Delete confirmation
   ----------------------------------------- */
 
-  const [deletePostId, setDeletePostId] =
-    useState<string | null>(null);
+  const [deletePostId, setDeletePostId] = useState<string | null>(null);
 
   /* -----------------------------------------
      Fetch Posts
   ----------------------------------------- */
 
   const fetchPosts = async (showLoading = true) => {
-    if (!isAuthenticated) {
-      setPosts([]);
-      setError(null);
-      setIsLoading(false);
-      return;
-    }
-
     try {
       if (showLoading) {
         setIsLoading(true);
@@ -82,56 +68,42 @@ const Feed = () => {
       const postsData = await getPosts();
 
       const uniqueAuthorIds = [
-        ...new Set(
-          postsData.map((post) => post.authorId),
-        ),
+        ...new Set(postsData.map((post) => post.authorId)),
       ];
 
       const users = await Promise.all(
-        uniqueAuthorIds.map((id) =>
-          getUserById(id),
-        ),
+        uniqueAuthorIds.map((id) => getUserById(id)),
       );
 
-      const usersMap = new Map(
-        users.map((user) => [user.id, user]),
-      );
+      const usersMap = new Map(users.map((user) => [user.id, user]));
 
-      const postsWithAuthors: PostWithAuthor[] =
-        postsData.flatMap((post) => {
-          const author = usersMap.get(
-            post.authorId,
-          );
+      const postsWithAuthors: PostWithAuthor[] = postsData.flatMap((post) => {
+        const author = usersMap.get(post.authorId);
 
-          if (!author) {
-            return [];
-          }
+        if (!author) {
+          return [];
+        }
 
-          return [
-            {
-              ...post,
-              author: {
-                id: author.id,
-                name: author.name,
-                email: author.email,
-                image: author.image ?? null,
-                avatar: author.avatar ?? null,
-              },
+        return [
+          {
+            ...post,
+            author: {
+              id: author.id,
+              name: author.name,
+              email: author.email,
+              image: author.image ?? null,
+              avatar: author.avatar ?? null,
             },
-          ];
-        });
+          },
+        ];
+      });
 
       setPosts(postsWithAuthors);
     } catch (error) {
-      console.error(
-        "Failed to load posts:",
-        error,
-      );
+      console.error("Failed to load posts:", error);
 
       setError(
-        error instanceof Error
-          ? error.message
-          : "Failed to load posts.",
+        error instanceof Error ? error.message : "Failed to load posts.",
       );
     } finally {
       if (showLoading) {
@@ -141,13 +113,6 @@ const Feed = () => {
   };
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      setPosts([]);
-      setError(null);
-      setIsLoading(false);
-      return;
-    }
-
     void fetchPosts();
   }, [isAuthenticated]);
 
@@ -156,9 +121,7 @@ const Feed = () => {
   ----------------------------------------- */
 
   const handlePostCreated = async () => {
-    setSuccessMessage(
-      "Post created successfully",
-    );
+    setSuccessMessage("Post created successfully");
 
     setShowSuccess(true);
 
@@ -172,9 +135,7 @@ const Feed = () => {
   const handlePostUpdated = async () => {
     await fetchPosts(false);
 
-    setSuccessMessage(
-      "Post updated successfully",
-    );
+    setSuccessMessage("Post updated successfully");
 
     setShowSuccess(true);
   };
@@ -191,16 +152,11 @@ const Feed = () => {
      Comment added
   ----------------------------------------- */
 
-  const handleCommentAdded = async (
-    postId: string,
-  ) => {
+  const handleCommentAdded = async (postId: string) => {
     try {
       await fetchPosts(false);
     } catch (error) {
-      console.error(
-        `Failed to refresh post ${postId}:`,
-        error,
-      );
+      console.error(`Failed to refresh post ${postId}:`, error);
     }
   };
 
@@ -208,19 +164,13 @@ const Feed = () => {
      Like message
   ----------------------------------------- */
 
-  const handleLikeMessage = (
-    message: string,
-  ) => {
-    const isError = message
-      .toLowerCase()
-      .includes("failed");
+  const handleLikeMessage = (message: string) => {
+    const isError = message.toLowerCase().includes("failed");
 
     setLikeToast({
       id: Date.now(),
       message,
-      type: isError
-        ? "error"
-        : "success",
+      type: isError ? "error" : "success",
     });
   };
 
@@ -228,19 +178,13 @@ const Feed = () => {
      Comment message
   ----------------------------------------- */
 
-  const handleCommentMessage = (
-    message: string,
-  ) => {
-    const isError = message
-      .toLowerCase()
-      .includes("failed");
+  const handleCommentMessage = (message: string) => {
+    const isError = message.toLowerCase().includes("failed");
 
     setCommentToast({
       id: Date.now(),
       message,
-      type: isError
-        ? "error"
-        : "success",
+      type: isError ? "error" : "success",
     });
   };
 
@@ -248,9 +192,7 @@ const Feed = () => {
      Open delete confirmation
   ----------------------------------------- */
 
-  const handleDeletePost = (
-    postId: string,
-  ) => {
+  const handleDeletePost = (postId: string) => {
     setDeletePostId(postId);
   };
 
@@ -269,30 +211,21 @@ const Feed = () => {
       await deletePost(postId);
 
       setPosts((currentPosts) =>
-        currentPosts.filter(
-          (post) => post.id !== postId,
-        ),
+        currentPosts.filter((post) => post.id !== postId),
       );
 
       setDeletePostId(null);
 
-      setSuccessMessage(
-        "Post deleted successfully",
-      );
+      setSuccessMessage("Post deleted successfully");
 
       setShowSuccess(true);
     } catch (error) {
-      console.error(
-        "Failed to delete post:",
-        error,
-      );
+      console.error("Failed to delete post:", error);
 
       setDeletePostId(null);
 
       setError(
-        error instanceof Error
-          ? error.message
-          : "Failed to delete post.",
+        error instanceof Error ? error.message : "Failed to delete post.",
       );
     }
   };
@@ -310,11 +243,7 @@ const Feed = () => {
   ----------------------------------------- */
 
   if (isAuthenticated && error) {
-    return (
-      <ErrorScreen
-        onRetry={() => fetchPosts(true)}
-      />
-    );
+    return <ErrorScreen onRetry={() => fetchPosts(true)} />;
   }
 
   return (
@@ -335,9 +264,7 @@ const Feed = () => {
           key={commentToast.id}
           message={commentToast.message}
           type={commentToast.type}
-          onDone={() =>
-            setCommentToast(null)
-          }
+          onDone={() => setCommentToast(null)}
         />
       )}
 
@@ -348,9 +275,7 @@ const Feed = () => {
 
         {isAuthenticated && (
           <ActionModal
-            isOpen={
-              deletePostId !== null
-            }
+            isOpen={deletePostId !== null}
             variant="danger"
             title="Delete post?"
             description="Are you sure you want to delete this post? This action cannot be undone."
@@ -372,18 +297,15 @@ const Feed = () => {
           <ActionModal
             isOpen={showSuccess}
             variant={
-              successMessage ===
-              "Post deleted successfully"
+              successMessage === "Post deleted successfully"
                 ? "danger"
                 : "success"
             }
             title={successMessage}
             description={
-              successMessage ===
-              "Post created successfully"
+              successMessage === "Post created successfully"
                 ? "Your post has been published and is now visible to others."
-                : successMessage ===
-                    "Post updated successfully"
+                : successMessage === "Post updated successfully"
                   ? "Your post has been updated successfully."
                   : "Your post has been deleted successfully."
             }
@@ -397,104 +319,54 @@ const Feed = () => {
             Create Post
         ----------------------------------------- */}
 
-        {isAuthenticated && (
-          <CreatePost
-            onPostCreated={
-              handlePostCreated
-            }
-          />
-        )}
+        {isAuthenticated && <CreatePost onPostCreated={handlePostCreated} />}
 
         {/* -----------------------------------------
             Posts
         ----------------------------------------- */}
 
-        {isAuthenticated && (
-          <>
-            {posts.length === 0 ? (
-              <p
-                className="
+        <>
+          {posts.length === 0 ? (
+            <p
+              className="
                   text-center
                   text-sm
                   text-[var(--color-content-secondary)]
                 "
-              >
-                No posts yet.
-              </p>
-            ) : (
-              <div className="flex flex-col gap-6">
-                {posts.map((post) => (
-                  <PostCard
-                    key={post.id}
-                    postId={post.id}
-                    authorId={
-                      post.author?.id ??
-                      post.authorId
-                    }
-                    name={
-                      post.author?.name ??
-                      "User"
-                    }
-                    username={getUsernameFromEmail(
-                      post.author?.email ?? "",
-                    )}
-                    createdAt={
-                      post.createdAt
-                    }
-                    content={post.content}
-                    image={
-                      post.image ??
-                      undefined
-                    }
-                    likes={
-                      post._count?.likes ??
-                      0
-                    }
-                    comments={
-                      post._count?.comments ??
-                      0
-                    }
-                    avatar={
-                      post.author?.image ??
-                      undefined
-                    }
-                    likesData={
-                      post.likes ?? []
-                    }
-                    commentsData={
-                      post.comments ?? []
-                    }
-                    showEdit={
-                      post.author?.id ===
-                      user?.id
-                    }
-                    onPostUpdated={
-                      handlePostUpdated
-                    }
-                    showDelete={
-                      post.author?.id ===
-                      user?.id
-                    }
-                    onDelete={() => {
-                      handleDeletePost(
-                        post.id,
-                      );
-                    }}
-                    onLikeMessage={
-                      handleLikeMessage
-                    }
-                    onCommentAdded={
-                      handleCommentAdded
-                    }
-                    onCommentMessage={
-                      handleCommentMessage
-                    }
-                  />
-                ))}
-              </div>
-            )}
-          </>
-        )}
+            >
+              No posts yet.
+            </p>
+          ) : (
+            <div className="flex flex-col gap-6">
+              {posts.map((post) => (
+                <PostCard
+                  key={post.id}
+                  postId={post.id}
+                  authorId={post.author?.id ?? post.authorId}
+                  name={post.author?.name ?? "User"}
+                  username={getUsernameFromEmail(post.author?.email ?? "")}
+                  createdAt={post.createdAt}
+                  content={post.content}
+                  image={post.image ?? undefined}
+                  likes={post._count?.likes ?? 0}
+                  comments={post._count?.comments ?? 0}
+                  avatar={post.author?.image ?? undefined}
+                  likesData={post.likes ?? []}
+                  commentsData={post.comments ?? []}
+                  showEdit={post.author?.id === user?.id}
+                  onPostUpdated={handlePostUpdated}
+                  showDelete={post.author?.id === user?.id}
+                  onDelete={() => {
+                    handleDeletePost(post.id);
+                  }}
+                  onLikeMessage={handleLikeMessage}
+                  onCommentAdded={handleCommentAdded}
+                  onCommentMessage={handleCommentMessage}
+                />
+              ))}
+            </div>
+          )}
+        </>
       </div>
     </section>
   );
