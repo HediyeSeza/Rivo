@@ -34,7 +34,7 @@ interface ToastState {
 }
 
 const Feed = () => {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
   const [posts, setPosts] = useState<PostWithAuthor[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -291,7 +291,7 @@ const Feed = () => {
 
         {/* Create Post */}
 
-        <CreatePost onPostCreated={handlePostCreated} />
+        {isAuthenticated && <CreatePost onPostCreated={handlePostCreated} />}
 
         {/* Posts */}
 

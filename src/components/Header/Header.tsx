@@ -116,6 +116,7 @@ function Header() {
           gap-4
           px-4
           shadow-sm
+          dark:shadow-[#2c2c2c]
           backdrop-blur-lg
           transition-all
           duration-300
@@ -163,52 +164,56 @@ function Header() {
             lg:gap-3
           "
         >
-          {/* Desktop Search */}
-          <div
-            className="
-            mx-auto
-            hidden
-            min-w-0
-            lg:min-w-[400px]
-            xl:min-w-[500px]
-            flex-1
-            lg:block
-            md:max-w-[420px]
-            lg:max-w-[580px]
-            xl:max-w-[620px]
-            2xl:max-w-[680px]
-          "
-          >
-            <SearchBar
-              value={searchQuery}
-              onChange={handleSearchChange}
-              onClear={handleSearchClear}
-            />
-          </div>
+          {isAuthenticated && (
+            <>
+              {/* Desktop Search */}
+              <div
+                className="
+                  mx-auto
+                  hidden
+                  min-w-0
+                  lg:min-w-[400px]
+                  xl:min-w-[500px]
+                  flex-1
+                  lg:block
+                  md:max-w-[420px]
+                  lg:max-w-[580px]
+                  xl:max-w-[620px]
+                  2xl:max-w-[680px]
+                "
+              >
+                <SearchBar
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  onClear={handleSearchClear}
+                />
+              </div>
 
-          {/* Mobile Search */}
-          <button
-            type="button"
-            onClick={() => navigate("/search")}
-            aria-label="Search"
-            className="
-              flex
-              h-10
-              w-10
-              shrink-0
-              items-center
-              justify-center
-              rounded-xl
-              text-[var(--color-content-primary)]
-              transition
-              duration-200
-              hover:bg-black/5
-              dark:hover:bg-white/5
-              lg:hidden
-            "
-          >
-            <Icon name="Search" size={20} />
-          </button>
+              {/* Mobile Search */}
+              <button
+                type="button"
+                onClick={() => navigate("/search")}
+                aria-label="Search"
+                className="
+                  flex
+                  h-10
+                  w-10
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-xl
+                  text-[var(--color-content-primary)]
+                  transition
+                  duration-200
+                  hover:bg-black/5
+                  dark:hover:bg-white/5
+                  lg:hidden
+                "
+              >
+                <Icon name="Search" size={20} />
+              </button>
+            </>
+          )}
 
           {/* Theme Toggle */}
           <div
