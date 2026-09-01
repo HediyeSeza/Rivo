@@ -200,6 +200,7 @@ const CreatePost = ({ onPostCreated }: CreatePostProps) => {
                 flex
                 h-9
                 w-9
+                cursor-pointer
                 items-center
                 justify-center
                 rounded-full
