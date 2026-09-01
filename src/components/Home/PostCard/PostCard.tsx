@@ -4,10 +4,14 @@ import { useState } from "react";
 import Icon from "../../common/Icon/Icon";
 import Avatar from "../../common/Avatar/Avatar";
 import LikeButton from "../../common/Selection/LikeButton/LikeButton";
+import EditableContent from "../../common/EditableContent/EditableContent";
 
 import avatarImage from "../../../assets/Avatar/a.png";
 
-import { type PostComment } from "../../../services/postApi";
+import {
+  type PostComment,
+  updatePost,
+} from "../../../services/postApi";
 
 import Comments from "./Comments/Comments";
 
@@ -42,7 +46,12 @@ interface PostCardProps {
 
   showDelete?: boolean;
   onDelete?: () => void;
-};
+
+  showEdit?: boolean;
+  onPostUpdated?: (
+    postId: string,
+  ) => void | Promise<void>;
+}
 
 /* =========================================
    Post Time
@@ -120,7 +129,6 @@ const resolvePostImageUrl = (
     return undefined;
   }
 
-  // If API already returns a complete URL
   if (
     value.startsWith("http://") ||
     value.startsWith("https://") ||
@@ -130,7 +138,6 @@ const resolvePostImageUrl = (
     return value;
   }
 
-  // Uploadcare UUID
   const uuid = value.match(
     /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i,
   )?.[0];
@@ -139,7 +146,6 @@ const resolvePostImageUrl = (
     return `${CDN_BASE}/${uuid}/`;
   }
 
-  // Relative URL
   if (value.startsWith("/")) {
     return value;
   }
@@ -170,36 +176,67 @@ const PostCard = ({
   onCommentMessage,
   showDelete = false,
   onDelete,
+  showEdit = false,
+  onPostUpdated,
 }: PostCardProps) => {
   const [showComments, setShowComments] =
+    useState(false);
+
+  const [isEditing, setIsEditing] =
     useState(false);
 
   const postImageUrl =
     resolvePostImageUrl(image);
 
   /* =========================================
-     Debug Image
+     Update Post
   ========================================= */
 
-  console.log(
-    "========== POST IMAGE DEBUG ==========",
-  );
+  const handleUpdatePost = async (
+    newContent: string,
+  ) => {
+    try {
+      const response = await updatePost(
+        postId,
+        {
+          content: newContent,
+        },
+      );
 
-  console.log("Post ID:", postId);
+      if (!response.success) {
+        return {
+          success: false,
+          message:
+            response.message ||
+            "Failed to update post.",
+        };
+      }
 
-  console.log(
-    "Image from API:",
-    image,
-  );
+      setIsEditing(false);
 
-  console.log(
-    "Resolved image URL:",
-    postImageUrl,
-  );
+      await onPostUpdated?.(postId);
 
-  console.log(
-    "======================================",
-  );
+      return {
+        success: true,
+        message:
+          response.message ||
+          "Post updated successfully.",
+      };
+    } catch (error) {
+      console.error(
+        "Failed to update post:",
+        error,
+      );
+
+      return {
+        success: false,
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to update post.",
+      };
+    }
+  };
 
   return (
     <article
@@ -293,31 +330,66 @@ const PostCard = ({
           </div>
         </div>
 
-        {showDelete && (
-          <button
-            type="button"
-            onClick={onDelete}
-            aria-label="Delete post"
-            className="
-              flex
-              h-9
-              w-9
-              shrink-0
-              cursor-pointer
-              items-center
-              justify-center
-              rounded-lg
-              transition-colors
-              duration-200
-              hover:bg-black/5
-              dark:hover:bg-white/5
-            "
-          >
-            <Icon
-              name="Tash"
-              size={20}
-            />
-          </button>
+        {/* =========================================
+            Edit + Delete
+        ========================================= */}
+
+        {(showEdit || showDelete) && !isEditing && (
+          <div className="flex items-center gap-1">
+            {showEdit && (
+              <button
+                type="button"
+                onClick={() => setIsEditing(true)}
+                aria-label="Edit post"
+                className="
+                  flex
+                  h-9
+                  w-9
+                  shrink-0
+                  cursor-pointer
+                  items-center
+                  justify-center
+                  rounded-lg
+                  transition-colors
+                  duration-200
+                  hover:bg-black/5
+                  dark:hover:bg-white/5
+                "
+              >
+                <Icon
+                  name="EditComment"
+                  size={18}
+                />
+              </button>
+            )}
+
+            {showDelete && (
+              <button
+                type="button"
+                onClick={onDelete}
+                aria-label="Delete post"
+                className="
+                  flex
+                  h-9
+                  w-9
+                  shrink-0
+                  cursor-pointer
+                  items-center
+                  justify-center
+                  rounded-lg
+                  transition-colors
+                  duration-200
+                  hover:bg-black/5
+                  dark:hover:bg-white/5
+                "
+              >
+                <Icon
+                  name="Tash"
+                  size={20}
+                />
+              </button>
+            )}
+          </div>
         )}
       </div>
 
@@ -326,66 +398,89 @@ const PostCard = ({
       ========================================= */}
 
       <div className="mt-3">
-        <p
-          className="
-            whitespace-pre-wrap
-            break-words
-            text-[14px]
-            leading-5
-            text-[var(--color-content-primary)]
-          "
-        >
-          {content}
-        </p>
-
-        {/* =========================================
-            Post Image
-        ========================================= */}
-
-        {postImageUrl && (
-          <div
-            className="
-              mt-3
-              flex
-              w-full
-              items-center
-              justify-center
-              overflow-hidden
-              rounded-xl
-              border
-              border-[var(--color-border)]
-              bg-[var(--color-background)]
-            "
-          >
-            <img
-              src={postImageUrl}
-              alt="Post image"
-              loading="lazy"
-              onLoad={() => {
-                console.log(
-                  "✅ Post image loaded successfully:",
-                  postImageUrl,
-                );
-              }}
-              onError={(event) => {
-                console.error(
-                  "❌ Failed to load post image:",
-                  event.currentTarget.src,
-                );
-
-                console.error(
-                  "Original image value:",
-                  image,
-                );
-              }}
-              className="
-                block
-                max-h-[520px]
-                w-full
-                object-contain
-              "
+        {isEditing ? (
+          <>
+            <EditableContent
+              initialContent={content}
+              onSave={handleUpdatePost}
+              onCancel={() => setIsEditing(false)}
+              rows={3}
+              saveLabel="Save"
+              savingLabel="Saving..."
             />
-          </div>
+
+            {postImageUrl && (
+              <div
+                className="
+                  mt-3
+                  flex
+                  w-full
+                  items-center
+                  justify-center
+                  overflow-hidden
+                  rounded-xl
+                  border
+                  border-[var(--color-border)]
+                  bg-[var(--color-background)]
+                "
+              >
+                <img
+                  src={postImageUrl}
+                  alt="Post image"
+                  loading="lazy"
+                  className="
+                    block
+                    max-h-[520px]
+                    w-full
+                    object-contain
+                  "
+                />
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <p
+              className="
+                whitespace-pre-wrap
+                break-words
+                text-[14px]
+                leading-5
+                text-[var(--color-content-primary)]
+              "
+            >
+              {content}
+            </p>
+
+            {postImageUrl && (
+              <div
+                className="
+                  mt-3
+                  flex
+                  w-full
+                  items-center
+                  justify-center
+                  overflow-hidden
+                  rounded-xl
+                  border
+                  border-[var(--color-border)]
+                  bg-[var(--color-background)]
+                "
+              >
+                <img
+                  src={postImageUrl}
+                  alt="Post image"
+                  loading="lazy"
+                  className="
+                    block
+                    max-h-[520px]
+                    w-full
+                    object-contain
+                  "
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
 
@@ -393,83 +488,89 @@ const PostCard = ({
           Actions
       ========================================= */}
 
-      <div className="mt-3 flex items-center gap-2">
-        <LikeButton
-          postId={postId}
-          likes={likesData}
-          likesCount={likes}
-          onMessage={onLikeMessage}
-          onLikeChange={onLikeChange}
-        />
-
-        <button
-          type="button"
-          aria-label={
-            showComments
-              ? "Hide comments"
-              : "Show comments"
-          }
-          onClick={() =>
-            setShowComments((prev) => !prev)
-          }
-          className={`
-            flex
-            cursor-pointer
-            items-center
-            gap-2
-            rounded-lg
-            px-2
-            py-1
-            text-[var(--color-content-secondary)]
-            transition-colors
-            duration-200
-            hover:bg-black/5
-            dark:hover:bg-white/5
-            ${
-              showComments
-                ? "bg-black/5 dark:bg-white/5"
-                : ""
-            }
-          `}
-        >
-          <Icon
-            name={
-              showComments
-                ? "ChatFill"
-                : "Chat"
-            }
-            size={18}
+      {!isEditing && (
+        <div className="mt-3 flex items-center gap-2">
+          <LikeButton
+            postId={postId}
+            likes={likesData}
+            likesCount={likes}
+            onMessage={onLikeMessage}
+            onLikeChange={onLikeChange}
           />
 
-          <span className="text-[14px]">
-            {comments}
-          </span>
-        </button>
-      </div>
+          <button
+            type="button"
+            aria-label={
+              showComments
+                ? "Hide comments"
+                : "Show comments"
+            }
+            onClick={() =>
+              setShowComments(
+                (prev) => !prev,
+              )
+            }
+            className={`
+              flex
+              cursor-pointer
+              items-center
+              gap-2
+              rounded-lg
+              px-2
+              py-1
+              text-[var(--color-content-secondary)]
+              transition-colors
+              duration-200
+              hover:bg-black/5
+              dark:hover:bg-white/5
+              ${
+                showComments
+                  ? "bg-black/5 dark:bg-white/5"
+                  : ""
+              }
+            `}
+          >
+            <Icon
+              name={
+                showComments
+                  ? "ChatFill"
+                  : "Chat"
+              }
+              size={18}
+            />
+
+            <span className="text-[14px]">
+              {comments}
+            </span>
+          </button>
+        </div>
+      )}
 
       {/* =========================================
           Comments
       ========================================= */}
 
-      {showComments && (
-        <div
-          className="
-            mt-4
-            border-t
-            border-[var(--color-border)]
-            pt-4
-          "
-        >
-          <Comments
-            postId={postId}
-            comments={commentsData}
-            onCommentAdded={
-              onCommentAdded ?? (() => {})
-            }
-            onMessage={onCommentMessage}
-          />
-        </div>
-      )}
+      {!isEditing &&
+        showComments && (
+          <div
+            className="
+              mt-4
+              border-t
+              border-[var(--color-border)]
+              pt-4
+            "
+          >
+            <Comments
+              postId={postId}
+              comments={commentsData}
+              onCommentAdded={
+                onCommentAdded ??
+                (() => {})
+              }
+              onMessage={onCommentMessage}
+            />
+          </div>
+        )}
     </article>
   );
 };

@@ -110,6 +110,40 @@ export const createPost = async (
 };
 
 /* =========================================
+   Update Post
+========================================= */
+
+export interface UpdatePostResponse {
+  message: string;
+  success: boolean;
+  data: Post;
+}
+
+export interface UpdatePostPayload {
+  content: string;
+  image?: string | null;
+}
+
+export const updatePost = async (
+  postId: string,
+  data: UpdatePostPayload,
+): Promise<UpdatePostResponse> => {
+  const payload: UpdatePostPayload = {
+    content: data.content.trim(),
+  };
+
+  if (data.image !== undefined) {
+    payload.image = data.image;
+  }
+
+  const response = await api.put<UpdatePostResponse>(
+    `/api/posts/${postId}`,
+    payload,
+  );
+
+  return response;
+};
+/* =========================================
    Delete Post
 ========================================= */
 
