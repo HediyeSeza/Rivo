@@ -35,6 +35,12 @@ type ProfilePostWithRelations = ProfilePost & {
   };
 
   post?: {
+    id?: string;
+    content?: string;
+    image?: string | null;
+    createdAt?: string;
+    updatedAt?: string;
+    authorId?: string;
     author?: {
       id?: string;
       name?: string;
@@ -48,8 +54,11 @@ type ProfilePostWithRelations = ProfilePost & {
     comments?: number;
   };
 
-  likes?: unknown[];
-  comments?: unknown[];
+  likes?: {
+    userId: string;
+  }[];
+
+  comments?: ProfilePost["comments"];
 };
 
 const ProfilePosts = ({
@@ -62,7 +71,8 @@ const ProfilePosts = ({
   const [activeTab, setActiveTab] =
     useState<ProfileTab>("posts");
 
-  const [posts, setPosts] = useState<ProfilePost[]>([]);
+  const [posts, setPosts] =
+    useState<ProfilePost[]>([]);
 
   const [likedPosts, setLikedPosts] =
     useState<ProfilePost[]>([]);
@@ -78,6 +88,10 @@ const ProfilePosts = ({
 
   const [showSuccess, setShowSuccess] =
     useState(false);
+
+  // -----------------------------------------
+  // Load profile posts
+  // -----------------------------------------
 
   useEffect(() => {
     const loadProfilePosts = async () => {
@@ -123,12 +137,20 @@ const ProfilePosts = ({
     };
 
     void loadProfilePosts();
-  }, [userId]);
+  }, [
+    userId,
+    onLoadingChange,
+    onPostsCountChange,
+  ]);
 
   const displayedPosts =
     activeTab === "posts"
       ? posts
       : likedPosts;
+
+  // -----------------------------------------
+  // Delete post
+  // -----------------------------------------
 
   const handleDeletePost = async () => {
     if (
@@ -182,6 +204,10 @@ const ProfilePosts = ({
     }
   };
 
+  // -----------------------------------------
+  // Post author
+  // -----------------------------------------
+
   const getPostAuthorName = (
     post: ProfilePost,
   ) => {
@@ -224,6 +250,10 @@ const ProfilePosts = ({
       userId
     );
   };
+
+  // -----------------------------------------
+  // Likes / Comments
+  // -----------------------------------------
 
   const getPostLikes = (
     post: ProfilePost,
@@ -319,16 +349,27 @@ const ProfilePosts = ({
     return currentPost.comments ?? [];
   };
 
+  // -----------------------------------------
+  // Get actual post
+  // -----------------------------------------
+
   const getActualPost = (
     post: ProfilePost,
-  ) => {
+  ): ProfilePost => {
     const currentPost =
-      post as ProfilePostWithRelations & {
-        post?: ProfilePost;
-      };
+      post as ProfilePostWithRelations;
 
-    return currentPost.post ?? post;
+    return currentPost.post
+      ? ({
+          ...post,
+          ...currentPost.post,
+        } as ProfilePost)
+      : post;
   };
+
+  // -----------------------------------------
+  // Loading
+  // -----------------------------------------
 
   if (isLoading) {
     return (
@@ -345,6 +386,10 @@ const ProfilePosts = ({
       </div>
     );
   }
+
+  // -----------------------------------------
+  // Error
+  // -----------------------------------------
 
   if (error) {
     return (
@@ -372,12 +417,14 @@ const ProfilePosts = ({
 
   return (
     <section className="w-full">
+      {/* Success Modal */}
       {showSuccess && (
         <SuccessModal
           message="Post deleted successfully"
         />
       )}
 
+      {/* Delete Confirmation */}
       {postToDelete && (
         <ConfirmModal
           onCancel={() =>
@@ -416,7 +463,6 @@ const ProfilePosts = ({
             font-medium
             transition-all
             duration-200
-
             ${
               activeTab === "posts"
                 ? "border-(--color-tab-active-border) bg-(--color-tab-active-bg) text-(--color-content-primary) shadow-sm"
@@ -445,7 +491,6 @@ const ProfilePosts = ({
             font-medium
             transition-all
             duration-200
-
             ${
               activeTab === "likes"
                 ? "border-(--color-tab-active-border) bg-(--color-tab-active-bg) text-(--color-content-primary) shadow-sm"
@@ -482,6 +527,12 @@ const ProfilePosts = ({
                 avatar={getPostAvatar(item)}
                 createdAt={post.createdAt}
                 content={post.content}
+
+                
+                image={
+                  post.image ?? undefined
+                }
+
                 likes={getPostLikes(item)}
                 comments={getPostComments(item)}
                 likesData={getPostLikesData(item)}
