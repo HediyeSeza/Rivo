@@ -1,10 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import Avatar from "../../../common/Avatar/Avatar";
 import Icon from "../../../common/Icon/Icon";
 import ConfirmModal from "../../../common/Modal/ConfirmModal";
-import { useNavigate } from "react-router-dom";
-import { searchUsers } from "../../../../services/userApi";
+import EditableContent from "../../../common/EditableContent/EditableContent";
 
 import avatarImage from "../../../../assets/Avatar/a.png";
 
@@ -13,6 +13,7 @@ import {
   updateComment,
   type PostComment,
 } from "../../../../services/postApi";
+import { searchUsers } from "../../../../services/userApi";
 
 import { useAuth } from "../../../../context/AuthContext";
 
@@ -65,8 +66,6 @@ const CommentItem = ({
   const isOwnComment = !!user && user.email === comment.author.email;
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editContent, setEditContent] = useState(comment.content);
-  const [isSaving, setIsSaving] = useState(false);
 
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -83,46 +82,6 @@ const CommentItem = ({
       }
     } catch (error) {
       console.error("Failed to find user profile:", error);
-    }
-  };
-
-  const startEditing = () => {
-    setEditContent(comment.content);
-    setIsEditing(true);
-  };
-
-  const cancelEditing = () => {
-    setIsEditing(false);
-  };
-
-  const handleSaveEdit = async () => {
-    const trimmed = editContent.trim();
-
-    if (!trimmed || isSaving) {
-      return;
-    }
-
-    try {
-      setIsSaving(true);
-
-      const response = await updateComment(postId, comment.id, trimmed);
-
-      onMessage?.(response.message);
-
-      if (!response.success) {
-        return;
-      }
-
-      setIsEditing(false);
-      await onCommentUpdated(postId);
-    } catch (error) {
-      console.error("Failed to update comment:", error);
-
-      onMessage?.(
-        error instanceof Error ? error.message : "Failed to update comment.",
-      );
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -191,14 +150,9 @@ const CommentItem = ({
               <div className="flex items-center gap-1">
                 <button
                   type="button"
-                  onClick={startEditing}
+                  onClick={() => setIsEditing(true)}
                   aria-label="Edit comment"
-                  className="
-                    rounded-md
-                    px-2
-                    py-1
-                    cursor-pointer
-                  "
+                  className="rounded-md px-2 py-1 cursor-pointer"
                 >
                   <Icon name="EditComment" size={15} />
                 </button>
@@ -207,12 +161,7 @@ const CommentItem = ({
                   type="button"
                   onClick={() => setIsConfirmingDelete(true)}
                   aria-label="Delete comment"
-                  className="
-                    rounded-md
-                    px-2
-                    py-1
-                    cursor-pointer
-                  "
+                  className="rounded-md px-2 py-1 cursor-pointer"
                 >
                   <Icon name="Tash" size={15} />
                 </button>
@@ -223,67 +172,26 @@ const CommentItem = ({
           {/* Comment Content / Edit Mode */}
           {isEditing ? (
             <div className="mt-2">
-              <textarea
-                value={editContent}
-                onChange={(event) => setEditContent(event.target.value)}
+              <EditableContent
+                initialContent={comment.content}
                 rows={2}
-                disabled={isSaving}
-                className="
-                  w-full
-                  resize-none
-                  rounded-xl
-                  border
-                  border-[var(--color-border)]
-                  bg-[var(--color-card)]
-                  px-3
-                  py-2
-                  text-[14px]
-                  text-[var(--color-content-primary)]
-                  outline-none
-                  focus:border-[var(--color-content-primary)]
-                  disabled:opacity-60
-                "
+                onCancel={() => setIsEditing(false)}
+                onMessage={onMessage}
+                onSave={async (newContent) => {
+                  const response = await updateComment(
+                    postId,
+                    comment.id,
+                    newContent,
+                  );
+
+                  if (response.success) {
+                    setIsEditing(false);
+                    await onCommentUpdated(postId);
+                  }
+
+                  return response;
+                }}
               />
-
-              <div className="mt-2 flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={cancelEditing}
-                  disabled={isSaving}
-                  className="
-                    rounded-lg
-                    px-3
-                    py-1.5
-                    cursor-pointer
-                    text-[13px]
-                    text-[var(--color-content-secondary)]
-                    hover:bg-black/5
-                    dark:hover:bg-white/5
-                  "
-                >
-                  Cancel
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleSaveEdit}
-                  disabled={!editContent.trim() || isSaving}
-                  className="
-                    rounded-lg
-                    bg-[var(--color-content-primary)]
-                    px-3
-                    py-1.5
-                    text-[13px]
-                    cursor-pointer
-                    font-semibold
-                    text-[var(--color-card)]
-                    disabled:cursor-not-allowed
-                    disabled:opacity-50
-                  "
-                >
-                  {isSaving ? "Saving..." : "Save"}
-                </button>
-              </div>
             </div>
           ) : (
             <p
