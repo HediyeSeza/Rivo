@@ -16,6 +16,7 @@ const CDN_BASE = "https://79gcelddzk.ucarecd.net";
 
 interface PostCardProps {
   postId: string;
+  authorId: string;
 
   name: string;
   username: string;
@@ -47,7 +48,9 @@ const formatPostTime = (createdAt: string) => {
   const postDate = new Date(createdAt);
   const now = new Date();
 
-  const diffInSeconds = Math.floor((now.getTime() - postDate.getTime()) / 1000);
+  const diffInSeconds = Math.floor(
+    (now.getTime() - postDate.getTime()) / 1000,
+  );
 
   if (diffInSeconds < 60) {
     return "just now";
@@ -56,25 +59,33 @@ const formatPostTime = (createdAt: string) => {
   const diffInMinutes = Math.floor(diffInSeconds / 60);
 
   if (diffInMinutes < 60) {
-    return `${diffInMinutes} ${diffInMinutes === 1 ? "minute" : "minutes"} ago`;
+    return `${diffInMinutes} ${
+      diffInMinutes === 1 ? "minute" : "minutes"
+    } ago`;
   }
 
   const diffInHours = Math.floor(diffInMinutes / 60);
 
   if (diffInHours < 24) {
-    return `${diffInHours} ${diffInHours === 1 ? "hour" : "hours"} ago`;
+    return `${diffInHours} ${
+      diffInHours === 1 ? "hour" : "hours"
+    } ago`;
   }
 
   const diffInDays = Math.floor(diffInHours / 24);
 
   if (diffInDays < 7) {
-    return `${diffInDays} ${diffInDays === 1 ? "day" : "days"} ago`;
+    return `${diffInDays} ${
+      diffInDays === 1 ? "day" : "days"
+    } ago`;
   }
 
   const diffInWeeks = Math.floor(diffInDays / 7);
 
   if (diffInWeeks < 4) {
-    return `${diffInWeeks} ${diffInWeeks === 1 ? "week" : "weeks"} ago`;
+    return `${diffInWeeks} ${
+      diffInWeeks === 1 ? "week" : "weeks"
+    } ago`;
   }
 
   return postDate.toLocaleDateString();
@@ -107,6 +118,7 @@ const resolvePostImageUrl = (image?: string | null) => {
 
 const PostCard = ({
   postId,
+  authorId,
   name,
   username,
   createdAt,
@@ -144,23 +156,48 @@ const PostCard = ({
     >
       {/* Post Header */}
       <div className="flex items-center gap-3">
-        <Avatar src={avatar || avatarImage} alt={`${name} avatar`} size={40} />
+        {/* Author Avatar */}
+        <Link
+          to={`/profile/${authorId}`}
+          className="
+            shrink-0
+            cursor-pointer
+            rounded-full
+            transition-opacity
+            duration-200
+            hover:opacity-80
+          "
+          aria-label={`View ${name}'s profile`}
+        >
+          <Avatar
+            src={avatar || avatarImage}
+            alt={`${name} avatar`}
+            size={40}
+          />
+        </Link>
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-            <h3
+            {/* Author Name */}
+            <Link
+              to={`/profile/${authorId}`}
               className="
+                cursor-pointer
                 text-[16px]
                 font-bold
                 leading-5
                 text-[var(--color-content-primary)]
+                transition-opacity
+                duration-200
+                hover:opacity-70
               "
             >
               {name}
-            </h3>
+            </Link>
 
+            {/* Username */}
             <Link
-              to={`/profile/${username}`}
+              to={`/profile/${authorId}`}
               className="
                 cursor-pointer
                 text-[12px]
@@ -251,7 +288,9 @@ const PostCard = ({
         {/* Comment */}
         <button
           type="button"
-          aria-label={showComments ? "Hide comments" : "Show comments"}
+          aria-label={
+            showComments ? "Hide comments" : "Show comments"
+          }
           onClick={() => setShowComments((prev) => !prev)}
           className={`
             flex
@@ -269,9 +308,14 @@ const PostCard = ({
             ${showComments ? "bg-black/5 dark:bg-white/5" : ""}
           `}
         >
-          <Icon name={showComments ? "ChatFill" : "Chat"} size={18} />
+          <Icon
+            name={showComments ? "ChatFill" : "Chat"}
+            size={18}
+          />
 
-          <span className="text-[14px]">{comments}</span>
+          <span className="text-[14px]">
+            {comments}
+          </span>
         </button>
       </div>
 

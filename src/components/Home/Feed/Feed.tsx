@@ -177,7 +177,9 @@ const Feed = () => {
       await deletePost(postId);
 
       setPosts((currentPosts) =>
-        currentPosts.filter((post) => post.id !== postId),
+        currentPosts.filter(
+          (post) => post.id !== postId,
+        ),
       );
 
       setSuccessMessage("Post deleted successfully");
@@ -225,8 +227,8 @@ const Feed = () => {
 
   return (
     <section className="w-full">
-
       {/* Toast */}
+
       {likeToast && (
         <Toast
           key={likeToast.id}
@@ -244,29 +246,34 @@ const Feed = () => {
       )}
 
       <div className="mx-auto w-full">
+        {/* Success Action Modal */}
 
-<ActionModal
-  isOpen={showSuccess}
-  variant={
-    successMessage === "Post deleted successfully"
-      ? "danger"
-      : "success"
-  }
-  title={successMessage}
-  description={
-    successMessage === "Post created successfully"
-      ? "Your post has been published and is now visible to others."
-      : "Your post has been deleted successfully."
-  }
-  buttonText="Awesome!"
-  onAction={handleCloseSuccess}
-  onClose={handleCloseSuccess}
-/>
+        <ActionModal
+          isOpen={showSuccess}
+          variant={
+            successMessage === "Post deleted successfully"
+              ? "danger"
+              : "success"
+          }
+          title={successMessage}
+          description={
+            successMessage === "Post created successfully"
+              ? "Your post has been published and is now visible to others."
+              : "Your post has been deleted successfully."
+          }
+          buttonText="Awesome!"
+          onAction={handleCloseSuccess}
+          onClose={handleCloseSuccess}
+        />
 
         {/* Create Post */}
-        <CreatePost onPostCreated={handlePostCreated} />
+
+        <CreatePost
+          onPostCreated={handlePostCreated}
+        />
 
         {/* Posts */}
+
         {posts.length === 0 ? (
           <p
             className="
@@ -283,6 +290,7 @@ const Feed = () => {
               <PostCard
                 key={post.id}
                 postId={post.id}
+                authorId={post.author?.id ?? post.authorId}
                 name={post.author?.name ?? "User"}
                 username={getUsernameFromEmail(
                   post.author?.email ?? "",
