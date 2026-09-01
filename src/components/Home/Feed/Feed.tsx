@@ -18,6 +18,8 @@ import { getUsernameFromEmail } from "../../../utils/getUsernameFromEmail";
 
 import Toast from "../../Toast/Toast";
 
+type ToastType = "success" | "error";
+
 type PostWithAuthor = Post & {
   author: {
     id: string;
@@ -27,6 +29,12 @@ type PostWithAuthor = Post & {
     avatar?: string | null;
   };
 };
+
+interface ToastState {
+  id: number;
+  message: string;
+  type: ToastType;
+}
 
 const Feed = () => {
   const { user } = useAuth();
@@ -38,15 +46,18 @@ const Feed = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
-  const [likeToast, setLikeToast] = useState<{
-    id: number;
-    message: string;
-  } | null>(null);
+  const [likeToast, setLikeToast] =
+    useState<ToastState | null>(null);
 
-  const [commentToast, setCommentToast] = useState<{
-    id: number;
-    message: string;
-  } | null>(null);
+  const [commentToast, setCommentToast] =
+    useState<ToastState | null>(null);
+
+  // -----------------------------------------
+  // Delete confirmation
+  // -----------------------------------------
+
+  const [deletePostId, setDeletePostId] =
+    useState<string | null>(null);
 
   const fetchPosts = async (showLoading = true) => {
     try {
@@ -59,20 +70,29 @@ const Feed = () => {
       const postsData = await getPosts();
 
       const uniqueAuthorIds = [
-        ...new Set(postsData.map((post) => post.authorId)),
+        ...new Set(
+          postsData.map((post) => post.authorId),
+        ),
       ];
 
       const users = await Promise.all(
-        uniqueAuthorIds.map((id) => getUserById(id)),
+        uniqueAuthorIds.map((id) =>
+          getUserById(id),
+        ),
       );
 
       const usersMap = new Map(
-        users.map((user) => [user.id, user]),
+        users.map((user) => [
+          user.id,
+          user,
+        ]),
       );
 
       const postsWithAuthors: PostWithAuthor[] =
         postsData.flatMap((post) => {
-          const author = usersMap.get(post.authorId);
+          const author = usersMap.get(
+            post.authorId,
+          );
 
           if (!author) {
             return [];
@@ -94,7 +114,10 @@ const Feed = () => {
 
       setPosts(postsWithAuthors);
     } catch (error) {
-      console.error("Failed to load posts:", error);
+      console.error(
+        "Failed to load posts:",
+        error,
+      );
 
       setError(
         error instanceof Error
@@ -117,7 +140,10 @@ const Feed = () => {
   // -----------------------------------------
 
   const handlePostCreated = async () => {
-    setSuccessMessage("Post created successfully");
+    setSuccessMessage(
+      "Post created successfully",
+    );
+
     setShowSuccess(true);
 
     await fetchPosts(false);
@@ -135,7 +161,9 @@ const Feed = () => {
   // Comment added
   // -----------------------------------------
 
-  const handleCommentAdded = async (postId: string) => {
+  const handleCommentAdded = async (
+    postId: string,
+  ) => {
     try {
       await fetchPosts(false);
     } catch (error) {
@@ -150,10 +178,19 @@ const Feed = () => {
   // Like message
   // -----------------------------------------
 
-  const handleLikeMessage = (message: string) => {
+  const handleLikeMessage = (
+    message: string,
+  ) => {
+    const isError = message
+      .toLowerCase()
+      .includes("failed");
+
     setLikeToast({
       id: Date.now(),
       message,
+      type: isError
+        ? "error"
+        : "success",
     });
   };
 
@@ -161,18 +198,41 @@ const Feed = () => {
   // Comment message
   // -----------------------------------------
 
-  const handleCommentMessage = (message: string) => {
+  const handleCommentMessage = (
+    message: string,
+  ) => {
+    const isError = message
+      .toLowerCase()
+      .includes("failed");
+
     setCommentToast({
       id: Date.now(),
       message,
+      type: isError
+        ? "error"
+        : "success",
     });
   };
 
   // -----------------------------------------
-  // Delete post
+  // Open delete confirmation
   // -----------------------------------------
 
-  const handleDeletePost = async (postId: string) => {
+  const handleDeletePost = (postId: string) => {
+    setDeletePostId(postId);
+  };
+
+  // -----------------------------------------
+  // Confirm delete post
+  // -----------------------------------------
+
+  const confirmDeletePost = async () => {
+    if (!deletePostId) {
+      return;
+    }
+
+    const postId = deletePostId;
+
     try {
       await deletePost(postId);
 
@@ -182,10 +242,20 @@ const Feed = () => {
         ),
       );
 
-      setSuccessMessage("Post deleted successfully");
+      setDeletePostId(null);
+
+      setSuccessMessage(
+        "Post deleted successfully",
+      );
+
       setShowSuccess(true);
     } catch (error) {
-      console.error("Failed to delete post:", error);
+      console.error(
+        "Failed to delete post:",
+        error,
+      );
+
+      setDeletePostId(null);
 
       setError(
         error instanceof Error
@@ -233,7 +303,10 @@ const Feed = () => {
         <Toast
           key={likeToast.id}
           message={likeToast.message}
-          onDone={() => setLikeToast(null)}
+          type={likeToast.type}
+          onDone={() =>
+            setLikeToast(null)
+          }
         />
       )}
 
@@ -241,23 +314,44 @@ const Feed = () => {
         <Toast
           key={commentToast.id}
           message={commentToast.message}
-          onDone={() => setCommentToast(null)}
+          type={commentToast.type}
+          onDone={() =>
+            setCommentToast(null)
+          }
         />
       )}
 
       <div className="mx-auto w-full">
+        {/* Delete Confirmation Modal */}
+
+        <ActionModal
+          isOpen={deletePostId !== null}
+          variant="danger"
+          title="Delete post?"
+          description="Are you sure you want to delete this post? This action cannot be undone."
+          buttonText="Delete"
+          onAction={() => {
+            void confirmDeletePost();
+          }}
+          onClose={() => {
+            setDeletePostId(null);
+          }}
+        />
+
         {/* Success Action Modal */}
 
         <ActionModal
           isOpen={showSuccess}
           variant={
-            successMessage === "Post deleted successfully"
+            successMessage ===
+            "Post deleted successfully"
               ? "danger"
               : "success"
           }
           title={successMessage}
           description={
-            successMessage === "Post created successfully"
+            successMessage ===
+            "Post created successfully"
               ? "Your post has been published and is now visible to others."
               : "Your post has been deleted successfully."
           }
@@ -290,8 +384,14 @@ const Feed = () => {
               <PostCard
                 key={post.id}
                 postId={post.id}
-                authorId={post.author?.id ?? post.authorId}
-                name={post.author?.name ?? "User"}
+                authorId={
+                  post.author?.id ??
+                  post.authorId
+                }
+                name={
+                  post.author?.name ??
+                  "User"
+                }
                 username={getUsernameFromEmail(
                   post.author?.email ?? "",
                 )}
@@ -300,16 +400,34 @@ const Feed = () => {
                 image={post.image ?? undefined}
                 likes={post._count?.likes ?? 0}
                 comments={post._count?.comments ?? 0}
-                avatar={post.author?.image ?? undefined}
-                likesData={post.likes ?? []}
-                commentsData={post.comments ?? []}
-                showDelete={post.author?.id === user?.id}
+                avatar={
+                  post.author?.image ??
+                  undefined
+                }
+                likesData={
+                  post.likes ?? []
+                }
+                commentsData={
+                  post.comments ?? []
+                }
+                showDelete={
+                  post.author?.id ===
+                  user?.id
+                }
                 onDelete={() => {
-                  void handleDeletePost(post.id);
+                  handleDeletePost(
+                    post.id,
+                  );
                 }}
-                onLikeMessage={handleLikeMessage}
-                onCommentAdded={handleCommentAdded}
-                onCommentMessage={handleCommentMessage}
+                onLikeMessage={
+                  handleLikeMessage
+                }
+                onCommentAdded={
+                  handleCommentAdded
+                }
+                onCommentMessage={
+                  handleCommentMessage
+                }
               />
             ))}
           </div>

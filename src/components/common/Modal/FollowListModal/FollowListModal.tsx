@@ -34,14 +34,20 @@ const FollowListModal = ({
 }: FollowListModalProps) => {
   const { user: authUser } = useAuth();
 
-  const [activeTab, setActiveTab] = useState<FollowTab>(initialTab);
-  const [users, setUsers] = useState<User[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] =
+    useState<FollowTab>(initialTab);
 
-  const [followedUserIds, setFollowedUserIds] = useState<Set<string>>(
-    new Set(),
-  );
+  const [users, setUsers] =
+    useState<User[]>([]);
+
+  const [isLoading, setIsLoading] =
+    useState(false);
+
+  const [error, setError] =
+    useState<string | null>(null);
+
+  const [followedUserIds, setFollowedUserIds] =
+    useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!isOpen) {
@@ -56,20 +62,28 @@ const FollowListModal = ({
       return;
     }
 
-    const loadCurrentUserFollowing = async () => {
-      try {
-        const followingUsers = await getUserFollowings(authUser.id);
+    const loadCurrentUserFollowing =
+      async () => {
+        try {
+          const followingUsers =
+            await getUserFollowings(
+              authUser.id,
+            );
 
-        setFollowedUserIds(
-          new Set(followingUsers.map((user) => user.id)),
-        );
-      } catch (error) {
-        console.error(
-          "Failed to load current user followings:",
-          error,
-        );
-      }
-    };
+          setFollowedUserIds(
+            new Set(
+              followingUsers.map(
+                (user) => user.id,
+              ),
+            ),
+          );
+        } catch (error) {
+          console.error(
+            "Failed to load current user followings:",
+            error,
+          );
+        }
+      };
 
     void loadCurrentUserFollowing();
   }, [isOpen, authUser?.id]);
@@ -92,19 +106,32 @@ const FollowListModal = ({
         const data =
           activeTab === "followers"
             ? await getUserFollowers(userId)
-            : await getUserFollowings(userId);
+            : await getUserFollowings(
+                userId,
+              );
 
         /*
-         * حتی اگر API سریع جواب بدهد،
-         * Loading حداقل 700ms نمایش داده می‌شود.
+         * Even if the API responds quickly,
+         * keep the loading state visible
+         * for at least 700ms.
          */
-        const elapsedTime = Date.now() - startTime;
-        const remainingTime = Math.max(700 - elapsedTime, 0);
+        const elapsedTime =
+          Date.now() - startTime;
+
+        const remainingTime = Math.max(
+          700 - elapsedTime,
+          0,
+        );
 
         if (remainingTime > 0) {
-          await new Promise((resolve) => {
-            window.setTimeout(resolve, remainingTime);
-          });
+          await new Promise(
+            (resolve) => {
+              window.setTimeout(
+                resolve,
+                remainingTime,
+              );
+            },
+          );
         }
 
         if (isCancelled) {
@@ -117,7 +144,10 @@ const FollowListModal = ({
           return;
         }
 
-        console.error("Failed to load follow list:", error);
+        console.error(
+          "Failed to load follow list:",
+          error,
+        );
 
         setError(
           error instanceof Error
@@ -136,23 +166,32 @@ const FollowListModal = ({
     return () => {
       isCancelled = true;
     };
-  }, [isOpen, activeTab, userId]);
+  }, [
+    isOpen,
+    activeTab,
+    userId,
+  ]);
 
   const handleFollowChange = (
     changedUserId: string,
     isFollowing: boolean,
   ) => {
-    setFollowedUserIds((currentIds) => {
-      const nextIds = new Set(currentIds);
+    setFollowedUserIds(
+      (currentIds) => {
+        const nextIds =
+          new Set(currentIds);
 
-      if (isFollowing) {
-        nextIds.add(changedUserId);
-      } else {
-        nextIds.delete(changedUserId);
-      }
+        if (isFollowing) {
+          nextIds.add(changedUserId);
+        } else {
+          nextIds.delete(
+            changedUserId,
+          );
+        }
 
-      return nextIds;
-    });
+        return nextIds;
+      },
+    );
   };
 
   if (!isOpen) {
@@ -187,7 +226,9 @@ const FollowListModal = ({
           bg-[var(--color-card)]
           shadow-xl
         "
-        onClick={(event) => event.stopPropagation()}
+        onClick={(event) =>
+          event.stopPropagation()
+        }
       >
         {/* Header */}
         <div
@@ -247,7 +288,9 @@ const FollowListModal = ({
         >
           <button
             type="button"
-            onClick={() => setActiveTab("followers")}
+            onClick={() =>
+              setActiveTab("followers")
+            }
             className={`
               relative
               cursor-pointer
@@ -264,7 +307,8 @@ const FollowListModal = ({
           >
             Followers
 
-            {activeTab === "followers" && (
+            {activeTab ===
+              "followers" && (
               <span
                 className="
                   absolute
@@ -282,7 +326,9 @@ const FollowListModal = ({
 
           <button
             type="button"
-            onClick={() => setActiveTab("following")}
+            onClick={() =>
+              setActiveTab("following")
+            }
             className={`
               relative
               cursor-pointer
@@ -299,7 +345,8 @@ const FollowListModal = ({
           >
             Following
 
-            {activeTab === "following" && (
+            {activeTab ===
+              "following" && (
               <span
                 className="
                   absolute
@@ -354,82 +401,112 @@ const FollowListModal = ({
           )}
 
           {/* Empty */}
-          {!isLoading && !error && users.length === 0 && (
-            <EmptyState
-              variant={
-                activeTab === "followers"
-                  ? "followers"
-                  : "following"
-              }
-              title={
-                activeTab === "followers"
-                  ? "No followers yet"
-                  : "Not following anyone yet"
-              }
-              description={
-                activeTab === "followers"
-                  ? "When people follow you, they’ll appear here."
-                  : "People you follow will appear here."
-              }
-            />
-          )}
+          {!isLoading &&
+            !error &&
+            users.length === 0 && (
+              <EmptyState
+                variant={
+                  activeTab ===
+                  "followers"
+                    ? "followers"
+                    : "following"
+                }
+                title={
+                  activeTab ===
+                  "followers"
+                    ? "No followers yet"
+                    : "Not following anyone yet"
+                }
+                description={
+                  activeTab ===
+                  "followers"
+                    ? "When people follow you, they’ll appear here."
+                    : "People you follow will appear here."
+                }
+              />
+            )}
 
           {/* Users */}
-          {!isLoading && !error && users.length > 0 && (
-            <div className="flex flex-col">
-              {users.map((user) => (
-                <div
-                  key={user.id}
-                  className="
-                    flex
-                    items-center
-                    gap-3
-                    border-b
-                    border-[var(--color-border)]
-                    px-5
-                    py-3
-                    last:border-b-0
-                  "
-                >
-                  <Avatar
-                    src={user.image ?? undefined}
-                    alt={`${user.name} avatar`}
-                    size={44}
-                  />
+          {!isLoading &&
+            !error &&
+            users.length > 0 && (
+              <div className="flex flex-col">
+                {users.map((user) => (
+                  <div
+                    key={user.id}
+                    className="
+                      flex
+                      items-center
+                      gap-3
+                      border-b
+                      border-[var(--color-border)]
+                      px-5
+                      py-3
+                      last:border-b-0
+                    "
+                  >
+                    <Avatar
+                      src={
+                        user.image ??
+                        undefined
+                      }
+                      alt={`${user.name} avatar`}
+                      size={44}
+                    />
 
-                  <div className="min-w-0 flex-1">
-                    <p
+                    <div className="min-w-0 flex-1">
+                      <p
+                        className="
+                          truncate
+                          text-[14px]
+                          font-semibold
+                          text-[var(--color-content-primary)]
+                        "
+                      >
+                        {user.name}
+                      </p>
+
+                      <p
+                        className="
+                          truncate
+                          text-[12px]
+                          text-[var(--color-content-secondary)]
+                        "
+                      >
+                        @
+                        {user.username ??
+                          user.email.split(
+                            "@",
+                          )[0]}
+                      </p>
+                    </div>
+
+                    {/* Follow button */}
+                    <div
                       className="
-                        truncate
-                        text-[14px]
-                        font-semibold
-                        text-[var(--color-content-primary)]
+                        w-[120px]
+                        shrink-0
+                        [&_button]:!w-full
                       "
                     >
-                      {user.name}
-                    </p>
-
-                    <p
-                      className="
-                        truncate
-                        text-[12px]
-                        text-[var(--color-content-secondary)]
-                      "
-                    >
-                      @{user.username ?? user.email.split("@")[0]}
-                    </p>
+                      <FollowUserButton
+                        userId={user.id}
+                        initialFollowing={followedUserIds.has(
+                          user.id,
+                        )}
+                        isFollower={
+                          activeTab ===
+                          "followers"
+                        }
+                        onFollowChange={
+                          handleFollowChange
+                        }
+                      />
+                    </div>
                   </div>
-
-                  <FollowUserButton
-                    userId={user.id}
-                    initialFollowing={followedUserIds.has(user.id)}
-                    isFollower={activeTab === "followers"}
-                    onFollowChange={handleFollowChange}
-                  />
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
         </div>
       </div>
     </div>

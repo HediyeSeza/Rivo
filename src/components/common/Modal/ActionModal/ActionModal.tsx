@@ -18,9 +18,6 @@ interface ActionModalProps {
   onClose: () => void;
   variant?: ActionModalVariant;
   icon?: ReactNode;
-
-  // مدت زمان نمایش
-  // پیش‌فرض: 5 ثانیه
   autoCloseMs?: number;
 }
 
@@ -62,6 +59,40 @@ const ActionModal = ({
   // =========================================
 
   const renderDefaultIcon = () => {
+    if (variant === "danger") {
+      return (
+        <svg
+          width="34"
+          height="34"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <path
+            d="M12 9V13"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
+
+          <path
+            d="M12 17H12.01"
+            stroke="currentColor"
+            strokeWidth="2.4"
+            strokeLinecap="round"
+          />
+
+          <path
+            d="M10.3 4.7L3.6 16.3C2.8 17.7 3.8 19.5 5.4 19.5H18.6C20.2 19.5 21.2 17.7 20.4 16.3L13.7 4.7C12.9 3.3 11.1 3.3 10.3 4.7Z"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinejoin="round"
+          />
+        </svg>
+      );
+    }
+
     return (
       <svg
         width="34"
@@ -164,6 +195,7 @@ const ActionModal = ({
           onClick={(event) => event.stopPropagation()}
         >
           {/* Close */}
+
           <button
             type="button"
             onClick={onClose}
@@ -191,9 +223,7 @@ const ActionModal = ({
             ×
           </button>
 
-          {/* =================================================
-              Icon
-              ================================================= */}
+          {/* Icon */}
 
           <div className="mb-6 flex justify-center">
             <div
@@ -212,10 +242,8 @@ const ActionModal = ({
                 ${glow.shadow}
               `}
             >
-              {/* Decorative Bubbles */}
               <DecorativeBubbles />
 
-              {/* Glow */}
               <span
                 className={`
                   pointer-events-none
@@ -228,7 +256,6 @@ const ActionModal = ({
                 `}
               />
 
-              {/* Colored Ring */}
               <span
                 className={`
                   pointer-events-none
@@ -241,16 +268,13 @@ const ActionModal = ({
                 `}
               />
 
-              {/* Icon */}
               <span className="relative z-20">
                 {icon ?? renderDefaultIcon()}
               </span>
             </div>
           </div>
 
-          {/* =================================================
-              Content
-              ================================================= */}
+          {/* Content */}
 
           <div className="text-center">
             <h2
@@ -283,9 +307,7 @@ const ActionModal = ({
             )}
           </div>
 
-          {/* =================================================
-              Action Button
-              ================================================= */}
+          {/* Action */}
 
           <button
             type="button"
@@ -356,6 +378,7 @@ const ActionModal = ({
           `}
         >
           {/* Glow Border */}
+
           <span
             className={`
               pointer-events-none
@@ -368,6 +391,7 @@ const ActionModal = ({
           />
 
           {/* Icon */}
+
           <div
             className={`
               relative
@@ -394,18 +418,44 @@ const ActionModal = ({
                 xmlns="http://www.w3.org/2000/svg"
                 aria-hidden="true"
               >
-                <path
-                  d="M5 12.5L9.5 17L19 7.5"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
+                {variant === "danger" ? (
+                  <>
+                    <path
+                      d="M12 9V13"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+
+                    <path
+                      d="M12 17H12.01"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                    />
+
+                    <path
+                      d="M10.3 4.7L3.6 16.3C2.8 17.7 3.8 19.5 5.4 19.5H18.6C20.2 19.5 21.2 17.7 20.4 16.3L13.7 4.7C12.9 3.3 11.1 3.3 10.3 4.7Z"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinejoin="round"
+                    />
+                  </>
+                ) : (
+                  <path
+                    d="M5 12.5L9.5 17L19 7.5"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                )}
               </svg>
             )}
           </div>
 
           {/* Divider */}
+
           <div
             className="
               mx-2.5
@@ -417,6 +467,7 @@ const ActionModal = ({
           />
 
           {/* Message */}
+
           <div className="relative z-10 min-w-0 flex-1">
             <p
               className="
@@ -432,6 +483,7 @@ const ActionModal = ({
           </div>
 
           {/* Close */}
+
           <button
             type="button"
             onClick={onClose}

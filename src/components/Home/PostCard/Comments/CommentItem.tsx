@@ -3,7 +3,6 @@ import { useState } from "react";
 import Avatar from "../../../common/Avatar/Avatar";
 import Icon from "../../../common/Icon/Icon";
 import ConfirmModal from "../../../common/Modal/ConfirmModal";
-import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { searchUsers } from "../../../../services/userApi";
 

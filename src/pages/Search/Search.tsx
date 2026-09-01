@@ -8,23 +8,71 @@ import EmptyState from "../../components/common/EmptyState/EmptyState";
 
 import Loading from "../../components/loading/Loading";
 
-import { searchUsers } from "../../services/userApi";
+import {
+  getUserFollowings,
+  searchUsers,
+} from "../../services/userApi";
+
+import { useAuth } from "../../context/AuthContext";
 
 import type { User } from "../../types/user";
 
 const Search = () => {
+  const [searchParams] = useSearchParams();
 
-const [searchParams] = useSearchParams();
+  const { user: authUser } = useAuth();
 
   // Query همیشه مستقیماً از URL خوانده می‌شود
   const query = searchParams.get("q") ?? "";
 
   const [users, setUsers] = useState<User[]>([]);
+
+  // IDs of users that the current user is already following
+  const [followingIds, setFollowingIds] =
+    useState<string[]>([]);
+
   const [isLoading, setIsLoading] =
     useState(false);
+
   const [error, setError] =
     useState<string | null>(null);
 
+  // -----------------------------------------
+  // Load current user's following list
+  // -----------------------------------------
+  useEffect(() => {
+    const loadFollowingUsers = async () => {
+      if (!authUser?.id) {
+        setFollowingIds([]);
+        return;
+      }
+
+      try {
+        const followingUsers =
+          await getUserFollowings(authUser.id);
+
+        setFollowingIds(
+          followingUsers.map(
+            (followingUser) =>
+              followingUser.id,
+          ),
+        );
+      } catch (error) {
+        console.error(
+          "Failed to load following users:",
+          error,
+        );
+
+        setFollowingIds([]);
+      }
+    };
+
+    void loadFollowingUsers();
+  }, [authUser?.id]);
+
+  // -----------------------------------------
+  // Search users
+  // -----------------------------------------
   useEffect(() => {
     const trimmedQuery = query.trim();
 
@@ -175,6 +223,7 @@ const [searchParams] = useSearchParams();
                 <SearchResults
                   users={users}
                   query={query}
+                  followingIds={followingIds}
                   isLoading={false}
                   error={null}
                 />
