@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { User } from "../../../types/user";
 
@@ -6,12 +6,27 @@ import { toggleFollowUser } from "../../../services/userApi";
 
 interface SearchUserCardProps {
   user: User;
+  initialFollowing?: boolean;
 }
 
-const SearchUserCard = ({ user }: SearchUserCardProps) => {
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [imageError, setImageError] = useState(false);
+const SearchUserCard = ({
+  user,
+  initialFollowing = false,
+}: SearchUserCardProps) => {
+  const [isFollowing, setIsFollowing] =
+    useState(initialFollowing);
+
+  const [isLoading, setIsLoading] =
+    useState(false);
+
+  const [imageError, setImageError] =
+    useState(false);
+
+  // Sync the local state when the parent
+  // provides a new following status.
+  useEffect(() => {
+    setIsFollowing(initialFollowing);
+  }, [initialFollowing]);
 
   const handleFollow = async () => {
     if (isLoading) {
@@ -21,21 +36,28 @@ const SearchUserCard = ({ user }: SearchUserCardProps) => {
     try {
       setIsLoading(true);
 
-      const response = await toggleFollowUser(user.id);
+      const response =
+        await toggleFollowUser(user.id);
 
       if (!response.success) {
         return;
       }
 
-      setIsFollowing((current) => !current);
+      setIsFollowing(
+        (current) => !current,
+      );
     } catch (error) {
-      console.error("Failed to follow user:", error);
+      console.error(
+        "Failed to follow user:",
+        error,
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
-  const showImage = Boolean(user.image) && !imageError;
+  const showImage =
+    Boolean(user.image) && !imageError;
 
   return (
     <article
@@ -60,7 +82,9 @@ const SearchUserCard = ({ user }: SearchUserCardProps) => {
           <img
             src={user.image ?? undefined}
             alt={user.name}
-            onError={() => setImageError(true)}
+            onError={() =>
+              setImageError(true)
+            }
             className="
               h-14
               w-14
@@ -83,7 +107,9 @@ const SearchUserCard = ({ user }: SearchUserCardProps) => {
               text-[var(--color-content-primary)]
             "
           >
-            {user.name.charAt(0).toUpperCase()}
+            {user.name
+              .charAt(0)
+              .toUpperCase()}
           </div>
         )}
       </div>
@@ -122,6 +148,7 @@ const SearchUserCard = ({ user }: SearchUserCardProps) => {
         disabled={isLoading}
         className={`
           shrink-0
+          cursor-pointer
           rounded-lg
           px-5
           py-2
@@ -168,6 +195,7 @@ const SearchUserCard = ({ user }: SearchUserCardProps) => {
           h-9
           w-9
           shrink-0
+          cursor-pointer
           items-center
           justify-center
           rounded-full
@@ -177,7 +205,9 @@ const SearchUserCard = ({ user }: SearchUserCardProps) => {
           dark:hover:bg-white/5
         "
       >
-        <span className="text-[20px] leading-none">⋮</span>
+        <span className="text-[20px] leading-none">
+          ⋮
+        </span>
       </button>
     </article>
   );

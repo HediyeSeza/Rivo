@@ -19,6 +19,7 @@ import FollowUserButton from "../ProfileConnections/FollowUserButton";
 import type { User } from "../../../types/user";
 
 import {
+  getUserFollowings,
   uploadImage,
 } from "../../../services/userApi";
 
@@ -104,6 +105,16 @@ const ProfileCard = ({
     setAvatarError,
   ] = useState<string | null>(null);
 
+  const [
+    isFollowing,
+    setIsFollowing,
+  ] = useState(false);
+
+  const [
+    isFollowStatusLoading,
+    setIsFollowStatusLoading,
+  ] = useState(false);
+
   const cropperRef =
     useRef<ReactCropperElement>(null);
 
@@ -117,6 +128,63 @@ const ProfileCard = ({
 
   const isOwnProfile =
     authUser?.id === user.id;
+
+  /*
+   * Load follow status for another user's profile.
+   *
+   * We check the following list of the currently
+   * authenticated user and determine whether the
+   * displayed profile user is already followed.
+   */
+  useEffect(() => {
+    if (!authUser?.id || isOwnProfile) {
+      setIsFollowing(false);
+      setIsFollowStatusLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadFollowStatus = async () => {
+      try {
+        setIsFollowStatusLoading(true);
+
+        const followingUsers =
+          await getUserFollowings(authUser.id);
+
+        if (cancelled) {
+          return;
+        }
+
+        const following =
+          followingUsers.some(
+            (followingUser) =>
+              followingUser.id === user.id,
+          );
+
+        setIsFollowing(following);
+      } catch (error) {
+        console.error(
+          "Failed to load follow status:",
+          error,
+        );
+      } finally {
+        if (!cancelled) {
+          setIsFollowStatusLoading(false);
+        }
+      }
+    };
+
+    void loadFollowStatus();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    authUser?.id,
+    user.id,
+    isOwnProfile,
+  ]);
 
   useEffect(() => {
     return () => {
@@ -259,9 +327,11 @@ const ProfileCard = ({
     }
 
     setAvatarError(null);
+
     setSelectedImage(
       URL.createObjectURL(file),
     );
+
     setIsCropOpen(true);
   };
 
@@ -500,41 +570,50 @@ const ProfileCard = ({
         </div>
 
         {/* Profile Action */}
-<div className="mb-1 mt-2 w-full">
-  {isOwnProfile ? (
-    <Button
-      type="button"
-      onClick={() =>
-        setIsEditProfileOpen(true)
-      }
-      variant="primary"
-      className="w-full"
-      icon={
-        <Icon
-          name="Edit"
-          size={20}
-          reverseTheme
-        />
-      }
-    >
-      Edit Profile
-    </Button>
-  ) : (
-    <div
-      className="
-        flex
-        w-full
-        [&_button]:!w-full
-      "
-    >
-      <FollowUserButton
-        userId={user.id}
-        initialFollowing={false}
-        onFollowChange={() => {}}
-      />
-    </div>
-  )}
-</div>
+        <div className="mb-1 mt-2 w-full">
+          {isOwnProfile ? (
+            <Button
+              type="button"
+              onClick={() =>
+                setIsEditProfileOpen(true)
+              }
+              variant="primary"
+              className="w-full"
+              icon={
+                <Icon
+                  name="Edit"
+                  size={20}
+                  reverseTheme
+                />
+              }
+            >
+              Edit Profile
+            </Button>
+          ) : (
+            <div
+              className="
+                flex
+                w-full
+                [&_button]:!w-full
+              "
+            >
+              <FollowUserButton
+                userId={user.id}
+                initialFollowing={
+                  isFollowing
+                }
+                onFollowChange={(
+                  _userId,
+                  nextFollowing,
+                ) => {
+                  setIsFollowing(
+                    nextFollowing,
+                  );
+                }}
+              />
+            </div>
+          )}
+        </div>
 
         {/* Edit Profile Modal */}
         {isOwnProfile && (

@@ -5,6 +5,7 @@ import SearchUserCard from "../SearchUserCard/SearchUserCard";
 interface SearchResultsProps {
   users: User[];
   query: string;
+  followingIds?: string[];
   isLoading?: boolean;
   error?: string | null;
 }
@@ -12,6 +13,7 @@ interface SearchResultsProps {
 const SearchResults = ({
   users,
   query,
+  followingIds = [],
   isLoading = false,
   error = null,
 }: SearchResultsProps) => {
@@ -77,12 +79,19 @@ const SearchResults = ({
 
       {!isLoading && !error && users.length > 0 && (
         <div className="flex w-full flex-col gap-3">
-          {users.map((user) => (
-            <SearchUserCard
-              key={user.id}
-              user={user}
-            />
-          ))}
+          {users.map((user) => {
+            const isFollowing = followingIds.includes(
+              user.id,
+            );
+
+            return (
+              <SearchUserCard
+                key={user.id}
+                user={user}
+                initialFollowing={isFollowing}
+              />
+            );
+          })}
         </div>
       )}
     </div>

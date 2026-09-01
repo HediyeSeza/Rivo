@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Button from "../../common/Button/Button";
 
@@ -8,7 +8,10 @@ interface FollowUserButtonProps {
   userId: string;
   initialFollowing?: boolean;
   isFollower?: boolean;
-  onFollowChange?: (userId: string, isFollowing: boolean) => void;
+  onFollowChange?: (
+    userId: string,
+    isFollowing: boolean,
+  ) => void;
 }
 
 const FollowUserButton = ({
@@ -17,9 +20,17 @@ const FollowUserButton = ({
   isFollower = false,
   onFollowChange,
 }: FollowUserButtonProps) => {
-  const [isFollowing, setIsFollowing] = useState(initialFollowing);
+  const [isFollowing, setIsFollowing] =
+    useState(initialFollowing);
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] =
+    useState(false);
+
+  // Sync local state whenever the parent
+  // provides a new follow status.
+  useEffect(() => {
+    setIsFollowing(initialFollowing);
+  }, [initialFollowing]);
 
   const handleToggleFollow = async () => {
     if (isLoading) {
@@ -29,19 +40,27 @@ const FollowUserButton = ({
     try {
       setIsLoading(true);
 
-      const response = await toggleFollowUser(userId);
+      const response =
+        await toggleFollowUser(userId);
 
       if (!response.success) {
         return;
       }
 
-      const nextFollowing = !isFollowing;
+      const nextFollowing =
+        !isFollowing;
 
       setIsFollowing(nextFollowing);
 
-      onFollowChange?.(userId, nextFollowing);
+      onFollowChange?.(
+        userId,
+        nextFollowing,
+      );
     } catch (error) {
-      console.error("Failed to toggle follow:", error);
+      console.error(
+        "Failed to toggle follow:",
+        error,
+      );
     } finally {
       setIsLoading(false);
     }
@@ -50,15 +69,25 @@ const FollowUserButton = ({
   return (
     <Button
       type="button"
-      variant={isFollowing ? "secondary" : "primary"}
+      variant={
+        isFollowing
+          ? "secondary"
+          : "primary"
+      }
       onClick={handleToggleFollow}
       disabled={isLoading}
       className="
+        w-full
         min-w-[88px]
         shrink-0
       "
     >
-      <span className="text-[13px] font-semibold">
+      <span
+        className="
+          text-[13px]
+          font-semibold
+        "
+      >
         {isLoading
           ? "..."
           : isFollowing
