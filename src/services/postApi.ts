@@ -19,6 +19,7 @@ export interface Post {
   id: string;
   authorId: string;
   content: string;
+  image?: string | null;
   createdAt: string;
   updatedAt: string;
 
@@ -72,6 +73,7 @@ interface CreatePostResponse {
 
 export interface CreatePostPayload {
   content: string;
+  image?: string | null;
 }
 
 export const createPost = async (data: CreatePostPayload): Promise<Post> => {

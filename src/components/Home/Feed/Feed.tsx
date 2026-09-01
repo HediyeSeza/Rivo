@@ -297,6 +297,7 @@ const Feed = () => {
                 )}
                 createdAt={post.createdAt}
                 content={post.content}
+                image={post.image ?? undefined}
                 likes={post._count?.likes ?? 0}
                 comments={post._count?.comments ?? 0}
                 avatar={post.author?.image ?? undefined}
