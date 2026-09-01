@@ -21,8 +21,7 @@ import { useAuth } from "../../context/AuthContext";
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const [showLogoutModal, setShowLogoutModal] =
-    useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const { theme, toggleTheme } = useTheme();
 
@@ -30,8 +29,7 @@ function Header() {
 
   const navigate = useNavigate();
 
-  const [searchParams, setSearchParams] =
-    useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const searchQuery = searchParams.get("q") ?? "";
 
@@ -232,10 +230,7 @@ function Header() {
                 dark:hover:bg-white/5
               "
             >
-              <Icon
-                name={theme === "dark" ? "Moon" : "Light"}
-                size={18}
-              />
+              <Icon name={theme === "dark" ? "Moon" : "Light"} size={18} />
             </button>
           </div>
 
@@ -243,13 +238,7 @@ function Header() {
           <Button
             className="w-0 md:!hidden"
             variant="primary"
-            icon={
-              <Icon
-                name="Menu"
-                size={18}
-                reverseTheme
-              />
-            }
+            icon={<Icon name="Menu" size={18} reverseTheme />}
             onClick={() => setIsMenuOpen(true)}
           >
             <span />
@@ -268,9 +257,7 @@ function Header() {
             icon={<Icon name="Home" size={18} />}
             onClick={() => navigate("/")}
           >
-            <span className="text-[14px] font-normal">
-              Home
-            </span>
+            <span className="text-[14px] font-normal">Home</span>
           </Button>
 
           {isAuthenticated && (
@@ -280,16 +267,10 @@ function Header() {
                 type="button"
                 className="!hidden md:!flex"
                 variant="pure"
-                icon={
-                  <Icon name="notif" size={18} />
-                }
-                onClick={() =>
-                  navigate("/notifications")
-                }
+                icon={<Icon name="notif" size={18} />}
+                onClick={() => navigate("/notifications")}
               >
-                <span className="text-[14px] font-normal">
-                  Notifications
-                </span>
+                <span className="text-[14px] font-normal">Notifications</span>
               </Button>
 
               {/* Profile */}
@@ -297,16 +278,10 @@ function Header() {
                 type="button"
                 className="!hidden md:!flex"
                 variant="pure"
-                icon={
-                  <Icon name="Person" size={18} />
-                }
-                onClick={() =>
-                  navigate("/profile")
-                }
+                icon={<Icon name="Person" size={18} />}
+                onClick={() => navigate("/profile")}
               >
-                <span className="text-[14px] font-normal">
-                  Profile
-                </span>
+                <span className="text-[14px] font-normal">Profile</span>
               </Button>
             </>
           )}
@@ -318,12 +293,8 @@ function Header() {
                 type="button"
                 className="!hidden md:!flex"
                 variant="pure"
-                icon={
-                  <Icon name="Logout" size={18} />
-                }
-                onClick={() =>
-                  setShowLogoutModal(true)
-                }
+                icon={<Icon name="Logout" size={18} />}
+                onClick={() => setShowLogoutModal(true)}
                 aria-label="Log out"
               >
                 <span />
@@ -348,9 +319,7 @@ function Header() {
           title="Log out?"
           message="Are you sure you want to log out?"
           confirmLabel="Log out"
-          onCancel={() =>
-            setShowLogoutModal(false)
-          }
+          onCancel={() => setShowLogoutModal(false)}
           onConfirm={handleLogoutConfirm}
         />
       )}
