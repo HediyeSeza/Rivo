@@ -1,49 +1,52 @@
-import './Input.css';
+import type { InputHTMLAttributes, ReactNode } from "react";
+import "./Input.css";
 
-interface InputProps {
+interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
-  placeholder?: string;
-  value?: string;
-  disabled?: boolean;
   error?: string;
   helperText?: string;
+  rightIcon?: ReactNode;
+  onRightIconClick?: () => void;
 }
 
 const Input = ({
   label,
-  placeholder,
-  value,
-  disabled = false,
   error,
   helperText,
+  className = "",
+  type = "text",
+  disabled = false,
+  rightIcon,
+  onRightIconClick,
+  ...props
 }: InputProps) => {
   return (
-    <div className={`input-wrapper ${error ? 'input-wrapper--error' : ''}`}>
-      {label && (
-        <label className="input-label">
-          {label}
-        </label>
-      )}
+    <div className={`input-wrapper ${error ? "input-wrapper--error" : ""}`}>
+      {label && <label className="input-label">{label}</label>}
 
-      <input
-        className="input"
-        type="text"
-        placeholder={placeholder}
-        value={value}
-        disabled={disabled}
-        readOnly={value !== undefined}
-      />
+      <div className="input-container">
+        <input
+          className={`input ${className}`}
+          type={type}
+          disabled={disabled}
+          {...props}
+        />
+        {rightIcon && (
+          <button
+            type="button"
+            className="input-right-icon"
+            onClick={onRightIconClick}
+            tabIndex={-1}
+          >
+            {rightIcon}
+          </button>
+        )}
+      </div>
 
-      {error && (
-        <span className="input-error">
-          {error}
-        </span>
-      )}
+      {error && <span className="input-error">{error}</span>}
 
       {!error && helperText && (
-        <span className="input-helper">
-          {helperText}
-        </span>
+        <span className="input-helper">{helperText}</span>
       )}
     </div>
   );

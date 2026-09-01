@@ -1,0 +1,75 @@
+/* ========================================
+   Error Screen
+   ======================================== */
+
+.error-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  width: 100%;
+  padding: 2rem 1rem;
+}
+
+.error-screen__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  text-align: center;
+  max-width: 400px;
+}
+
+.error-screen__title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-content-primary);
+  margin: 0;
+}
+
+.error-screen__message {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--color-content-secondary);
+  margin: 0;
+}
+
+.error-screen__button {
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.error-screen__icon {
+  animation: spin 1s linear infinite;
+  margin-left: -0.25rem;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ========================================
+   Responsive
+   ======================================== */
+
+@media (max-width: 640px) {
+  .error-screen {
+    min-height: 300px;
+    padding: 1.5rem 1rem;
+  }
+
+  .error-screen__title {
+    font-size: 20px;
+  }
+
+  .error-screen__message {
+    font-size: 14px;
+  }
+}

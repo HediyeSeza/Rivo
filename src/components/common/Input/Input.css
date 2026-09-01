@@ -2,7 +2,6 @@
    Rivo - Input
    ======================================== */
 
-
 /* ========================================
    Wrapper
    ======================================== */
@@ -10,11 +9,10 @@
 .input-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 
   width: 100%;
 }
-
 
 /* ========================================
    Label
@@ -24,13 +22,12 @@
   color: var(--color-content-primary);
 
   font-family: inherit;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 24px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
 
   cursor: text;
 }
-
 
 /* ========================================
    Input Base
@@ -38,9 +35,8 @@
 
 .input {
   width: 100%;
-  min-height: 60px;
-
-  padding: 0 18px;
+  min-height: 36px;
+  padding: 8px 12px;
 
   background-color: var(--input-bg);
   color: var(--input-text);
@@ -49,9 +45,9 @@
   border-radius: 8px;
 
   font-family: inherit;
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 400;
-  line-height: 24px;
+  line-height: 18px;
 
   outline: none;
 
@@ -63,16 +59,18 @@
   box-sizing: border-box;
 }
 
+.input-container .input {
+  padding-right: 42px;
+}
 
 /* ========================================
    Placeholder
    ======================================== */
 
 .input::placeholder {
-  color: var(--input-placeholder);
+  color: var(--color-content-secondary);
   opacity: 1;
 }
-
 
 /* ========================================
    Hover
@@ -82,7 +80,6 @@
   border-color: var(--input-focus-border);
 }
 
-
 /* ========================================
    Focus
    ======================================== */
@@ -90,7 +87,6 @@
 .input:focus {
   border-color: var(--input-focus-border);
 }
-
 
 /* ========================================
    Disabled
@@ -109,7 +105,6 @@
   color: var(--input-disabled-placeholder);
 }
 
-
 /* ========================================
    Textarea
    ======================================== */
@@ -124,7 +119,6 @@
   line-height: 24px;
 }
 
-
 /* ========================================
    Error
    ======================================== */
@@ -136,7 +130,6 @@
 .input-wrapper--error .input:focus {
   border-color: var(--color-red);
 }
-
 
 /* ========================================
    Error Message
@@ -151,7 +144,6 @@
   line-height: 18px;
 }
 
-
 /* ========================================
    Helper Text
    ======================================== */
@@ -163,4 +155,61 @@
   font-size: 12px;
   font-weight: 400;
   line-height: 18px;
+}
+
+/* ========================================
+   Input Container
+   ======================================== */
+
+.input-container {
+  position: relative;
+  width: 100%;
+}
+
+/* ========================================
+   Right Icon
+   ======================================== */
+
+.input-right-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: opacity 150ms ease;
+}
+
+.input-right-icon:hover {
+  opacity: 0.7;
+}
+
+.input-right-icon img {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+/* ========================================
+   Dark Mode
+   ======================================== */
+
+.dark .input {
+  background-color: var(--button-tertiary-bg);
+  border-color: var(--button-tertiary-bg);
+}
+
+.dark .input:hover:not(:disabled) {
+  border-color: rgb(38 38 38 / 95%);
+}
+
+.dark .input:focus {
+  border-color: var(--color-brand-main);
 }

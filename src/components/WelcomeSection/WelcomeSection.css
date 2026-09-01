@@ -1,0 +1,126 @@
+/* ========================================
+   WelcomeSection Styles
+   ======================================== */
+
+.welcome-section {
+  position: sticky;
+  top: 92px;
+  width: 100%;
+  max-width: 350px;
+  border-radius: 18px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-card);
+  padding: 30px 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.welcome-section-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+/* ========================================
+   Header
+   ======================================== */
+
+.welcome-section-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.welcome-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+
+  color: var(--color-content-primary);
+  margin: 0;
+}
+
+.welcome-section-subtitle {
+  font-size: 14px;
+  line-height: 20px;
+
+  color: var(--color-content-secondary);
+  margin: 0;
+}
+
+/* ========================================
+   Buttons
+   ======================================== */
+
+.welcome-section-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.welcome-section-button {
+  width: 100% !important;
+  min-height: 35px !important;
+  font-size: 14px !important;
+}
+
+.welcome-section-signin-btn {
+  border: 2px solid var(--color-content-opposite) !important;
+}
+
+/* ========================================
+   Divider
+   ======================================== */
+
+/* .welcome-section-divider {
+  height: 1px;
+  width: 100%;
+  background-color: var(--color-border);
+} */
+
+/* ========================================
+   Footer
+   ======================================== */
+
+/* .welcome-section-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.welcome-section-footer-text {
+  font-size: 11px;
+  line-height: 16px;
+  text-align: center;
+
+  color: var(--color-content-tertiary);
+  margin: 0;
+}
+
+.welcome-section-link {
+  color: var(--color-brand-main);
+  text-decoration: none;
+  font-weight: 500;
+
+  transition: color 150ms ease;
+}
+
+.welcome-section-link:hover {
+  color: var(--color-brand-secondary);
+  text-decoration: underline;
+} */
+
+/* ========================================
+   Responsive
+   ======================================== */
+
+@media (max-width: 768px) {
+  .welcome-section {
+    display: none;
+  }
+}

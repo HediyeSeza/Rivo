@@ -1,0 +1,247 @@
+/* ========================================
+   LoginForm Styles
+   ======================================== */
+
+.login-form-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 100vh;
+  width: 100%;
+
+  background-color: var(--color-bg);
+  padding: 20px;
+  gap: 16px;
+}
+
+.login-form-container {
+  width: 100%;
+  max-width: 900px;
+}
+
+.login-form-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.login-form-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  padding: 40px 32px;
+}
+
+.login-form-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+}
+
+.login-form-image-placeholder {
+  background-color: var(--color-bg);
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.login-form-image {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  max-height: 100%;
+}
+
+/* ========================================
+   Back Button
+   ======================================== */
+
+.login-form-back-button {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--color-brand-main);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  padding: 0;
+  margin: 0;
+  flex-shrink: 0;
+
+  transition: color 150ms ease;
+}
+
+.login-form-back-button img {
+  display: block;
+}
+
+.login-form-back-button:hover {
+  color: var(--color-brand-secondary);
+  text-decoration: underline;
+}
+
+/* ========================================
+   Title & Subtitle
+   ======================================== */
+
+.login-form-title {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.3;
+
+  color: var(--color-content-primary);
+  margin: 0;
+  text-align: center;
+  width: 100%;
+}
+
+.login-form-subtitle {
+  font-size: 14px;
+  line-height: 20px;
+
+  color: var(--color-content-secondary);
+  margin: 0;
+  text-align: center;
+}
+
+/* ========================================
+   Form
+   ======================================== */
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.login-form-submit {
+  width: 100% !important;
+  min-height: 36px;
+  font-size: 14px !important;
+}
+
+/* ========================================
+   Footer
+   ======================================== */
+
+.login-form-footer {
+  text-align: center;
+}
+
+.login-form-footer-text {
+  font-size: 14px;
+  line-height: 20px;
+
+  color: var(--color-content-secondary);
+}
+
+.login-form-link {
+  background: none;
+  border: none;
+  color: var(--color-brand-main);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  padding: 0;
+
+  transition: color 150ms ease;
+}
+
+.login-form-link:hover {
+  color: var(--color-brand-secondary);
+  text-decoration: underline;
+}
+
+/* ========================================
+   Policy
+   ======================================== */
+
+.login-form-policy {
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+
+  color: var(--color-content-tertiary);
+  width: 100%;
+  max-width: 1200px;
+}
+
+.login-form-policy p {
+  margin: 0;
+}
+
+.login-form-policy-link {
+  color: var(--color-brand-main);
+  text-decoration: none;
+
+  transition: color 150ms ease;
+}
+
+.login-form-policy-link:hover {
+  color: var(--color-brand-secondary);
+  text-decoration: underline;
+}
+
+/* ========================================
+   Responsive
+   ======================================== */
+
+@media (max-width: 768px) {
+  .login-form-wrapper {
+    grid-template-columns: 1fr;
+  }
+
+  .login-form-image-placeholder {
+    display: none;
+  }
+}
+
+/* ========================================
+   Dark Mode
+   ======================================== */
+
+.dark .login-form-main {
+  background-color: var(--color-bg);
+}
+
+.dark .login-form-wrapper {
+  background-color: var(--color-content-opposite);
+  border-color: var(--button-tertiary-bg);
+}
+
+.dark .login-form-image-placeholder {
+  background-color: var(--color-bg);
+}
+
+@media (max-width: 640px) {
+  .login-form-content {
+    padding: 32px 20px;
+    gap: 20px;
+  }
+
+  .login-form-title {
+    font-size: 20px;
+  }
+}

@@ -21,27 +21,17 @@
   object-fit: contain;
 }
 
-.icon__dark {
-  display: block;
-}
-
-.icon__light {
-  display: none;
-}
-
-
 /* ========================================
    Light Theme
    ======================================== */
 
-:root .icon__dark {
+.icon__dark {
   display: none;
 }
 
-:root .icon__light {
+.icon__light {
   display: block;
 }
-
 
 /* ========================================
    Dark Theme
@@ -53,4 +43,20 @@
 
 .dark .icon__light {
   display: none;
+}
+
+.icon--reverse-theme .icon__dark {
+  display: block;
+}
+
+.icon--reverse-theme .icon__light {
+  display: none;
+}
+
+.dark .icon--reverse-theme .icon__dark {
+  display: none;
+}
+
+.dark .icon--reverse-theme .icon__light {
+  display: block;
 }
