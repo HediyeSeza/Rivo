@@ -31,7 +31,6 @@ export interface Post {
   };
 
   likes: PostLike[];
-
   comments: PostComment[];
 
   _count: {
@@ -46,10 +45,9 @@ interface PostsResponse {
   data: Post[];
 }
 
-export interface ToggleLikeResponse {
-  message: string;
-  success: boolean;
-}
+/* =========================================
+   Get Posts
+========================================= */
 
 export const getPosts = async (): Promise<Post[]> => {
   const response = await api.get<PostsResponse>("/api/posts");
@@ -57,13 +55,28 @@ export const getPosts = async (): Promise<Post[]> => {
   return response.data ?? [];
 };
 
+/* =========================================
+   Like / Unlike Post
+========================================= */
+
+export interface ToggleLikeResponse {
+  message: string;
+  success: boolean;
+}
+
 export const toggleLikePost = async (
   postId: string,
 ): Promise<ToggleLikeResponse> => {
-  const response = await api.patch<ToggleLikeResponse>(`/api/posts/${postId}`);
+  const response = await api.patch<ToggleLikeResponse>(
+    `/api/posts/${postId}`,
+  );
 
   return response;
 };
+
+/* =========================================
+   Create Post
+========================================= */
 
 interface CreatePostResponse {
   message: string;
@@ -76,15 +89,39 @@ export interface CreatePostPayload {
   image?: string | null;
 }
 
-export const createPost = async (data: CreatePostPayload): Promise<Post> => {
-  const response = await api.post<CreatePostResponse>("/api/posts", data);
+export const createPost = async (
+  data: CreatePostPayload,
+): Promise<Post> => {
+  const payload: CreatePostPayload = {
+    content: data.content.trim(),
+  };
+
+  // فقط اگر واقعاً image داریم، آن را به request اضافه کن
+  if (data.image) {
+    payload.image = data.image;
+  }
+
+  const response = await api.post<CreatePostResponse>(
+    "/api/posts",
+    payload,
+  );
 
   return response.data;
 };
 
-export const deletePost = async (postId: string): Promise<void> => {
+/* =========================================
+   Delete Post
+========================================= */
+
+export const deletePost = async (
+  postId: string,
+): Promise<void> => {
   await api.delete(`/api/posts/${postId}`);
 };
+
+/* =========================================
+   Create Comment
+========================================= */
 
 export interface CreateCommentResponse {
   message: string;
@@ -98,12 +135,16 @@ export const createComment = async (
   const response = await api.post<CreateCommentResponse>(
     `/api/posts/${postId}/comment`,
     {
-      content,
+      content: content.trim(),
     },
   );
 
   return response;
 };
+
+/* =========================================
+   Update Comment
+========================================= */
 
 export interface UpdateCommentResponse {
   message: string;
@@ -118,11 +159,17 @@ export const updateComment = async (
 ): Promise<UpdateCommentResponse> => {
   const response = await api.put<UpdateCommentResponse>(
     `/api/posts/${postId}/comment/${commentId}`,
-    { content },
+    {
+      content: content.trim(),
+    },
   );
 
   return response;
 };
+
+/* =========================================
+   Delete Comment
+========================================= */
 
 export interface DeleteCommentResponse {
   message: string;
