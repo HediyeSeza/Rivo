@@ -3,7 +3,6 @@ import { useState } from "react";
 
 import Icon from "../../common/Icon/Icon";
 import Avatar from "../../common/Avatar/Avatar";
-
 import LikeButton from "../../common/Selection/LikeButton/LikeButton";
 
 import avatarImage from "../../../assets/Avatar/a.png";
@@ -12,18 +11,16 @@ import { type PostComment } from "../../../services/postApi";
 
 import Comments from "./Comments/Comments";
 
-const CDN_BASE = "https://79gcelddzk.ucarecd.net";
+const CDN_BASE = "https://1p5nep1spk.ucarecd.net";
 
 interface PostCardProps {
   postId: string;
   authorId: string;
-
   name: string;
   username: string;
   createdAt: string;
   content: string;
   image?: string | null;
-
   likes?: number;
   comments?: number;
   avatar?: string;
@@ -37,12 +34,19 @@ interface PostCardProps {
   onLikeMessage?: (message: string) => void;
   onLikeChange?: (postId: string, isLiked: boolean) => void;
 
-  onCommentAdded?: (postId: string) => void | Promise<void>;
+  onCommentAdded?: (
+    postId: string,
+  ) => void | Promise<void>;
+
   onCommentMessage?: (message: string) => void;
 
   showDelete?: boolean;
   onDelete?: () => void;
-}
+};
+
+/* =========================================
+   Post Time
+========================================= */
 
 const formatPostTime = (createdAt: string) => {
   const postDate = new Date(createdAt);
@@ -56,7 +60,9 @@ const formatPostTime = (createdAt: string) => {
     return "just now";
   }
 
-  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  const diffInMinutes = Math.floor(
+    diffInSeconds / 60,
+  );
 
   if (diffInMinutes < 60) {
     return `${diffInMinutes} ${
@@ -64,7 +70,9 @@ const formatPostTime = (createdAt: string) => {
     } ago`;
   }
 
-  const diffInHours = Math.floor(diffInMinutes / 60);
+  const diffInHours = Math.floor(
+    diffInMinutes / 60,
+  );
 
   if (diffInHours < 24) {
     return `${diffInHours} ${
@@ -72,7 +80,9 @@ const formatPostTime = (createdAt: string) => {
     } ago`;
   }
 
-  const diffInDays = Math.floor(diffInHours / 24);
+  const diffInDays = Math.floor(
+    diffInHours / 24,
+  );
 
   if (diffInDays < 7) {
     return `${diffInDays} ${
@@ -80,7 +90,9 @@ const formatPostTime = (createdAt: string) => {
     } ago`;
   }
 
-  const diffInWeeks = Math.floor(diffInDays / 7);
+  const diffInWeeks = Math.floor(
+    diffInDays / 7,
+  );
 
   if (diffInWeeks < 4) {
     return `${diffInWeeks} ${
@@ -91,30 +103,53 @@ const formatPostTime = (createdAt: string) => {
   return postDate.toLocaleDateString();
 };
 
-const resolvePostImageUrl = (image?: string | null) => {
+/* =========================================
+   Resolve Post Image URL
+========================================= */
+
+const resolvePostImageUrl = (
+  image?: string | null,
+) => {
   if (!image) {
     return undefined;
   }
 
-  if (
-    image.startsWith("http://") ||
-    image.startsWith("https://") ||
-    image.startsWith("blob:") ||
-    image.startsWith("data:")
-  ) {
-    return image;
+  const value = image.trim();
+
+  if (!value) {
+    return undefined;
   }
 
-  const uuid = image.match(
+  // If API already returns a complete URL
+  if (
+    value.startsWith("http://") ||
+    value.startsWith("https://") ||
+    value.startsWith("blob:") ||
+    value.startsWith("data:")
+  ) {
+    return value;
+  }
+
+  // Uploadcare UUID
+  const uuid = value.match(
     /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i,
   )?.[0];
 
-  if (!uuid) {
-    return image;
+  if (uuid) {
+    return `${CDN_BASE}/${uuid}/`;
   }
 
-  return `${CDN_BASE}/${uuid}/`;
+  // Relative URL
+  if (value.startsWith("/")) {
+    return value;
+  }
+
+  return value;
 };
+
+/* =========================================
+   Post Card
+========================================= */
 
 const PostCard = ({
   postId,
@@ -136,8 +171,35 @@ const PostCard = ({
   showDelete = false,
   onDelete,
 }: PostCardProps) => {
-  const [showComments, setShowComments] = useState(false);
-  const postImageUrl = resolvePostImageUrl(image);
+  const [showComments, setShowComments] =
+    useState(false);
+
+  const postImageUrl =
+    resolvePostImageUrl(image);
+
+  /* =========================================
+     Debug Image
+  ========================================= */
+
+  console.log(
+    "========== POST IMAGE DEBUG ==========",
+  );
+
+  console.log("Post ID:", postId);
+
+  console.log(
+    "Image from API:",
+    image,
+  );
+
+  console.log(
+    "Resolved image URL:",
+    postImageUrl,
+  );
+
+  console.log(
+    "======================================",
+  );
 
   return (
     <article
@@ -149,14 +211,16 @@ const PostCard = ({
         bg-white
         p-5
         shadow-sm
+        text-[var(--color-content-primary)]
         dark:border-[#313131]
         dark:bg-[#191919]
-        text-[var(--color-content-primary)]
       "
     >
-      {/* Post Header */}
+      {/* =========================================
+          Post Header
+      ========================================= */}
+
       <div className="flex items-center gap-3">
-        {/* Author Avatar */}
         <Link
           to={`/profile/${authorId}`}
           className="
@@ -177,8 +241,15 @@ const PostCard = ({
         </Link>
 
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-            {/* Author Name */}
+          <div
+            className="
+              flex
+              flex-wrap
+              items-center
+              gap-x-2
+              gap-y-0.5
+            "
+          >
             <Link
               to={`/profile/${authorId}`}
               className="
@@ -195,7 +266,6 @@ const PostCard = ({
               {name}
             </Link>
 
-            {/* Username */}
             <Link
               to={`/profile/${authorId}`}
               className="
@@ -223,7 +293,6 @@ const PostCard = ({
           </div>
         </div>
 
-        {/* Delete */}
         {showDelete && (
           <button
             type="button"
@@ -244,12 +313,18 @@ const PostCard = ({
               dark:hover:bg-white/5
             "
           >
-            <Icon name="Tash" size={20} />
+            <Icon
+              name="Tash"
+              size={20}
+            />
           </button>
         )}
       </div>
 
-      {/* Post Content */}
+      {/* =========================================
+          Post Content
+      ========================================= */}
+
       <div className="mt-3">
         <p
           className="
@@ -263,20 +338,62 @@ const PostCard = ({
           {content}
         </p>
 
-        {postImageUrl ? (
-          <div className="mt-3 overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-background)]">
+        {/* =========================================
+            Post Image
+        ========================================= */}
+
+        {postImageUrl && (
+          <div
+            className="
+              mt-3
+              flex
+              w-full
+              items-center
+              justify-center
+              overflow-hidden
+              rounded-xl
+              border
+              border-[var(--color-border)]
+              bg-[var(--color-background)]
+            "
+          >
             <img
               src={postImageUrl}
               alt="Post image"
-              className="max-h-[420px] w-full object-cover"
+              loading="lazy"
+              onLoad={() => {
+                console.log(
+                  "✅ Post image loaded successfully:",
+                  postImageUrl,
+                );
+              }}
+              onError={(event) => {
+                console.error(
+                  "❌ Failed to load post image:",
+                  event.currentTarget.src,
+                );
+
+                console.error(
+                  "Original image value:",
+                  image,
+                );
+              }}
+              className="
+                block
+                max-h-[520px]
+                w-full
+                object-contain
+              "
             />
           </div>
-        ) : null}
+        )}
       </div>
 
-      {/* Actions */}
+      {/* =========================================
+          Actions
+      ========================================= */}
+
       <div className="mt-3 flex items-center gap-2">
-        {/* Like */}
         <LikeButton
           postId={postId}
           likes={likesData}
@@ -285,13 +402,16 @@ const PostCard = ({
           onLikeChange={onLikeChange}
         />
 
-        {/* Comment */}
         <button
           type="button"
           aria-label={
-            showComments ? "Hide comments" : "Show comments"
+            showComments
+              ? "Hide comments"
+              : "Show comments"
           }
-          onClick={() => setShowComments((prev) => !prev)}
+          onClick={() =>
+            setShowComments((prev) => !prev)
+          }
           className={`
             flex
             cursor-pointer
@@ -305,11 +425,19 @@ const PostCard = ({
             duration-200
             hover:bg-black/5
             dark:hover:bg-white/5
-            ${showComments ? "bg-black/5 dark:bg-white/5" : ""}
+            ${
+              showComments
+                ? "bg-black/5 dark:bg-white/5"
+                : ""
+            }
           `}
         >
           <Icon
-            name={showComments ? "ChatFill" : "Chat"}
+            name={
+              showComments
+                ? "ChatFill"
+                : "Chat"
+            }
             size={18}
           />
 
@@ -319,7 +447,10 @@ const PostCard = ({
         </button>
       </div>
 
-      {/* Comments */}
+      {/* =========================================
+          Comments
+      ========================================= */}
+
       {showComments && (
         <div
           className="
@@ -332,7 +463,9 @@ const PostCard = ({
           <Comments
             postId={postId}
             comments={commentsData}
-            onCommentAdded={onCommentAdded ?? (() => {})}
+            onCommentAdded={
+              onCommentAdded ?? (() => {})
+            }
             onMessage={onCommentMessage}
           />
         </div>
