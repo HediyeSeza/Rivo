@@ -72,6 +72,8 @@ import chatFillLight from "../../../assets/icons/Light/fill-chat.svg";
 import editCommentDark from "../../../assets/icons/Dark/edit-2.svg";
 import editCommentLight from "../../../assets/icons/Light/edit-2.svg";
 
+import refreshDark from "../../../assets/icons/Dark/refresh.svg";
+import refreshLight from "../../../assets/icons/Light/refresh.svg";
 
 const icons = {
   Chat: {
@@ -183,6 +185,11 @@ const icons = {
   Post: {
     dark: postDark,
     light: postLight,
+  },
+
+  Refresh: {
+    dark: refreshDark,
+    light: refreshLight,
   },
 } as const;
 

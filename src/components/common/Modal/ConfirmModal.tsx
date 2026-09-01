@@ -7,6 +7,7 @@ interface ConfirmModalProps {
   confirmLabel?: string;
   onConfirm: () => void | Promise<void>;
   onCancel: () => void;
+  isLoading?: boolean;
 }
 
 const ConfirmModal: FC<ConfirmModalProps> = ({
@@ -15,6 +16,7 @@ const ConfirmModal: FC<ConfirmModalProps> = ({
   confirmLabel = "Delete",
   onConfirm,
   onCancel,
+  isLoading = false,
 }) => {
   const modal = (
     <div
@@ -48,10 +50,7 @@ const ConfirmModal: FC<ConfirmModalProps> = ({
         "
         onClick={(event) => event.stopPropagation()}
       >
-        <h2
-          id="confirm-modal-title"
-          className="text-[16px] font-bold"
-        >
+        <h2 id="confirm-modal-title" className="text-[16px] font-bold">
           {title}
         </h2>
 
@@ -95,7 +94,8 @@ const ConfirmModal: FC<ConfirmModalProps> = ({
           <button
             type="button"
             onClick={onConfirm}
-            className="
+            disabled={isLoading}
+            className={`
               rounded-lg
               bg-red-500
               px-3
@@ -104,10 +104,30 @@ const ConfirmModal: FC<ConfirmModalProps> = ({
               font-medium
               text-white
               transition
-              hover:bg-red-600
-            "
+              ${
+                isLoading ? "cursor-not-allowed opacity-70" : "hover:bg-red-600"
+              }
+            `}
           >
-            {confirmLabel}
+            {isLoading ? (
+              <span className="flex items-center gap-2">
+                <span
+                  className="
+                    inline-block
+                    h-3
+                    w-3
+                    animate-spin
+                    rounded-full
+                    border-2
+                    border-white
+                    border-t-transparent
+                  "
+                />
+                {confirmLabel}
+              </span>
+            ) : (
+              confirmLabel
+            )}
           </button>
         </div>
       </div>

@@ -80,15 +80,15 @@ const RegisterForm = () => {
         signIn(result.user, result.token);
         navigate("/");
       } catch (error) {
-        setServerError(
-          error instanceof ApiError
-            ? error.status === 409
-              ? "An account with this email already exists."
-              : error.message
-            : error instanceof Error
-              ? error.message
-              : "Unable to create your account. Please try again.",
-        );
+        if (error instanceof ApiError) {
+          if (error.status === 409) {
+            setServerError("An account with this email already exists.");
+          } else {
+            setServerError("An error occurred. Please try again.");
+          }
+        } else {
+          setServerError("An error occurred. Please try again.");
+        }
       } finally {
         setIsSubmitting(false);
       }
@@ -123,6 +123,14 @@ const RegisterForm = () => {
               Enter your details below to create your account
             </p>
 
+            {serverError && (
+              <div className="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 dark:border-red-800 dark:bg-red-950">
+                <p className="text-sm font-medium text-red-900 dark:text-red-100">
+                  {serverError}
+                </p>
+              </div>
+            )}
+
             <form className="register-form" onSubmit={handleSubmit}>
               <Input
                 label="Name"
@@ -133,8 +141,6 @@ const RegisterForm = () => {
                 onChange={handleChange}
                 error={errors.name}
               />
-
-              {serverError && <p className="input-error">{serverError}</p>}
 
               <Input
                 label="Email"

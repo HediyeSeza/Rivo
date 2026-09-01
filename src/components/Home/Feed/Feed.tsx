@@ -4,14 +4,11 @@ import PostCard from "../PostCard/PostCard";
 import CreatePost from "../CreatePost/CreatePost";
 import Loading from "../../loading/Loading";
 import ActionModal from "../../common/Modal/ActionModal/ActionModal";
+import ErrorScreen from "../../common/ErrorScreen/ErrorScreen";
 
 import { useAuth } from "../../../context/AuthContext";
 
-import {
-  deletePost,
-  getPosts,
-  type Post,
-} from "../../../services/postApi";
+import { deletePost, getPosts, type Post } from "../../../services/postApi";
 
 import { getUserById } from "../../../services/userApi";
 import { getUsernameFromEmail } from "../../../utils/getUsernameFromEmail";
@@ -46,18 +43,15 @@ const Feed = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
-  const [likeToast, setLikeToast] =
-    useState<ToastState | null>(null);
+  const [likeToast, setLikeToast] = useState<ToastState | null>(null);
 
-  const [commentToast, setCommentToast] =
-    useState<ToastState | null>(null);
+  const [commentToast, setCommentToast] = useState<ToastState | null>(null);
 
   // -----------------------------------------
   // Delete confirmation
   // -----------------------------------------
 
-  const [deletePostId, setDeletePostId] =
-    useState<string | null>(null);
+  const [deletePostId, setDeletePostId] = useState<string | null>(null);
 
   const fetchPosts = async (showLoading = true) => {
     try {
@@ -70,59 +64,42 @@ const Feed = () => {
       const postsData = await getPosts();
 
       const uniqueAuthorIds = [
-        ...new Set(
-          postsData.map((post) => post.authorId),
-        ),
+        ...new Set(postsData.map((post) => post.authorId)),
       ];
 
       const users = await Promise.all(
-        uniqueAuthorIds.map((id) =>
-          getUserById(id),
-        ),
+        uniqueAuthorIds.map((id) => getUserById(id)),
       );
 
-      const usersMap = new Map(
-        users.map((user) => [
-          user.id,
-          user,
-        ]),
-      );
+      const usersMap = new Map(users.map((user) => [user.id, user]));
 
-      const postsWithAuthors: PostWithAuthor[] =
-        postsData.flatMap((post) => {
-          const author = usersMap.get(
-            post.authorId,
-          );
+      const postsWithAuthors: PostWithAuthor[] = postsData.flatMap((post) => {
+        const author = usersMap.get(post.authorId);
 
-          if (!author) {
-            return [];
-          }
+        if (!author) {
+          return [];
+        }
 
-          return [
-            {
-              ...post,
-              author: {
-                id: author.id,
-                name: author.name,
-                email: author.email,
-                image: author.image ?? null,
-                avatar: author.avatar ?? null,
-              },
+        return [
+          {
+            ...post,
+            author: {
+              id: author.id,
+              name: author.name,
+              email: author.email,
+              image: author.image ?? null,
+              avatar: author.avatar ?? null,
             },
-          ];
-        });
+          },
+        ];
+      });
 
       setPosts(postsWithAuthors);
     } catch (error) {
-      console.error(
-        "Failed to load posts:",
-        error,
-      );
+      console.error("Failed to load posts:", error);
 
       setError(
-        error instanceof Error
-          ? error.message
-          : "Failed to load posts.",
+        error instanceof Error ? error.message : "Failed to load posts.",
       );
     } finally {
       if (showLoading) {
@@ -140,9 +117,7 @@ const Feed = () => {
   // -----------------------------------------
 
   const handlePostCreated = async () => {
-    setSuccessMessage(
-      "Post created successfully",
-    );
+    setSuccessMessage("Post created successfully");
 
     setShowSuccess(true);
 
@@ -161,16 +136,11 @@ const Feed = () => {
   // Comment added
   // -----------------------------------------
 
-  const handleCommentAdded = async (
-    postId: string,
-  ) => {
+  const handleCommentAdded = async (postId: string) => {
     try {
       await fetchPosts(false);
     } catch (error) {
-      console.error(
-        `Failed to refresh post ${postId}:`,
-        error,
-      );
+      console.error(`Failed to refresh post ${postId}:`, error);
     }
   };
 
@@ -178,19 +148,13 @@ const Feed = () => {
   // Like message
   // -----------------------------------------
 
-  const handleLikeMessage = (
-    message: string,
-  ) => {
-    const isError = message
-      .toLowerCase()
-      .includes("failed");
+  const handleLikeMessage = (message: string) => {
+    const isError = message.toLowerCase().includes("failed");
 
     setLikeToast({
       id: Date.now(),
       message,
-      type: isError
-        ? "error"
-        : "success",
+      type: isError ? "error" : "success",
     });
   };
 
@@ -198,19 +162,13 @@ const Feed = () => {
   // Comment message
   // -----------------------------------------
 
-  const handleCommentMessage = (
-    message: string,
-  ) => {
-    const isError = message
-      .toLowerCase()
-      .includes("failed");
+  const handleCommentMessage = (message: string) => {
+    const isError = message.toLowerCase().includes("failed");
 
     setCommentToast({
       id: Date.now(),
       message,
-      type: isError
-        ? "error"
-        : "success",
+      type: isError ? "error" : "success",
     });
   };
 
@@ -237,30 +195,21 @@ const Feed = () => {
       await deletePost(postId);
 
       setPosts((currentPosts) =>
-        currentPosts.filter(
-          (post) => post.id !== postId,
-        ),
+        currentPosts.filter((post) => post.id !== postId),
       );
 
       setDeletePostId(null);
 
-      setSuccessMessage(
-        "Post deleted successfully",
-      );
+      setSuccessMessage("Post deleted successfully");
 
       setShowSuccess(true);
     } catch (error) {
-      console.error(
-        "Failed to delete post:",
-        error,
-      );
+      console.error("Failed to delete post:", error);
 
       setDeletePostId(null);
 
       setError(
-        error instanceof Error
-          ? error.message
-          : "Failed to delete post.",
+        error instanceof Error ? error.message : "Failed to delete post.",
       );
     }
   };
@@ -278,21 +227,7 @@ const Feed = () => {
   // -----------------------------------------
 
   if (error) {
-    return (
-      <section className="w-full">
-        <div className="mx-auto w-full">
-          <p
-            className="
-              text-center
-              text-sm
-              text-[var(--color-content-secondary)]
-            "
-          >
-            {error}
-          </p>
-        </div>
-      </section>
-    );
+    return <ErrorScreen onRetry={() => fetchPosts(true)} />;
   }
 
   return (
@@ -304,9 +239,7 @@ const Feed = () => {
           key={likeToast.id}
           message={likeToast.message}
           type={likeToast.type}
-          onDone={() =>
-            setLikeToast(null)
-          }
+          onDone={() => setLikeToast(null)}
         />
       )}
 
@@ -315,9 +248,7 @@ const Feed = () => {
           key={commentToast.id}
           message={commentToast.message}
           type={commentToast.type}
-          onDone={() =>
-            setCommentToast(null)
-          }
+          onDone={() => setCommentToast(null)}
         />
       )}
 
@@ -343,15 +274,13 @@ const Feed = () => {
         <ActionModal
           isOpen={showSuccess}
           variant={
-            successMessage ===
-            "Post deleted successfully"
+            successMessage === "Post deleted successfully"
               ? "danger"
               : "success"
           }
           title={successMessage}
           description={
-            successMessage ===
-            "Post created successfully"
+            successMessage === "Post created successfully"
               ? "Your post has been published and is now visible to others."
               : "Your post has been deleted successfully."
           }
@@ -362,9 +291,7 @@ const Feed = () => {
 
         {/* Create Post */}
 
-        <CreatePost
-          onPostCreated={handlePostCreated}
-        />
+        <CreatePost onPostCreated={handlePostCreated} />
 
         {/* Posts */}
 
@@ -384,50 +311,24 @@ const Feed = () => {
               <PostCard
                 key={post.id}
                 postId={post.id}
-                authorId={
-                  post.author?.id ??
-                  post.authorId
-                }
-                name={
-                  post.author?.name ??
-                  "User"
-                }
-                username={getUsernameFromEmail(
-                  post.author?.email ?? "",
-                )}
+                authorId={post.author?.id ?? post.authorId}
+                name={post.author?.name ?? "User"}
+                username={getUsernameFromEmail(post.author?.email ?? "")}
                 createdAt={post.createdAt}
                 content={post.content}
                 image={post.image ?? undefined}
                 likes={post._count?.likes ?? 0}
                 comments={post._count?.comments ?? 0}
-                avatar={
-                  post.author?.image ??
-                  undefined
-                }
-                likesData={
-                  post.likes ?? []
-                }
-                commentsData={
-                  post.comments ?? []
-                }
-                showDelete={
-                  post.author?.id ===
-                  user?.id
-                }
+                avatar={post.author?.image ?? undefined}
+                likesData={post.likes ?? []}
+                commentsData={post.comments ?? []}
+                showDelete={post.author?.id === user?.id}
                 onDelete={() => {
-                  handleDeletePost(
-                    post.id,
-                  );
+                  handleDeletePost(post.id);
                 }}
-                onLikeMessage={
-                  handleLikeMessage
-                }
-                onCommentAdded={
-                  handleCommentAdded
-                }
-                onCommentMessage={
-                  handleCommentMessage
-                }
+                onLikeMessage={handleLikeMessage}
+                onCommentAdded={handleCommentAdded}
+                onCommentMessage={handleCommentMessage}
               />
             ))}
           </div>
