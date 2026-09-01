@@ -598,19 +598,17 @@ const ProfileCard = ({
               "
             >
               <FollowUserButton
-                userId={user.id}
-                initialFollowing={
-                  isFollowing
-                }
-                onFollowChange={(
-                  _userId,
-                  nextFollowing,
-                ) => {
-                  setIsFollowing(
-                    nextFollowing,
-                  );
-                }}
-              />
+  userId={user.id}
+  initialFollowing={isFollowing}
+  isFollower={false}
+  disabled={isFollowStatusLoading}
+  onFollowChange={(
+    _userId,
+    nextFollowing,
+  ) => {
+    setIsFollowing(nextFollowing);
+  }}
+/>
             </div>
           )}
         </div>

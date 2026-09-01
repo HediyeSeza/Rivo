@@ -8,6 +8,7 @@ interface FollowUserButtonProps {
   userId: string;
   initialFollowing?: boolean;
   isFollower?: boolean;
+  disabled?: boolean;
   onFollowChange?: (
     userId: string,
     isFollowing: boolean,
@@ -18,6 +19,7 @@ const FollowUserButton = ({
   userId,
   initialFollowing = false,
   isFollower = false,
+  disabled = false,
   onFollowChange,
 }: FollowUserButtonProps) => {
   const [isFollowing, setIsFollowing] =
@@ -33,7 +35,7 @@ const FollowUserButton = ({
   }, [initialFollowing]);
 
   const handleToggleFollow = async () => {
-    if (isLoading) {
+    if (isLoading || disabled) {
       return;
     }
 
@@ -66,6 +68,9 @@ const FollowUserButton = ({
     }
   };
 
+  const isButtonDisabled =
+    isLoading || disabled;
+
   return (
     <Button
       type="button"
@@ -75,7 +80,7 @@ const FollowUserButton = ({
           : "primary"
       }
       onClick={handleToggleFollow}
-      disabled={isLoading}
+      disabled={isButtonDisabled}
       className="
         w-full
         min-w-[88px]

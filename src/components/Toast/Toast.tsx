@@ -1,26 +1,32 @@
 import { useEffect, useState } from "react";
 
+import { createPortal } from "react-dom";
+
 interface ToastProps {
   message: string;
   duration?: number;
+  type?: "success" | "error";
   onDone?: () => void;
 }
 
 const Toast = ({
   message,
   duration = 5000,
+  type = "success",
   onDone,
 }: ToastProps) => {
   const [isLeaving, setIsLeaving] = useState(false);
 
+  const isSuccess = type === "success";
+
   useEffect(() => {
     const leaveTimer = window.setTimeout(() => {
       setIsLeaving(true);
-    }, duration);
+    }, Math.max(0, duration - 250));
 
     const removeTimer = window.setTimeout(() => {
       onDone?.();
-    }, duration + 250);
+    }, duration);
 
     return () => {
       window.clearTimeout(leaveTimer);
@@ -28,257 +34,133 @@ const Toast = ({
     };
   }, [duration, onDone]);
 
-  return (
-    <>
-{/* =====================================================
-    DESKTOP / TABLET
-    ===================================================== */}
-<div
-  role="status"
-  aria-live="polite"
-  className="
-    fixed
-    inset-0
-    z-[100]
-    hidden
-    items-center
-    justify-center
-    bg-black/55
-    px-4
-    py-6
-    backdrop-blur-[2px]
-    md:flex
-  "
->
-  <div
-    className={`
-      relative
-      w-full
-      max-w-[380px]
-      rounded-[20px]
-      border
-      border-[var(--color-border)]
-      bg-[var(--color-card)]
-      px-6
-      py-10
-      shadow-2xl
-      sm:px-10
-      sm:py-12
-      ${isLeaving ? "toast-desktop-exit" : "toast-desktop-enter"}
-    `}
-  >
-    {/* Close */}
-    <button
-      type="button"
-      onClick={onDone}
-      aria-label="Close"
+  const colorClasses = isSuccess
+    ? {
+        border: "border-green-500/25",
+        iconBorder: "border-green-500/30",
+        background: "bg-green-500/10",
+        icon: "text-green-600",
+        shadow:
+          "shadow-[0_8px_30px_rgba(0,0,0,0.12),0_0_18px_rgba(34,197,94,0.12)]",
+        darkShadow:
+          "dark:shadow-[0_8px_30px_rgba(0,0,0,0.4),0_0_20px_rgba(34,197,94,0.16)]",
+      }
+    : {
+        border: "border-red-500/25",
+        iconBorder: "border-red-500/30",
+        background: "bg-red-500/10",
+        icon: "text-red-500",
+        shadow:
+          "shadow-[0_8px_30px_rgba(0,0,0,0.12),0_0_18px_rgba(239,68,68,0.12)]",
+        darkShadow:
+          "dark:shadow-[0_8px_30px_rgba(0,0,0,0.4),0_0_20px_rgba(239,68,68,0.16)]",
+      };
+
+  const toast = (
+    <div
+      role="status"
+      aria-live="polite"
       className="
-        absolute
-        right-5
-        top-5
+        fixed
+        inset-x-0
+        top-3
+        z-[9999]
         flex
-        h-8
-        w-8
-        cursor-pointer
-        items-center
         justify-center
-        rounded-full
-        text-[20px]
-        font-medium
-        text-[var(--color-content-secondary)]
-        transition-colors
-        hover:bg-[var(--color-background-secondary)]
-        hover:text-[var(--color-content-primary)]
+        px-4
+        pointer-events-none
+        translate-x-[105px]
       "
     >
-      ×
-    </button>
-
-    {/* Icon */}
-    <div className="mb-7 flex justify-center">
       <div
-        className="
+        className={`
+          pointer-events-auto
           relative
           flex
-          h-[100px]
-          w-[100px]
+          w-fit
+          min-w-[260px]
+          max-w-[calc(100vw-32px)]
           items-center
-          justify-center
-          rounded-full
+          rounded-[12px]
           border
-          border-green-500/30
-          bg-green-500/10
-          text-[var(--color-content-primary)]
-          shadow-[0_0_30px_rgba(34,197,94,0.18)]
-        "
-      >
-        <span
-          className="
-            pointer-events-none
-            absolute
-            inset-[-8px]
-            rounded-full
-            bg-green-500/10
-            blur-[10px]
-          "
-        />
-
-        <span
-          className="
-            pointer-events-none
-            absolute
-            inset-0
-            rounded-full
-            border
-            border-green-500/30
-          "
-        />
-
-        <svg
-          width="40"
-          height="40"
-          viewBox="0 0 24 24"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden="true"
-        >
-          <path
-            d="M5 12.5L9.5 17L19 7.5"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </div>
-    </div>
-
-    {/* Message */}
-    <div className="text-center">
-     <h2
-  className="
-    text-[18px]
-    font-semibold
-    leading-6
-    text-[var(--color-content-primary)]
-    sm:text-[19px]
-  "
->
-  {message}
-</h2>
-    </div>
-
-    {/* Action Button */}
-    <button
-      type="button"
-      onClick={onDone}
-      className="
-        mt-8
-        flex
-        h-14
-        w-full
-        cursor-pointer
-        items-center
-        justify-center
-        rounded-[10px]
-        bg-black
-        text-[16px]
-        font-semibold
-        text-white
-        transition-all
-        duration-200
-        hover:opacity-90
-        active:scale-[0.99]
-        dark:bg-white
-        dark:text-black
-      "
-    >
-      Awesome!
-    </button>
-  </div>
-</div>
-
-      {/* =====================================================
-          MOBILE
-          ===================================================== */}
-      <div
-        role="status"
-        aria-live="polite"
-        className={`
-          fixed
-          top-5
-          left-1/2
-          z-[100]
-          flex
-          w-[calc(100%-32px)]
-          max-w-[420px]
-          -translate-x-1/2
-          items-center
-          rounded-[14px]
-          border
-          border-[var(--color-border)]
           bg-[var(--color-card)]
           px-3
           py-2.5
           text-[var(--color-content-primary)]
-          shadow-[0_8px_30px_rgba(0,0,0,0.08),0_0_18px_rgba(34,197,94,0.12)]
           backdrop-blur-md
-          dark:shadow-[0_8px_30px_rgba(0,0,0,0.4),0_0_20px_rgba(34,197,94,0.16)]
-          md:hidden
+          ${colorClasses.border}
+          ${colorClasses.shadow}
+          ${colorClasses.darkShadow}
           ${isLeaving ? "toast-exit" : "toast-enter"}
         `}
       >
-        {/* Green Glow Border */}
+        {/* Colored Border */}
         <span
-          className="
+          className={`
             pointer-events-none
             absolute
-            inset-[-2px]
-            rounded-[14px]
+            inset-[-1px]
+            rounded-[12px]
             border
-            border-green-500/25
-          "
+            ${colorClasses.border}
+          `}
         />
 
         {/* Icon */}
         <span
-          className="
+          className={`
             relative
             z-10
             flex
-            h-8
-            w-8
+            h-7
+            w-7
             shrink-0
             items-center
             justify-center
             rounded-full
             border
-            border-green-500/30
-            bg-green-500/10
-            text-[var(--color-content-primary)]
-            shadow-[0_0_18px_rgba(34,197,94,0.16)]
-          "
+            ${colorClasses.iconBorder}
+            ${colorClasses.background}
+            ${colorClasses.icon}
+          `}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="h-4 w-4"
-            aria-hidden="true"
-          >
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
+          {isSuccess ? (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-3.5 w-3.5"
+              aria-hidden="true"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          ) : (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-3.5 w-3.5"
+              aria-hidden="true"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          )}
         </span>
 
         {/* Divider */}
         <span
           className="
-            mx-2.5
-            h-7
+            mx-2
+            h-6
             w-px
             shrink-0
             bg-[var(--color-border)]
@@ -291,10 +173,8 @@ const Toast = ({
             relative
             z-10
             min-w-0
-            flex-1
-            truncate
             text-left
-            text-[13px]
+            text-[12px]
             font-semibold
             leading-5
             text-[var(--color-content-primary)]
@@ -316,20 +196,24 @@ const Toast = ({
             h-7
             w-7
             shrink-0
+            cursor-pointer
             items-center
             justify-center
             rounded-full
-            text-[18px]
+            text-[16px]
             text-[var(--color-content-secondary)]
             transition-colors
             hover:bg-[var(--color-background-secondary)]
+            hover:text-[var(--color-content-primary)]
           "
         >
           ×
         </button>
       </div>
-    </>
+    </div>
   );
+
+  return createPortal(toast, document.body);
 };
 
 export default Toast;
