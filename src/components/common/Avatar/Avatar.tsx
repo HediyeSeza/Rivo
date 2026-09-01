@@ -7,7 +7,7 @@ interface AvatarProps {
   className?: string;
 }
 
-const CDN_BASE = "https://79gcelddzk.ucarecd.net";
+const CDN_BASE = "https://1p5nep1spk.ucarecd.net";
 
 const UUID_PATTERN =
   /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;

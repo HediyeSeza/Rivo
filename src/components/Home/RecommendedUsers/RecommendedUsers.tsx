@@ -9,7 +9,7 @@ import type { User } from "../../../types/user";
 import { getRecommendedUsers } from "../../../services/userApi";
 
 const CDN_BASE =
-  "https://79gcelddzk.ucarecd.net";
+  "https://1p5nep1spk.ucarecd.net";
 
 const resolveAvatarUrl = (
   image: string | null | undefined,
