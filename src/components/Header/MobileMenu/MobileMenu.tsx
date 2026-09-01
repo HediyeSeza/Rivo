@@ -15,16 +15,14 @@ interface MobileMenuProps {
   onClose: () => void;
 }
 
-const MobileMenu = ({
-  isOpen,
-  onClose,
-}: MobileMenuProps) => {
+const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
   const navigate = useNavigate();
 
   const { signOut, isAuthenticated } = useAuth();
 
-  const [showLogoutModal, setShowLogoutModal] =
-    useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -44,12 +42,15 @@ const MobileMenu = ({
   };
 
   const handleLogoutConfirm = async () => {
-    setShowLogoutModal(false);
-    onClose();
-
-    await signOut();
-
-    navigate("/login");
+    setIsLoggingOut(true);
+    try {
+      onClose();
+      await signOut();
+      navigate("/login");
+    } finally {
+      setShowLogoutModal(false);
+      setIsLoggingOut(false);
+    }
   };
 
   return (
@@ -60,18 +61,14 @@ const MobileMenu = ({
         <div
           onClick={onClose}
           className={`absolute inset-0 bg-black/50 transition-opacity duration-300 ${
-            isOpen
-              ? "pointer-events-auto opacity-100"
-              : "opacity-0"
+            isOpen ? "pointer-events-auto opacity-100" : "opacity-0"
           }`}
         />
 
         {/* Menu */}
         <div
           className={`pointer-events-auto absolute right-0 top-0 z-10 h-[100rem] w-[75%] bg-white px-5 py-6 transition-transform duration-300 ease-in-out dark:bg-black ${
-            isOpen
-              ? "translate-x-0"
-              : "translate-x-full"
+            isOpen ? "translate-x-0" : "translate-x-full"
           }`}
         >
           {/* Menu Header */}
@@ -109,19 +106,10 @@ const MobileMenu = ({
               type="button"
               className="w-full"
               variant="secondary"
-              icon={
-                <Icon
-                  name="Home"
-                  size={18}
-                />
-              }
-              onClick={() =>
-                handleNavigate("/")
-              }
+              icon={<Icon name="Home" size={18} />}
+              onClick={() => handleNavigate("/")}
             >
-              <span className="text-[16px] font-normal">
-                Home
-              </span>
+              <span className="text-[16px] font-normal">Home</span>
             </Button>
 
             {isAuthenticated && (
@@ -131,21 +119,10 @@ const MobileMenu = ({
                   type="button"
                   className="w-full"
                   variant="secondary"
-                  icon={
-                    <Icon
-                      name="notif"
-                      size={18}
-                    />
-                  }
-                  onClick={() =>
-                    handleNavigate(
-                      "/notifications",
-                    )
-                  }
+                  icon={<Icon name="notif" size={18} />}
+                  onClick={() => handleNavigate("/notifications")}
                 >
-                  <span className="text-[16px] font-normal">
-                    Notifications
-                  </span>
+                  <span className="text-[16px] font-normal">Notifications</span>
                 </Button>
 
                 {/* Profile */}
@@ -153,19 +130,10 @@ const MobileMenu = ({
                   type="button"
                   className="w-full"
                   variant="secondary"
-                  icon={
-                    <Icon
-                      name="Person"
-                      size={18}
-                    />
-                  }
-                  onClick={() =>
-                    handleNavigate("/profile")
-                  }
+                  icon={<Icon name="Person" size={18} />}
+                  onClick={() => handleNavigate("/profile")}
                 >
-                  <span className="text-[16px] font-normal">
-                    Profile
-                  </span>
+                  <span className="text-[16px] font-normal">Profile</span>
                 </Button>
               </>
             )}
@@ -176,12 +144,7 @@ const MobileMenu = ({
                 type="button"
                 className="w-full"
                 variant="secondary"
-                icon={
-                  <Icon
-                    name="Logout"
-                    size={18}
-                  />
-                }
+                icon={<Icon name="Logout" size={18} />}
                 onClick={handleLogoutClick}
                 aria-label="Log out"
               >
@@ -192,9 +155,7 @@ const MobileMenu = ({
                 type="button"
                 className="w-full"
                 variant="primary"
-                onClick={() =>
-                  handleNavigate("/login")
-                }
+                onClick={() => handleNavigate("/login")}
               >
                 Sign in
               </Button>
@@ -209,6 +170,7 @@ const MobileMenu = ({
           title="Log out?"
           message="Are you sure you want to log out?"
           confirmLabel="Log out"
+          isLoading={isLoggingOut}
           onCancel={handleLogoutCancel}
           onConfirm={handleLogoutConfirm}
         />

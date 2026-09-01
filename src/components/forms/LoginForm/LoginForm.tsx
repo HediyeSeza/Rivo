@@ -72,11 +72,11 @@ const LoginForm = () => {
         signIn(result.user, result.token);
         navigate("/");
       } catch (error) {
-        setServerError(
-          error instanceof ApiError && [401, 404].includes(error.status)
-            ? "This account does not exist or the password is incorrect."
-            : "Unable to log in. Please try again.",
-        );
+        if (error instanceof ApiError && [401, 404].includes(error.status)) {
+          setServerError("Email or password is incorrect.");
+        } else {
+          setServerError("An error occurred. Please try again.");
+        }
       } finally {
         setIsSubmitting(false);
       }
@@ -111,6 +111,14 @@ const LoginForm = () => {
               Login to your Socially account
             </p>
 
+            {serverError && (
+              <div className="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 dark:border-red-800 dark:bg-red-950">
+                <p className="text-sm font-medium text-red-900 dark:text-red-100">
+                  {serverError}
+                </p>
+              </div>
+            )}
+
             <form className="login-form" onSubmit={handleSubmit}>
               <Input
                 label="Email"
@@ -121,8 +129,6 @@ const LoginForm = () => {
                 onChange={handleChange}
                 error={errors.email}
               />
-
-              {serverError && <p className="input-error">{serverError}</p>}
 
               <Input
                 label="Password"

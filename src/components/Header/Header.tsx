@@ -23,6 +23,8 @@ function Header() {
 
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
   const { theme, toggleTheme } = useTheme();
 
   const { signOut, isAuthenticated } = useAuth();
@@ -89,8 +91,13 @@ function Header() {
   };
 
   const handleLogoutConfirm = async () => {
-    setShowLogoutModal(false);
-    await handleSignOut();
+    setIsLoggingOut(true);
+    try {
+      await handleSignOut();
+    } finally {
+      setShowLogoutModal(false);
+      setIsLoggingOut(false);
+    }
   };
 
   return (
@@ -321,6 +328,7 @@ function Header() {
           title="Log out?"
           message="Are you sure you want to log out?"
           confirmLabel="Log out"
+          isLoading={isLoggingOut}
           onCancel={() => setShowLogoutModal(false)}
           onConfirm={handleLogoutConfirm}
         />
