@@ -8,10 +8,7 @@ import EmptyState from "../../components/common/EmptyState/EmptyState";
 
 import Loading from "../../components/loading/Loading";
 
-import {
-  getUserFollowings,
-  searchUsers,
-} from "../../services/userApi";
+import { getUserFollowings, searchUsers } from "../../services/userApi";
 
 import { useAuth } from "../../context/AuthContext";
 
@@ -28,14 +25,11 @@ const Search = () => {
   const [users, setUsers] = useState<User[]>([]);
 
   // IDs of users that the current user is already following
-  const [followingIds, setFollowingIds] =
-    useState<string[]>([]);
+  const [followingIds, setFollowingIds] = useState<string[]>([]);
 
-  const [isLoading, setIsLoading] =
-    useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [error, setError] =
-    useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // -----------------------------------------
   // Load current user's following list
@@ -48,20 +42,13 @@ const Search = () => {
       }
 
       try {
-        const followingUsers =
-          await getUserFollowings(authUser.id);
+        const followingUsers = await getUserFollowings(authUser.id);
 
         setFollowingIds(
-          followingUsers.map(
-            (followingUser) =>
-              followingUser.id,
-          ),
+          followingUsers.map((followingUser) => followingUser.id),
         );
       } catch (error) {
-        console.error(
-          "Failed to load following users:",
-          error,
-        );
+        console.error("Failed to load following users:", error);
 
         setFollowingIds([]);
       }
@@ -86,45 +73,38 @@ const Search = () => {
 
     let isCancelled = false;
 
-    const timeoutId = window.setTimeout(
-      async () => {
-        try {
-          setIsLoading(true);
-          setError(null);
+    const timeoutId = window.setTimeout(async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
 
-          const results =
-            await searchUsers(trimmedQuery);
+        const results = await searchUsers(trimmedQuery);
 
-          if (isCancelled) {
-            return;
-          }
-
-          setUsers(results);
-        } catch (error) {
-          if (isCancelled) {
-            return;
-          }
-
-          console.error(
-            "Failed to search users:",
-            error,
-          );
-
-          setUsers([]);
-
-          setError(
-            error instanceof Error
-              ? error.message
-              : "Something went wrong while searching.",
-          );
-        } finally {
-          if (!isCancelled) {
-            setIsLoading(false);
-          }
+        if (isCancelled) {
+          return;
         }
-      },
-      400,
-    );
+
+        setUsers(results);
+      } catch (error) {
+        if (isCancelled) {
+          return;
+        }
+
+        console.error("Failed to search users:", error);
+
+        setUsers([]);
+
+        setError(
+          error instanceof Error
+            ? error.message
+            : "Something went wrong while searching.",
+        );
+      } finally {
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
+      }
+    }, 400);
 
     return () => {
       isCancelled = true;
@@ -164,9 +144,7 @@ const Search = () => {
                 {isLoading
                   ? "Searching..."
                   : `${users.length} ${
-                      users.length === 1
-                        ? "user"
-                        : "users"
+                      users.length === 1 ? "user" : "users"
                     } found`}
               </p>
             </div>
@@ -206,28 +184,24 @@ const Search = () => {
             )}
 
             {/* Empty Search */}
-            {!isLoading &&
-              !error &&
-              users.length === 0 && (
-                <EmptyState
-                  variant="search"
-                  title="No users found"
-                  description={`We couldn't find any users matching "${query}".`}
-                />
-              )}
+            {!isLoading && !error && users.length === 0 && (
+              <EmptyState
+                variant="search"
+                title="No users found"
+                description={`We couldn't find any users matching "${query}".`}
+              />
+            )}
 
             {/* Results */}
-            {!isLoading &&
-              !error &&
-              users.length > 0 && (
-                <SearchResults
-                  users={users}
-                  query={query}
-                  followingIds={followingIds}
-                  isLoading={false}
-                  error={null}
-                />
-              )}
+            {!isLoading && !error && users.length > 0 && (
+              <SearchResults
+                users={users}
+                query={query}
+                followingIds={followingIds}
+                isLoading={false}
+                error={null}
+              />
+            )}
           </section>
         )}
       </div>

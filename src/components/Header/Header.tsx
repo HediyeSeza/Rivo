@@ -144,27 +144,6 @@ function Header() {
           </h1>
         </button>
 
-        {/* Desktop Search */}
-        <div
-          className="
-            mx-auto
-            hidden
-            min-w-0
-            flex-1
-            md:block
-            md:max-w-[420px]
-            lg:max-w-[580px]
-            xl:max-w-[620px]
-            2xl:max-w-[680px]
-          "
-        >
-          <SearchBar
-            value={searchQuery}
-            onChange={handleSearchChange}
-            onClear={handleSearchClear}
-          />
-        </div>
-
         {/* Navigation */}
         <nav
           className="
@@ -177,6 +156,29 @@ function Header() {
             lg:gap-3
           "
         >
+          {/* Desktop Search */}
+          <div
+            className="
+            mx-auto
+            hidden
+            min-w-0
+            lg:min-w-[400px]
+            xl:min-w-[500px]
+            flex-1
+            lg:block
+            md:max-w-[420px]
+            lg:max-w-[580px]
+            xl:max-w-[620px]
+            2xl:max-w-[680px]
+          "
+          >
+            <SearchBar
+              value={searchQuery}
+              onChange={handleSearchChange}
+              onClear={handleSearchClear}
+            />
+          </div>
+
           {/* Mobile Search */}
           <button
             type="button"
@@ -195,7 +197,7 @@ function Header() {
               duration-200
               hover:bg-black/5
               dark:hover:bg-white/5
-              md:hidden
+              lg:hidden
             "
           >
             <Icon name="Search" size={20} />
@@ -238,7 +240,7 @@ function Header() {
           <Button
             className="w-0 md:!hidden"
             variant="primary"
-            icon={<Icon name="Menu" size={18} reverseTheme />}
+            icon={<Icon name="Menu" size={18} reverseTheme className="pl-2" />}
             onClick={() => setIsMenuOpen(true)}
           >
             <span />
