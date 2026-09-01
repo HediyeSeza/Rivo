@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Button from "../../common/Button/Button";
@@ -12,6 +13,7 @@ interface MobileMenuProps {
 const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
   const navigate = useNavigate();
   const { signOut, isAuthenticated } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -19,9 +21,14 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
   };
 
   const handleSignOut = async () => {
-    await signOut();
-    onClose();
-    navigate("/login");
+    setIsLoggingOut(true);
+    try {
+      await signOut();
+      onClose();
+      navigate("/login");
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   return (
@@ -100,6 +107,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
               variant="secondary"
               icon={<Icon name="Logout" size={18} />}
               onClick={handleSignOut}
+              disabled={isLoggingOut}
               aria-label="Log out"
             >
               <span />

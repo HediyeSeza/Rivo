@@ -18,6 +18,7 @@ import { useAuth } from "../../context/AuthContext";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const { theme, toggleTheme } = useTheme();
 
@@ -76,8 +77,13 @@ function Header() {
   };
 
   const handleSignOut = async () => {
-    await signOut();
-    navigate("/login");
+    setIsLoggingOut(true);
+    try {
+      await signOut();
+      navigate("/login");
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   return (
@@ -278,6 +284,7 @@ function Header() {
             variant="pure"
             icon={<Icon name="Logout" size={18} />}
             onClick={handleSignOut}
+            disabled={isLoggingOut}
             aria-label="Log out"
           >
             <span />
